@@ -1,0 +1,168 @@
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Search, Sun, Star } from "lucide-react";
+import { venues } from "@/data/venues";
+import { FilterChips } from "@/components/FilterChips";
+import { SunBadge } from "@/components/SunBadge";
+import { cn } from "@/lib/utils";
+
+const filters = [
+  { id: "all", label: "Alle", emoji: "📍" },
+  { id: "sun-now", label: "Sol nå", emoji: "☀️" },
+  { id: "deal", label: "Tilbud", emoji: "🏷️" },
+  { id: "trending", label: "Trending", emoji: "🔥" },
+  { id: "family", label: "Familie", emoji: "👨‍👩‍👧" },
+];
+
+// Bounding box for Bergen pins → map onto SVG coordinates
+const BOUNDS = { minLat: 60.378, maxLat: 60.408, minLng: 5.305, maxLng: 5.335 };
+
+function project(lat: number, lng: number) {
+  const x = ((lng - BOUNDS.minLng) / (BOUNDS.maxLng - BOUNDS.minLng)) * 100;
+  const y = (1 - (lat - BOUNDS.minLat) / (BOUNDS.maxLat - BOUNDS.minLat)) * 100;
+  return { x: Math.max(6, Math.min(94, x)), y: Math.max(6, Math.min(94, y)) };
+}
+
+const Explore = () => {
+  const [filter, setFilter] = useState("all");
+  const [selectedId, setSelectedId] = useState<string | null>(venues[0].id);
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    let v = venues;
+    if (filter === "sun-now") v = v.filter(x => x.sunStatus === "sun-now");
+    else if (filter === "deal") v = v.filter(x => x.dealText);
+    else if (filter === "trending") v = v.filter(x => x.trending);
+    else if (filter === "family") v = v.filter(x => x.familyFriendly);
+    if (query) v = v.filter(x => (x.name + x.area + x.tags.join(" ")).toLowerCase().includes(query.toLowerCase()));
+    return v;
+  }, [filter, query]);
+
+  const selected = venues.find(v => v.id === selectedId) ?? null;
+
+  return (
+    <div className="relative min-h-screen">
+      {/* Map */}
+      <div className="relative h-[60vh] overflow-hidden bg-gradient-to-br from-ocean/20 via-secondary to-sunset-pink/15">
+        {/* Stylized fjord svg backdrop */}
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+          <defs>
+            <pattern id="grid" width="6" height="6" patternUnits="userSpaceOnUse">
+              <path d="M6 0H0V6" fill="none" stroke="hsl(var(--border))" strokeWidth="0.15" />
+            </pattern>
+            <linearGradient id="water" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stopColor="hsl(var(--ocean) / 0.25)" />
+              <stop offset="1" stopColor="hsl(var(--ocean) / 0.4)" />
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" fill="url(#grid)" />
+          {/* Fjord */}
+          <path d="M0,55 Q20,40 40,52 T80,48 L100,55 L100,100 L0,100 Z" fill="url(#water)" />
+          {/* Land highlight */}
+          <path d="M0,55 Q20,40 40,52 T80,48 L100,55" fill="none" stroke="hsl(var(--primary) / 0.3)" strokeWidth="0.3" />
+        </svg>
+
+        {/* Pins */}
+        {filtered.map((v) => {
+          const { x, y } = project(v.lat, v.lng);
+          const isSun = v.sunStatus === "sun-now";
+          const isSelected = selectedId === v.id;
+          return (
+            <button
+              key={v.id}
+              onClick={() => setSelectedId(v.id)}
+              className="absolute -translate-x-1/2 -translate-y-full tap-scale"
+              style={{ left: `${x}%`, top: `${y}%` }}
+            >
+              <div className={cn(
+                "grid h-9 w-9 place-items-center rounded-full shadow-card transition-all",
+                isSun ? "bg-gradient-to-br from-sun to-primary" : v.trending ? "bg-gradient-to-br from-sunset-pink to-primary" : "bg-night",
+                isSelected && "scale-125 ring-4 ring-white/80",
+              )}>
+                {isSun ? <Sun className="h-4 w-4 text-white" strokeWidth={2.5} /> : <Star className="h-4 w-4 text-white" />}
+              </div>
+              <div className="mx-auto h-2 w-2 -translate-y-1 rotate-45 bg-night/80" />
+            </button>
+          );
+        })}
+
+        {/* Top bar */}
+        <div className="absolute inset-x-0 top-0 z-10 px-5 pt-[max(env(safe-area-inset-top),1rem)]">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="grid h-10 w-10 place-items-center rounded-full glass shadow-soft tap-scale">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <div className="flex flex-1 items-center gap-2 rounded-full glass px-4 py-2.5 shadow-soft">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Søk i Bergen..."
+                className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+          <div className="mt-3">
+            <FilterChips options={filters} active={filter} onChange={setFilter} />
+          </div>
+        </div>
+      </div>
+
+      {/* Selected card sheet */}
+      {selected && (
+        <div className="-mt-10 px-5">
+          <Link to={`/venue/${selected.id}`} key={selected.id} className="block animate-scale-in">
+            <div className="overflow-hidden rounded-3xl bg-card shadow-float">
+              <div className="flex gap-3 p-3">
+                <img src={selected.image} alt={selected.name} className="h-24 w-24 shrink-0 rounded-2xl object-cover" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{selected.category}</span>
+                    <span>·</span>
+                    <span>{selected.area}</span>
+                  </div>
+                  <h3 className="mt-0.5 truncate font-display text-lg font-semibold">{selected.name}</h3>
+                  <div className="mt-1 flex items-center gap-2 text-sm">
+                    <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{selected.rating}</span>
+                    <span className="text-muted-foreground">· {"kr".repeat(selected.priceLevel)}</span>
+                  </div>
+                  <div className="mt-2"><SunBadge status={selected.sunStatus} until={selected.sunUntil} /></div>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
+      )}
+
+      {/* List */}
+      <section className="mt-6 px-5">
+        <h2 className="mb-3 font-display text-xl font-semibold">{filtered.length} steder i nærheten</h2>
+        <div className="space-y-3">
+          {filtered.map((v) => (
+            <button
+              key={v.id}
+              onClick={() => setSelectedId(v.id)}
+              className={cn(
+                "tap-scale flex w-full items-center gap-3 rounded-2xl bg-card p-2.5 text-left shadow-soft transition-all",
+                selectedId === v.id && "ring-2 ring-primary",
+              )}
+            >
+              <img src={v.image} alt={v.name} className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-display text-base font-semibold">{v.name}</div>
+                <div className="truncate text-xs text-muted-foreground">{v.area} · {v.category}</div>
+                <div className="mt-1"><SunBadge status={v.sunStatus} until={v.sunUntil} /></div>
+              </div>
+              <div className="shrink-0 text-right">
+                <div className="inline-flex items-center gap-1 text-sm"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{v.rating}</div>
+                <div className="text-xs text-muted-foreground">{"kr".repeat(v.priceLevel)}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Explore;
