@@ -272,7 +272,7 @@ function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boo
           <h2 className="font-display text-lg font-semibold">Legg til nytt sted</h2>
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
-          Mangler et sted i Bergen? Legg det til så andre kan finne det.
+          Mangler et sted? Legg det til så andre kan finne det.
         </p>
         <div className="mt-5 grid">
           <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
