@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Loader2, MapPin } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { MobileSheet } from "@/components/ui/mobile-sheet";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useVenue } from "@/hooks/useVenue";
 import { useAddContribution } from "@/hooks/useAddContribution";
@@ -83,13 +83,12 @@ export function ContributeFab() {
 
   return (
     <>
-      <Sheet open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
-        <SheetContent side="bottom" className="rounded-t-3xl">
+      <MobileSheet open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
           {!isAuthed ? (
             <div className="py-6 text-center">
-              <SheetHeader>
-                <SheetTitle className="text-center">Logg inn for å bidra</SheetTitle>
-              </SheetHeader>
+              <div className="text-center">
+                <h2 className="font-display text-lg font-semibold">Logg inn for å bidra</h2>
+              </div>
               <p className="mt-2 text-sm text-muted-foreground">
                 Tjen poeng ved å dele sol, ølpriser og bilder.
               </p>
@@ -211,8 +210,7 @@ export function ContributeFab() {
               }}
             />
           )}
-        </SheetContent>
-      </Sheet>
+      </MobileSheet>
     </>
   );
 }
@@ -230,9 +228,9 @@ function VenueAddSuccess({
 }) {
   return (
     <div className="pb-4 text-center">
-      <SheetHeader>
-        <SheetTitle className="text-center">Stedet er lagt til 🎉</SheetTitle>
-      </SheetHeader>
+      <div className="text-center">
+        <h2 className="font-display text-lg font-semibold">Stedet er lagt til 🎉</h2>
+      </div>
       <p className="mt-2 text-sm text-muted-foreground">
         Stedet er lagt til. Gjør det nyttig ved å legge inn bilde, sol eller ølpris.
       </p>
@@ -260,9 +258,9 @@ function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boo
   if (!isOnVenue) {
     return (
       <div className="pb-4">
-        <SheetHeader>
-          <SheetTitle>Legg til nytt sted</SheetTitle>
-        </SheetHeader>
+        <div className="text-center">
+          <h2 className="font-display text-lg font-semibold">Legg til nytt sted</h2>
+        </div>
         <p className="mt-2 text-sm text-muted-foreground">
           Mangler et sted i Bergen? Legg det til så andre kan finne det.
         </p>
@@ -277,9 +275,9 @@ function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boo
   }
   return (
     <div className="pb-4">
-      <SheetHeader>
-        <SheetTitle>Hva vil du dele?</SheetTitle>
-      </SheetHeader>
+      <div className="text-center">
+        <h2 className="font-display text-lg font-semibold">Hva vil du dele?</h2>
+      </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
         <ActionCard emoji="☀️" label="Er det sol?" onClick={() => onPick("sun")} />
         <ActionCard emoji="🍺" label="Ølpris" onClick={() => onPick("beer")} />
@@ -316,9 +314,9 @@ function ActionCard({
 function SunForm({ venueId, onDone }: { venueId?: string; onDone: (s: "sun" | "shade") => void }) {
   return (
     <div className="pb-4">
-      <SheetHeader>
-        <SheetTitle>Hvordan er det akkurat nå?</SheetTitle>
-      </SheetHeader>
+      <div className="text-center">
+        <h2 className="font-display text-lg font-semibold">Hvordan er det akkurat nå?</h2>
+      </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
         <ActionCard emoji="☀️" label="Sol" disabled={!venueId} onClick={() => onDone("sun")} />
         <ActionCard emoji="🌥️" label="Skygge" disabled={!venueId} onClick={() => onDone("shade")} />
@@ -352,9 +350,9 @@ function BeerForm({
   if (!editing && lastPrice != null) {
     return (
       <div className="pb-4">
-        <SheetHeader>
-          <SheetTitle>Billigste pils</SheetTitle>
-        </SheetHeader>
+        <div className="text-center">
+          <h2 className="font-display text-lg font-semibold">Billigste pils</h2>
+        </div>
         <div className="mt-4 rounded-2xl bg-secondary/60 p-4 text-center">
           <div className="text-xs uppercase tracking-widest text-muted-foreground">
             Sist registrerte pris
@@ -375,9 +373,9 @@ function BeerForm({
 
   return (
     <div className="pb-4">
-      <SheetHeader>
-        <SheetTitle>Ny ølpris</SheetTitle>
-      </SheetHeader>
+      <div className="text-center">
+        <h2 className="font-display text-lg font-semibold">Ny ølpris</h2>
+      </div>
       <div className="mt-4 space-y-2">
         <Label>Pris (kr)</Label>
         <Input
@@ -406,9 +404,9 @@ function PhotoForm({ venueId, onDone }: { venueId?: string; onDone: (f: File) =>
   const [file, setFile] = useState<File | null>(null);
   return (
     <div className="pb-4">
-      <SheetHeader>
-        <SheetTitle>Last opp bilde</SheetTitle>
-      </SheetHeader>
+      <div className="text-center">
+        <h2 className="font-display text-lg font-semibold">Last opp bilde</h2>
+      </div>
       <Input
         type="file"
         accept="image/*"
@@ -467,9 +465,9 @@ function VenueForm({
 
   return (
     <div className="pb-4">
-      <SheetHeader>
-        <SheetTitle>Legg til nytt sted</SheetTitle>
-      </SheetHeader>
+      <div className="text-center">
+        <h2 className="font-display text-lg font-semibold">Legg til nytt sted</h2>
+      </div>
       <div className="mt-4 space-y-3">
         <div>
           <Label>Navn</Label>
