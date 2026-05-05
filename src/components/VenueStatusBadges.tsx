@@ -1,9 +1,15 @@
 import { timeAgo } from "@/lib/time";
 import type { VenueContribution } from "@/hooks/useVenueContributions";
+import { cn } from "@/lib/utils";
 
-type Props = { contributions: VenueContribution[] };
+type Props = {
+  contributions: VenueContribution[];
+  onSun?: () => void;
+  onBeer?: () => void;
+  onPhoto?: () => void;
+};
 
-export function VenueStatusBadges({ contributions }: Props) {
+export function VenueStatusBadges({ contributions, onSun, onBeer, onPhoto }: Props) {
   const sun = contributions.find((c) => c.type === "sun_report");
   const beer = contributions
     .filter((c) => c.type === "beer_price")
@@ -20,34 +26,64 @@ export function VenueStatusBadges({ contributions }: Props) {
 
   return (
     <div className="mt-5 grid grid-cols-3 gap-2">
-      <Badge
+      <BadgeButton
         emoji={sunIsSun ? "☀️" : sun ? "🌥️" : "☀️"}
         label={sun ? (sunIsSun ? "Sol" : "Skygge") : "Ingen rapport"}
-        sub={sun ? timeAgo(sun.created_at) : "vær først"}
+        sub={sun ? timeAgo(sun.created_at) : "Rapportér sol"}
         active={!!sun}
+        onClick={onSun}
+        ariaLabel="Rapportér sol-status"
       />
-      <Badge
+      <BadgeButton
         emoji="🍺"
         label={cheapest ? `kr ${cheapest.price}` : "Ingen pris"}
-        sub={cheapest ? timeAgo(cheapest.at) : "del prisen"}
+        sub={cheapest ? "Oppdatert " + timeAgo(cheapest.at) : "Del prisen"}
         active={!!cheapest}
+        onClick={onBeer}
+        ariaLabel="Legg til ølpris"
       />
-      <Badge
+      <BadgeButton
         emoji="📸"
         label={photos.length > 0 ? `${photos.length} bilde${photos.length > 1 ? "r" : ""}` : "Ingen bilder"}
-        sub={photos[0] ? timeAgo(photos[0].created_at) : "del et bilde"}
+        sub={photos[0] ? timeAgo(photos[0].created_at) : "Del et bilde"}
         active={photos.length > 0}
+        onClick={onPhoto}
+        ariaLabel="Last opp bilde"
       />
     </div>
   );
 }
 
-function Badge({ emoji, label, sub, active }: { emoji: string; label: string; sub: string; active: boolean }) {
+function BadgeButton({
+  emoji,
+  label,
+  sub,
+  active,
+  onClick,
+  ariaLabel,
+}: {
+  emoji: string;
+  label: string;
+  sub: string;
+  active: boolean;
+  onClick?: () => void;
+  ariaLabel: string;
+}) {
   return (
-    <div className={`rounded-2xl p-3 text-center ${active ? "bg-card shadow-soft" : "bg-secondary/40"}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className={cn(
+        "tap-scale rounded-2xl p-3 text-center transition-all",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+        "hover:shadow-card active:scale-[0.97]",
+        active ? "bg-card shadow-soft" : "bg-secondary/40 hover:bg-secondary/60",
+      )}
+    >
       <div className="text-xl leading-none">{emoji}</div>
-      <div className={`mt-1 text-sm font-semibold leading-tight ${active ? "" : "text-muted-foreground"}`}>{label}</div>
+      <div className={cn("mt-1 text-sm font-semibold leading-tight", !active && "text-muted-foreground")}>{label}</div>
       <div className="mt-0.5 text-[10px] text-muted-foreground">{sub}</div>
-    </div>
+    </button>
   );
 }
