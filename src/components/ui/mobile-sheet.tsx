@@ -76,7 +76,7 @@ export function MobileSheet({ open, onOpenChange, children, title, className }: 
             maxHeight: maxHeight ? `${maxHeight}px` : "85vh",
           }}
           className={cn(
-            "fixed inset-x-0 z-[71] flex flex-col rounded-t-3xl bg-background shadow-2xl",
+            "fixed inset-x-0 z-[801] flex flex-col rounded-t-3xl bg-background shadow-2xl",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
             "data-[state=closed]:duration-200 data-[state=open]:duration-300",
