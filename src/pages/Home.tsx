@@ -9,6 +9,7 @@ import { FilterChips } from "@/components/FilterChips";
 import { useCity } from "@/context/CityContext";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { useVenuePhotos } from "@/hooks/useVenuePhotos";
+import { useAuthProfile } from "@/hooks/useAuthProfile";
 
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
@@ -20,6 +21,10 @@ const Home = () => {
   const [filter, setFilter] = useState("all");
   const { currentCity } = useCity();
   const { data: allVenues = [], isLoading, error } = useVenues();
+  const { user, profile } = useAuthProfile();
+  const userDisplayName =
+    profile?.username?.trim() || user?.email?.split("@")[0]?.trim() || "Gjest";
+  const userInitials = userDisplayName.slice(0, 2).toUpperCase();
   const venues = useMemo(
     () => allVenues.filter(v => (v.city ?? "Bergen") === currentCity),
     [allVenues, currentCity],
@@ -77,7 +82,7 @@ const Home = () => {
               </div>
             </div>
             <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-full glass-dark text-white tap-scale">
-              <span className="text-xs font-semibold">JS</span>
+              <span className="text-xs font-semibold">{userInitials}</span>
             </Link>
           </div>
 
