@@ -136,12 +136,13 @@ const Explore = () => {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Søk i Bergen..."
+                placeholder={`Søk i ${city}...`}
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 space-y-2">
+            <FilterChips options={cityOptions} active={city} onChange={(id) => setCity(id as "Bergen" | "Oslo")} />
             <FilterChips options={filters} active={filter} onChange={setFilter} />
           </div>
         </div>
