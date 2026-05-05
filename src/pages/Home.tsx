@@ -68,11 +68,11 @@ const Home = () => {
               </span>
               {sunCount} steder med sol akkurat nå
             </div>
-            <h1 className="mt-3 font-display text-[2.6rem] font-semibold leading-[1.05] tracking-tight text-balance">
-              Hvor skal du se<br />
-              <span className="bg-gradient-to-r from-sun via-primary-glow to-sunset-pink bg-clip-text pb-1 text-transparent">solen senke seg?</span>
+            <h1 className="mt-3 font-display text-[2.4rem] font-semibold leading-[1.1] tracking-tight text-balance">
+              Hvor skal du se
+              <span className="mt-1 block bg-gradient-to-r from-sun via-primary-glow to-sunset-pink bg-clip-text pb-2 text-transparent">solen senke seg?</span>
             </h1>
-            <p className="mt-3 max-w-xs text-sm/relaxed opacity-90">
+            <p className="mt-4 max-w-xs text-sm/relaxed opacity-90">
               Oppdag Bergens beste steder akkurat nå — basert på sol, tilbud og stemning.
             </p>
           </div>
