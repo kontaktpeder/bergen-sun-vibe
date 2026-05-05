@@ -70,6 +70,10 @@ export function useVenueBadges(venueIds: string[]) {
           if (Number.isFinite(n) && n > 0) s.beerPrice = n;
         } else if (r.type === "photo") {
           s.photoCount += 1;
+          if (!s.latestPhotoUrl) {
+            const url = (r.data as Record<string, unknown> | null)?.image_url;
+            if (typeof url === "string" && url.length > 0) s.latestPhotoUrl = url;
+          }
         }
 
         out[r.venue_id] = s;
