@@ -43,6 +43,8 @@ const Explore = () => {
     [venues, city],
   );
 
+  const { data: badgeMap = {} } = useVenueBadges(cityVenues.map(v => v.dbId));
+
   useEffect(() => {
     if (cityVenues.length && !cityVenues.find(v => v.id === selectedId)) {
       setSelectedId(cityVenues[0].id);
