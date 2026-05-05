@@ -76,7 +76,7 @@ const Profile = () => {
         <h1 className="mt-3 font-display text-2xl font-semibold">{displayName}</h1>
         <p className="text-sm text-muted-foreground">{user?.email}</p>
 
-        <div className="mt-5 grid grid-cols-3 gap-3">
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {stats.map(({ label, value, icon: Icon }) => (
             <div key={label} className="rounded-2xl bg-card p-4 text-center shadow-soft">
               <Icon className="mx-auto h-4 w-4 text-primary" />
@@ -164,12 +164,14 @@ const Profile = () => {
           ))}
         </div>
 
-        <div className="mt-8 rounded-3xl bg-gradient-to-br from-night to-sunset-purple p-6 text-white shadow-card">
-          <div className="text-xs font-semibold uppercase tracking-widest opacity-80">Uteliv Pro</div>
-          <h3 className="mt-1 font-display text-xl font-semibold">Få sol-alerts før alle andre</h3>
-          <p className="mt-1 text-sm opacity-85">Eksklusive tilbud, push-varsler når sola treffer favorittstedene dine.</p>
-          <button className="tap-scale mt-4 rounded-full bg-sun px-5 py-2.5 text-sm font-semibold text-night">Prøv 7 dager gratis</button>
-        </div>
+        {import.meta.env.VITE_ENABLE_PRO === "true" && (
+          <div className="mt-8 rounded-3xl bg-gradient-to-br from-night to-sunset-purple p-6 text-white shadow-card">
+            <div className="text-xs font-semibold uppercase tracking-widest opacity-80">Uteliv Pro</div>
+            <h3 className="mt-1 font-display text-xl font-semibold">Få sol-alerts før alle andre</h3>
+            <p className="mt-1 text-sm opacity-85">Eksklusive tilbud, push-varsler når sola treffer favorittstedene dine.</p>
+            <button className="tap-scale mt-4 rounded-full bg-sun px-5 py-2.5 text-sm font-semibold text-night">Prøv 7 dager gratis</button>
+          </div>
+        )}
 
         {isAdmin && (
           <Link
