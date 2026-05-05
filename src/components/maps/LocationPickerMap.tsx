@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
+import { useEffect, useMemo, useState } from "react";
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents, CircleMarker } from "react-leaflet";
 import L, { type LatLngLiteral } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Button } from "@/components/ui/button";
-import { MapPin } from "lucide-react";
+import { LocateFixed, MapPin } from "lucide-react";
+import { useUserLocation } from "@/hooks/useUserLocation";
+import { toast } from "sonner";
 
 type Mode = "pick" | "view";
 
@@ -17,7 +19,6 @@ type LocationPickerMapProps = {
   onCancel?: () => void;
 };
 
-// Branded pin icon (matches app's orange/sun palette).
 const pinIcon = L.divIcon({
   className: "venue-picker-marker",
   html: `
@@ -52,6 +53,39 @@ function ClickHandler({
   return null;
 }
 
+function LocateControl({
+  mode,
+  onLocated,
+}: {
+  mode: Mode;
+  onLocated: (lat: number, lng: number) => void;
+}) {
+  const map = useMap();
+  const { location, loading, error, locate } = useUserLocation();
+
+  useEffect(() => {
+    if (!location) return;
+    map.flyTo([location.lat, location.lng], 16, { duration: 0.8 });
+    if (mode === "pick") onLocated(location.lat, location.lng);
+  }, [location, map, mode, onLocated]);
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  return (
+    <button
+      type="button"
+      onClick={locate}
+      disabled={loading}
+      className="absolute bottom-3 right-3 z-[500] inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-2 text-xs font-medium shadow-float backdrop-blur transition-colors disabled:opacity-60"
+    >
+      <LocateFixed className="h-3.5 w-3.5 text-primary" />
+      {loading ? "Finner posisjon..." : "Du er her"}
+    </button>
+  );
+}
+
 export function LocationPickerMap({
   initialLat,
   initialLng,
@@ -64,6 +98,7 @@ export function LocationPickerMap({
   const [draft, setDraft] = useState<{ lat: number; lng: number } | null>(
     selectedLocation ?? null,
   );
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
 
   const center: LatLngLiteral = useMemo(
     () =>
@@ -100,6 +135,20 @@ export function LocationPickerMap({
             onPick={(lat, lng) => setDraft({ lat, lng })}
           />
           {active && <Marker position={[active.lat, active.lng]} icon={pinIcon} />}
+          {userPos && (
+            <CircleMarker
+              center={[userPos.lat, userPos.lng]}
+              radius={7}
+              pathOptions={{ color: "#2563eb", fillColor: "#3b82f6", fillOpacity: 0.8, weight: 2 }}
+            />
+          )}
+          <LocateControl
+            mode={mode}
+            onLocated={(lat, lng) => {
+              setUserPos({ lat, lng });
+              if (mode === "pick") setDraft({ lat, lng });
+            }}
+          />
         </MapContainer>
       </div>
 
