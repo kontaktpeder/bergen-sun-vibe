@@ -103,7 +103,7 @@ const Explore = () => {
 
       {/* Selected card sheet */}
       {selected && (
-        <div className="-mt-10 px-5">
+        <div className="relative z-[600] -mt-10 px-5">
           <Link to={`/venue/${selected.id}`} key={selected.id} className="block animate-scale-in">
             <div className="overflow-hidden rounded-3xl bg-card shadow-float">
               <div className="flex gap-3 p-3">
