@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
 import heroImg from "@/assets/hero-bergen.jpg";
-import { sectionConfig } from "@/lib/domain";
+import { buildSectionConfig, type SectionDef } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
 import { FilterChips } from "@/components/FilterChips";
@@ -30,10 +30,12 @@ const Home = () => {
   const { data: badgeMap = {} } = useVenueBadges(venues.map(v => v.dbId));
   const sunCount = Object.values(badgeMap).filter(b => b.sun === "sunny").length;
 
+  const sectionConfig = useMemo<SectionDef[]>(() => buildSectionConfig(currentCity), [currentCity]);
+
   const filteredSections = useMemo(() => {
     if (filter === "all") return sectionConfig;
-    const map: Record<string, typeof sectionConfig[number]["id"][]> = {
-      sun: ["sun-now", "evening-sun"],
+    const map: Record<string, SectionDef["id"][]> = {
+      sun: ["sun-now"],
       deals: ["cheap-beer"],
       trending: ["trending"],
       family: ["family"],
@@ -42,7 +44,7 @@ const Home = () => {
     };
     const ids = map[filter] || [];
     return sectionConfig.filter(s => ids.includes(s.id));
-  }, [filter]);
+  }, [filter, sectionConfig]);
 
   const featured = venues.find(v => v.id === "bergen-rooftop") ?? venues[0];
 
