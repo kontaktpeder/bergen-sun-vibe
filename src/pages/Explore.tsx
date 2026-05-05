@@ -53,17 +53,6 @@ const Explore = () => {
     return v;
   }, [filter, query, cityVenues]);
 
-  const bounds = useMemo(
-    () => computeBounds(filtered.length ? filtered : cityVenues, CITY_BOUNDS[city]),
-    [filtered, cityVenues, city],
-  );
-
-  function project(lat: number, lng: number) {
-    const x = ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 100;
-    const y = (1 - (lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * 100;
-    return { x: Math.max(10, Math.min(90, x)), y: Math.max(40, Math.min(86, y)) };
-  }
-
   const selected = cityVenues.find(v => v.id === selectedId) ?? null;
 
   return (
