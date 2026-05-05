@@ -464,6 +464,37 @@ function VenueForm({
   }, []);
 
   const hasCoords = lat !== "" && lng !== "";
+  const selectedLocation = hasCoords
+    ? { lat: Number(lat), lng: Number(lng) }
+    : null;
+
+  if (showMapPicker) {
+    // Default center: existing pick, or Bergen city center.
+    const initial = selectedLocation ?? { lat: 60.3913, lng: 5.3221 };
+    return (
+      <div className="pb-4">
+        <div className="text-center">
+          <h2 className="font-display text-lg font-semibold">Velg posisjon på kart</h2>
+        </div>
+        <div className="mt-4">
+          <LocationPickerMap
+            mode="pick"
+            initialLat={initial.lat}
+            initialLng={initial.lng}
+            city="Bergen"
+            selectedLocation={selectedLocation}
+            onCancel={() => setShowMapPicker(false)}
+            onSelectLocation={(la, ln) => {
+              setLat(la.toFixed(6));
+              setLng(ln.toFixed(6));
+              setGeoState("ok");
+              setShowMapPicker(false);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pb-4">
@@ -506,13 +537,20 @@ function VenueForm({
             )}
             {geoState === "idle" && <span className="text-muted-foreground">Ingen posisjon enda</span>}
           </div>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-2">
             <button
               type="button"
               onClick={requestLocation}
               className="text-xs font-medium text-primary underline-offset-2 hover:underline"
             >
               Bruk min posisjon
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowMapPicker(true)}
+              className="text-xs font-medium text-primary underline-offset-2 hover:underline"
+            >
+              🗺️ Velg på kart
             </button>
             <button
               type="button"
