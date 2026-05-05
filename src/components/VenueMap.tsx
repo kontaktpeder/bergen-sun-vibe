@@ -82,7 +82,7 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
     useEffect(() => {
       const v = validVenues.find((x) => x.id === selectedId);
       if (v) map.panTo([v.lat, v.lng], { animate: true });
-    }, [map]);
+    }, [map, selectedId, validVenues]);
     return null;
   }
 

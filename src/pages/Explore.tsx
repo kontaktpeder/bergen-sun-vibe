@@ -1,7 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Search, Star } from "lucide-react";
+import { ArrowLeft, LocateFixed, Search, Star } from "lucide-react";
+import { toast } from "sonner";
 import { useVenues } from "@/hooks/useVenues";
+import { useUserLocation } from "@/hooks/useUserLocation";
 import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
 import { VenueMap } from "@/components/VenueMap";
