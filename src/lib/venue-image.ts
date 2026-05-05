@@ -25,8 +25,8 @@ export function resolveVenueImage(
   userPhotoUrl?: string | null,
   size?: { w?: number; h?: number },
 ): ResolvedVenueImage {
-  if (userPhotoUrl) return { kind: "user", src: userPhotoUrl };
-  if (venue.image) return { kind: "custom", src: venue.image };
+  if (userPhotoUrl && userPhotoUrl.trim().length > 0) return { kind: "user", src: userPhotoUrl };
+  if (venue.image && venue.image.trim().length > 0) return { kind: "custom", src: venue.image };
   const g = googlePlacePhotoUrl(venue.googlePhotoName, size);
   if (g) return { kind: "google", src: g };
   return { kind: "fallback", src: null };
