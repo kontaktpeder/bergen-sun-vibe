@@ -105,24 +105,16 @@ export function ContributeFab() {
                 if (success.venueSlug) navigate(`/venue/${success.venueSlug}`);
               }}
               onAddPhoto={() => {
-                setSuccess(null);
-                setSelectedVenueDbId(success.venueId);
-                setMode("photo");
+                close();
+                if (success.venueSlug) navigate(`/venue/${success.venueSlug}?contribute=photo`);
               }}
               onAddBeer={() => {
-                setSuccess(null);
-                setSelectedVenueDbId(success.venueId);
-                setMode("beer");
+                close();
+                if (success.venueSlug) navigate(`/venue/${success.venueSlug}?contribute=beer`);
               }}
             />
           ) : mode === "menu" ? (
-            <Menu
-              onPick={(m) => setMode(m)}
-              showVenuePicker={!isOnVenue}
-              venues={venues.map((v) => ({ id: v.dbId, name: v.name }))}
-              selectedVenueDbId={selectedVenueDbId}
-              onPickVenue={setSelectedVenueDbId}
-            />
+            <Menu onPick={(m) => setMode(m)} isOnVenue={isOnVenue} />
           ) : mode === "sun" ? (
             <SunForm
               venueId={venueDbId}
