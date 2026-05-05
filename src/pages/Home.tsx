@@ -52,7 +52,7 @@ const Home = () => {
     <div className="pb-8">
       {/* Hero */}
       <header className="relative z-0 h-[580px] overflow-hidden">
-        <img src={heroImg} alt="Bergen ved solnedgang" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={heroImg} alt={`${currentCity} ved solnedgang`} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-night/40 via-night/55 to-night/85" />
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/25 via-transparent to-transparent mix-blend-overlay" />
 
@@ -159,7 +159,7 @@ const Home = () => {
       })}
 
       <div className="mt-12 px-5 text-center">
-        <p className="font-display text-sm italic text-muted-foreground">Laget med ☀️ i Bergen</p>
+        <p className="font-display text-sm italic text-muted-foreground">Laget med ☀️ i {currentCity}</p>
       </div>
     </div>
   );
