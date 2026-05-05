@@ -82,51 +82,28 @@ const Explore = () => {
   return (
     <div className="relative min-h-screen">
       {/* Map */}
-      <div className="relative h-[60vh] overflow-hidden bg-gradient-to-br from-ocean/20 via-secondary to-sunset-pink/15">
-        {/* Stylized fjord svg backdrop */}
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-          <defs>
-            <pattern id="grid" width="6" height="6" patternUnits="userSpaceOnUse">
-              <path d="M6 0H0V6" fill="none" stroke="hsl(var(--border))" strokeWidth="0.15" />
-            </pattern>
-            <linearGradient id="water" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stopColor="hsl(var(--ocean) / 0.25)" />
-              <stop offset="1" stopColor="hsl(var(--ocean) / 0.4)" />
-            </linearGradient>
-          </defs>
-          <rect width="100" height="100" fill="url(#grid)" />
-          {/* Fjord */}
-          <path d="M0,55 Q20,40 40,52 T80,48 L100,55 L100,100 L0,100 Z" fill="url(#water)" />
-          {/* Land highlight */}
-          <path d="M0,55 Q20,40 40,52 T80,48 L100,55" fill="none" stroke="hsl(var(--primary) / 0.3)" strokeWidth="0.3" />
-        </svg>
+      <div className="relative h-[60vh] overflow-hidden bg-secondary">
+        {/* Real Leaflet map */}
+        <div className="absolute inset-0">
+          <VenueMap
+            venues={filtered}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            fallbackCenter={CITY_CENTERS[city]}
+          />
+        </div>
 
-        {/* Pins */}
-        {filtered.map((v) => {
-          const { x, y } = project(v.lat, v.lng);
-          const isSun = v.sunStatus === "sun-now";
-          const isSelected = selectedId === v.id;
-          return (
-            <button
-              key={v.id}
-              onClick={() => setSelectedId(v.id)}
-              className="absolute -translate-x-1/2 -translate-y-full tap-scale"
-              style={{ left: `${x}%`, top: `${y}%` }}
-            >
-              <div className={cn(
-                "grid h-9 w-9 place-items-center rounded-full shadow-card transition-all",
-                isSun ? "bg-gradient-to-br from-sun to-primary" : v.trending ? "bg-gradient-to-br from-sunset-pink to-primary" : "bg-night",
-                isSelected && "scale-125 ring-4 ring-white/80",
-              )}>
-                {isSun ? <Sun className="h-4 w-4 text-white" strokeWidth={2.5} /> : <Star className="h-4 w-4 text-white" />}
-              </div>
-              <div className="mx-auto h-2 w-2 -translate-y-1 rotate-45 bg-night/80" />
-            </button>
-          );
-        })}
+        {/* Empty-state overlay when no venues have coords */}
+        {filtered.length === 0 && !isLoading && (
+          <div className="pointer-events-none absolute inset-0 z-[400] grid place-items-center">
+            <div className="rounded-2xl bg-card/95 px-4 py-3 text-center text-sm shadow-card backdrop-blur">
+              Ingen steder å vise på kartet
+            </div>
+          </div>
+        )}
 
-        {/* Top bar */}
-        <div className="absolute inset-x-0 top-0 z-10 px-5 pt-[max(env(safe-area-inset-top),1rem)]">
+        {/* Top bar — z-[500] to sit above Leaflet panes */}
+        <div className="absolute inset-x-0 top-0 z-[500] px-5 pt-[max(env(safe-area-inset-top),1rem)]">
           <div className="flex items-center gap-3">
             <Link to="/" className="grid h-10 w-10 place-items-center rounded-full glass shadow-soft tap-scale">
               <ArrowLeft className="h-4 w-4" />
