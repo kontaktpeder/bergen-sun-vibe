@@ -82,7 +82,7 @@ export function VenueFallback({ venue, className, compact, showCta = true }: Pro
           type="button"
           onClick={handleCta}
           aria-label="Bidra med bilde"
-          className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full border border-white/30 bg-white/20 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-md transition-colors hover:bg-white/30"
+          className="absolute left-2 bottom-2 z-10 inline-flex items-center gap-1 rounded-full border border-white/30 bg-white/20 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-md transition-colors hover:bg-white/30"
         >
           <ImagePlus className="h-3 w-3" />
           Bilde
