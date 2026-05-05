@@ -90,6 +90,11 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <div className="leaflet-bottom leaflet-right pointer-events-none">
+        <div className="leaflet-control bg-card/80 px-2 py-0.5 text-[10px] text-muted-foreground rounded-tl-md">
+          © OpenStreetMap
+        </div>
+      </div>
       <FitBounds venues={validVenues} />
       <PanToSelected />
       {validVenues.map((v) => (
