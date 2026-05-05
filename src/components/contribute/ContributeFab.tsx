@@ -29,7 +29,8 @@ export function ContributeFab() {
   const [selectedVenueDbId, setSelectedVenueDbId] = useState<string | undefined>(undefined);
   const venueDbId = currentVenue?.dbId ?? selectedVenueDbId;
 
-  const addContribution = useAddContribution(user?.id, profile?.points ?? 0);
+  void profile;
+  const addContribution = useAddContribution(user?.id);
   const { upload } = useUploadImage();
 
   const reset = () => {
@@ -249,8 +250,15 @@ function BeerForm({ venueId, onDone }: { venueId?: string; onDone: (price: numbe
       </div>
       <Button
         className="mt-5 w-full"
-        disabled={!venueId || !price}
-        onClick={() => onDone(Number(price))}
+        disabled={!venueId}
+        onClick={() => {
+          const n = Number(price);
+          if (!Number.isFinite(n) || n <= 0 || n > 1000) {
+            toast.error("Ugyldig pris (1–1000 kr).");
+            return;
+          }
+          onDone(n);
+        }}
       >
         Lagre 🍺
       </Button>
@@ -323,8 +331,15 @@ function VenueForm({
       </div>
       <Button
         className="mt-5 w-full"
-        disabled={!name}
-        onClick={() => onDone({ name, lat: Number(lat), lng: Number(lng), category })}
+        disabled={!name.trim()}
+        onClick={() => {
+          const la = Number(lat);
+          const ln = Number(lng);
+          if (!name.trim()) return toast.error("Navn er påkrevd.");
+          if (!Number.isFinite(la) || la < -90 || la > 90) return toast.error("Ugyldig lat.");
+          if (!Number.isFinite(ln) || ln < -180 || ln > 180) return toast.error("Ugyldig lng.");
+          onDone({ name: name.trim(), lat: la, lng: ln, category });
+        }}
       >
         Legg til 📍
       </Button>
