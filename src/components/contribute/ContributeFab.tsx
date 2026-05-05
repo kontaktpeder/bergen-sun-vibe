@@ -233,20 +233,23 @@ function VenueAddSuccess({
         <h2 className="font-display text-lg font-semibold">Stedet er lagt til 🎉</h2>
       </div>
       <p className="mt-2 text-sm text-muted-foreground">
-        Stedet er lagt til. Gjør det nyttig ved å legge inn bilde, sol eller ølpris.
+        Steder med bilde får langt flere besøk. Legg til ett nå – det tar 10 sekunder.
       </p>
       <div className="mt-5 grid gap-2">
-        {success.venueSlug && (
-          <Button className="w-full" onClick={onSeeVenue}>
-            Se stedet
-          </Button>
-        )}
-        <Button variant="secondary" className="w-full" onClick={onAddPhoto}>
-          📸 Legg til bilde
+        <Button className="w-full" onClick={onAddPhoto}>
+          📸 Legg til bilde nå
         </Button>
         <Button variant="secondary" className="w-full" onClick={onAddBeer}>
           🍺 Legg til ølpris
         </Button>
+        {success.venueSlug && (
+          <button
+            onClick={onSeeVenue}
+            className="mt-1 text-xs font-medium text-muted-foreground underline-offset-2 hover:underline"
+          >
+            Hopp over – se stedet
+          </button>
+        )}
       </div>
     </div>
   );

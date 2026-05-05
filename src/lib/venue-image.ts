@@ -12,24 +12,22 @@ export function googlePlacePhotoUrl(
   return `${FUNCTIONS_BASE}/get-google-place-photo?name=${encodeURIComponent(photoName)}&w=${w}&h=${h}`;
 }
 
-const FALLBACK = "/placeholder.svg";
+export type ResolvedVenueImage =
+  | { kind: "user" | "custom" | "google"; src: string }
+  | { kind: "fallback"; src: null };
 
 /**
  * Resolve image source for a venue.
- * Priority:
- *  1. user-uploaded photo (passed in)
- *  2. venue.image (custom DB image_url)
- *  3. Google Place Photo via edge function
- *  4. placeholder
+ * Priority: user-uploaded → DB image_url → Google Place photo → branded fallback.
  */
 export function resolveVenueImage(
   venue: Pick<Venue, "image" | "googlePhotoName">,
   userPhotoUrl?: string | null,
   size?: { w?: number; h?: number },
-): { src: string; isGoogle: boolean } {
-  if (userPhotoUrl) return { src: userPhotoUrl, isGoogle: false };
-  if (venue.image) return { src: venue.image, isGoogle: false };
+): ResolvedVenueImage {
+  if (userPhotoUrl) return { kind: "user", src: userPhotoUrl };
+  if (venue.image) return { kind: "custom", src: venue.image };
   const g = googlePlacePhotoUrl(venue.googlePhotoName, size);
-  if (g) return { src: g, isGoogle: true };
-  return { src: FALLBACK, isGoogle: false };
+  if (g) return { kind: "google", src: g };
+  return { kind: "fallback", src: null };
 }
