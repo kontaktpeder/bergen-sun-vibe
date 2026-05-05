@@ -27,7 +27,8 @@ const Home = () => {
     () => allVenues.filter(v => (v.city ?? "Bergen") === currentCity),
     [allVenues, currentCity],
   );
-  const sunCount = venues.filter(v => v.sunStatus === "sun-now").length;
+  const { data: badgeMap = {} } = useVenueBadges(venues.map(v => v.dbId));
+  const sunCount = Object.values(badgeMap).filter(b => b.sun === "sunny").length;
 
   const filteredSections = useMemo(() => {
     if (filter === "all") return sectionConfig;
