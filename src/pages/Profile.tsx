@@ -123,7 +123,34 @@ const Profile = () => {
           );
         })()}
 
-        <div className="mt-6 overflow-hidden rounded-2xl bg-card shadow-soft">
+        <div className="mt-6 rounded-2xl bg-card p-5 shadow-soft">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
+              <MapPin className="h-4 w-4" />
+            </div>
+            <div className="flex-1">
+              <div className="font-medium">Mitt område</div>
+              <div className="text-xs text-muted-foreground">Styrer hjem og utforsk</div>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {cities.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCurrentCity(c)}
+                className={`tap-scale rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  currentCity === c
+                    ? "bg-foreground text-background"
+                    : "bg-secondary text-muted-foreground"
+                }`}
+              >
+                {c === "Bergen" ? "🏔️ Bergen" : "🏙️ Oslo"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 overflow-hidden rounded-2xl bg-card shadow-soft">
           {items.map(({ icon: Icon, label, desc }, i) => (
             <button key={label} className={`tap-scale flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-secondary ${i > 0 ? "border-t border-border" : ""}`}>
               <div className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
