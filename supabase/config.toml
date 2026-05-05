@@ -1,1 +1,4 @@
 project_id = "scotayzooytzwjdoisoz"
+
+[functions.get-google-place-photo]
+verify_jwt = false

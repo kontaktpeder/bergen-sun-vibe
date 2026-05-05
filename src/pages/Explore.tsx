@@ -7,6 +7,7 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
 import { VenueMap } from "@/components/VenueMap";
+import { VenueImage } from "@/components/VenueImage";
 import { cn } from "@/lib/utils";
 
 const filters = [
@@ -156,7 +157,9 @@ const Explore = () => {
             <Link to={`/venue/${selected.id}`} key={selected.id} className="block animate-scale-in">
               <div className="overflow-hidden rounded-2xl bg-card/95 shadow-float backdrop-blur">
                 <div className="flex gap-3 p-2.5">
-                  <img src={selected.image} alt={selected.name} className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl">
+                    <VenueImage venue={selected} size={{ w: 200, h: 200 }} />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <span>{selected.category}</span>
@@ -204,7 +207,9 @@ const Explore = () => {
                 selectedId === v.id && "ring-2 ring-primary",
               )}
             >
-              <img src={v.image} alt={v.name} className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+              <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl">
+                <VenueImage venue={v} size={{ w: 160, h: 160 }} />
+              </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-display text-base font-semibold">{v.name}</div>
                 <div className="truncate text-xs text-muted-foreground">{v.area} · {v.category}</div>

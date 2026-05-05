@@ -8,6 +8,7 @@ import { ReportButton } from "@/components/ReportButton";
 import { VenueContributeModule } from "@/components/contribute/VenueContributeModule";
 import { VenueStatusBadges } from "@/components/VenueStatusBadges";
 import { VenuePhotoGallery } from "@/components/VenuePhotoGallery";
+import { VenueImage } from "@/components/VenueImage";
 import { FLAGS } from "@/lib/flags";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import { timeAgo } from "@/lib/time";
@@ -85,7 +86,11 @@ const VenueDetail = () => {
     <div className="pb-10">
       {/* Hero */}
       <div className="relative h-[55vh] overflow-hidden">
-        <img src={venue.image} alt={venue.name} className="h-full w-full object-cover" />
+        {(() => {
+          const userPhoto = contributions.find(c => c.type === "photo")?.data as Record<string, unknown> | undefined;
+          const userPhotoUrl = typeof userPhoto?.image_url === "string" ? userPhoto.image_url : undefined;
+          return <VenueImage venue={venue} userPhotoUrl={userPhotoUrl} size={{ w: 1200, h: 900 }} loading="eager" />;
+        })()}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-night/30" />
 
         <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-5 pt-[max(env(safe-area-inset-top),1rem)]">
