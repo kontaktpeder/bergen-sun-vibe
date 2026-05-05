@@ -117,7 +117,7 @@ export function buildSectionConfig(city: string): SectionDef[] {
   return [
     { id: "best-now", title: "Best akkurat nå", subtitle: `Topp picks i ${city} i kveld`, filter: (v) => v.rating >= 4.6 },
     { id: "sun-now", title: "Sol nå ☀️", subtitle: "Bekreftet av brukere nylig", filter: (v, b) => b?.[v.dbId]?.sun === "sunny" },
-    { id: "cheap-beer", title: "Billig øl 🍺", subtitle: "Rapporterte priser", filter: (v, b) => (b?.[v.dbId]?.beerPrice ?? Infinity) <= 99 },
+    { id: "cheap-beer", title: "Billigst øl 🍺", subtitle: "Sortert etter laveste rapporterte pris", filter: (v, b) => (b?.[v.dbId]?.beerPrice ?? null) != null },
     { id: "trending", title: `Populært i ${city}`, subtitle: "Det alle snakker om", filter: (v) => v.trending === true },
     { id: "family", title: "Familievennlig", subtitle: "Alle aldre velkommen", filter: (v) => v.familyFriendly },
     { id: "fresh-photos", title: "Ferske bilder 📸", subtitle: "Nylig delt av brukere", filter: (v, b) => (b?.[v.dbId]?.photoCount ?? 0) > 0 },
