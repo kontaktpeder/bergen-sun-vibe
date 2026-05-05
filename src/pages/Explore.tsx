@@ -15,11 +15,9 @@ import { useCity, type City } from "@/context/CityContext";
 import { cn } from "@/lib/utils";
 
 const filters = [
-  { id: "all", label: "Alle", emoji: "📍" },
-  { id: "sun-now", label: "Sol nå", emoji: "☀️" },
-  { id: "deal", label: "Tilbud", emoji: "🏷️" },
-  { id: "trending", label: "Trending", emoji: "🔥" },
-  { id: "family", label: "Familie", emoji: "👨‍👩‍👧" },
+  { id: "all", label: "Alt", emoji: "✨" },
+  { id: "sun", label: "Sol nå", emoji: "☀️" },
+  { id: "cheap", label: "Billigst øl", emoji: "🍺" },
 ];
 
 const cityOptions = [
