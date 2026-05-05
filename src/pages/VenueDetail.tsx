@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
+import { ReportButton } from "@/components/ReportButton";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
@@ -189,6 +190,7 @@ const VenueDetail = () => {
                     {c.type === "photo" && d?.image_url && (
                       <img src={d.image_url} alt="" className="h-10 w-10 rounded-md object-cover" />
                     )}
+                    <ReportButton contributionId={c.id} />
                   </li>
                 );
               })}
