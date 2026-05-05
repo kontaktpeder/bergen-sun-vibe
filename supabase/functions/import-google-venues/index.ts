@@ -18,7 +18,29 @@ const CITIES: Record<string, City> = {
   Oslo: { name: "Oslo", lat: 59.9139, lng: 10.7522, radius: 5000 },
 };
 
-const TYPES = ["bar", "restaurant", "cafe", "night_club"] as const;
+const TYPES = ["bar", "pub", "restaurant", "cafe", "night_club"] as const;
+
+// Types that signal "this is a hotel, not a real venue" — we drop these entirely.
+const EXCLUDED_TYPES = new Set([
+  "lodging",
+  "hotel",
+  "motel",
+  "hostel",
+  "resort_hotel",
+  "extended_stay_hotel",
+  "bed_and_breakfast",
+  "guest_house",
+  "inn",
+  "campground",
+]);
+
+function isExcluded(p: any): boolean {
+  const types = (p?.types ?? []) as string[];
+  if (types.some((t) => EXCLUDED_TYPES.has(t))) return true;
+  const primary = p?.primaryType as string | undefined;
+  if (primary && EXCLUDED_TYPES.has(primary)) return true;
+  return false;
+}
 
 const FIELD_MASK = [
   "places.id",
@@ -44,12 +66,17 @@ function slugify(s: string) {
     .slice(0, 60) || "venue";
 }
 
-function categoryFromTypes(types: string[] | undefined): string {
-  if (!types || !types.length) return "bar";
-  if (types.includes("night_club")) return "bar";
-  if (types.includes("bar")) return "bar";
-  if (types.includes("cafe") || types.includes("coffee_shop")) return "cafe";
-  if (types.includes("restaurant") || types.includes("meal_takeaway")) return "restaurant";
+function categoryFromTypes(primary: string | undefined, types: string[] | undefined): string {
+  // Prefer primaryType when available
+  const p = primary ?? "";
+  if (p === "night_club" || p === "bar" || p === "pub") return "bar";
+  if (p === "cafe" || p === "coffee_shop") return "cafe";
+  if (p === "restaurant" || p === "meal_takeaway" || p === "gastropub") return "restaurant";
+
+  const t = types ?? [];
+  if (t.includes("night_club") || t.includes("bar") || t.includes("pub")) return "bar";
+  if (t.includes("cafe") || t.includes("coffee_shop")) return "cafe";
+  if (t.includes("restaurant") || t.includes("meal_takeaway")) return "restaurant";
   return "bar";
 }
 
@@ -179,11 +206,17 @@ Deno.serve(async (req) => {
     for (const cityName of requested) {
       const city = CITIES[cityName];
       const dedup = new Map<string, any>();
+      let excludedCount = 0;
       for (const t of TYPES) {
         try {
           const places = await nearbySearch(GKEY, city, t);
           for (const p of places) {
-            if (p?.id) dedup.set(p.id, p);
+            if (!p?.id) continue;
+            if (isExcluded(p)) {
+              excludedCount++;
+              continue;
+            }
+            dedup.set(p.id, p);
           }
         } catch (e) {
           summary.errors.push(`${cityName}/${t}: ${(e as Error).message}`);
@@ -194,17 +227,18 @@ Deno.serve(async (req) => {
 
       const byCategory: Record<string, number> = {};
       for (const p of all) {
-        const cat = categoryFromTypes(p.types ?? []);
+        const cat = categoryFromTypes(p.primaryType, p.types);
         byCategory[cat] = (byCategory[cat] ?? 0) + 1;
       }
       const samples = all.slice(0, 5).map((p) => ({
         name: p.displayName?.text ?? "?",
         address: p.formattedAddress ?? null,
-        category: categoryFromTypes(p.types ?? []),
+        category: categoryFromTypes(p.primaryType, p.types),
+        primaryType: p.primaryType ?? null,
         rating: typeof p.rating === "number" ? p.rating : null,
         types: (p.types ?? []) as string[],
       }));
-      summary.perCity[cityName] = { fetched: all.length, inserted: 0, updated: 0, byCategory, samples };
+      summary.perCity[cityName] = { fetched: all.length, inserted: 0, updated: 0, byCategory, samples, excludedHotels: excludedCount } as any;
 
       if (dryRun) continue;
 
@@ -234,7 +268,7 @@ Deno.serve(async (req) => {
           }
           const photoName = p.photos?.[0]?.name ?? null;
           const types = (p.types ?? []) as string[];
-          const category = categoryFromTypes(types);
+          const category = categoryFromTypes(p.primaryType, types);
 
           const updatePayload = {
             google_maps_url: p.googleMapsUri ?? null,
