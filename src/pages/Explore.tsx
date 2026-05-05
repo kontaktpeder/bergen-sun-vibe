@@ -189,7 +189,7 @@ const Explore = () => {
           </div>
         )}
         {!isLoading && !error && filtered.length > 0 && (
-          <h2 className="mb-3 font-display text-xl font-semibold">{filtered.length} steder i nærheten</h2>
+          <h2 className="mb-3 font-display text-xl font-semibold">{filtered.length} steder i {city}</h2>
         )}
         <div className="space-y-3">
           {filtered.map((v) => (
