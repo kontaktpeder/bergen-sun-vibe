@@ -135,7 +135,12 @@ const Home = () => {
 
       {/* Sections */}
       {filteredSections.map((section) => {
-        const items = venues.filter(v => section.filter(v, badgeMap));
+        let items = venues.filter(v => section.filter(v, badgeMap));
+        if (section.id === "cheap-beer") {
+          items = [...items].sort(
+            (a, b) => (badgeMap[a.dbId]?.beerPrice ?? Infinity) - (badgeMap[b.dbId]?.beerPrice ?? Infinity),
+          );
+        }
         if (!items.length) return null;
         const variant = section.id === "sun-now" || section.id === "trending" ? "default" : "compact";
         return (
