@@ -25,7 +25,7 @@ function project(lat: number, lng: number) {
 
 const Explore = () => {
   const [filter, setFilter] = useState("all");
-  const { data: venues = [] } = useVenues();
+  const { data: venues = [], isLoading, error } = useVenues();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
