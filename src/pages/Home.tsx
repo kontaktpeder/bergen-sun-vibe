@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
-import heroImg from "@/assets/hero-bergen.jpg";
+import heroImg from "@/assets/hero-sunset.jpg";
 import { buildSectionConfig, type SectionDef } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
@@ -12,11 +12,7 @@ import { useVenueBadges } from "@/hooks/useVenueBadges";
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
   { id: "sun", label: "Sol nå", emoji: "☀️" },
-  { id: "deals", label: "Tilbud", emoji: "🍻" },
-  { id: "trending", label: "Trending", emoji: "🔥" },
-  { id: "family", label: "Familie", emoji: "👨‍👩‍👧" },
-  { id: "cheap", label: "Billig", emoji: "💸" },
-  { id: "date", label: "Date", emoji: "💛" },
+  { id: "cheap", label: "Billigst øl", emoji: "🍺" },
 ];
 
 const Home = () => {
@@ -36,11 +32,7 @@ const Home = () => {
     if (filter === "all") return sectionConfig;
     const map: Record<string, SectionDef["id"][]> = {
       sun: ["sun-now"],
-      deals: ["cheap-beer"],
-      trending: ["trending"],
-      family: ["family"],
       cheap: ["cheap-beer"],
-      date: ["best-now", "trending"],
     };
     const ids = map[filter] || [];
     return sectionConfig.filter(s => ids.includes(s.id));
