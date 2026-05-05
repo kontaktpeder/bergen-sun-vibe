@@ -167,7 +167,13 @@ Deno.serve(async (req) => {
       updated: 0,
       skipped: 0,
       errors: [] as string[],
-      perCity: {} as Record<string, { fetched: number; inserted: number; updated: number }>,
+      perCity: {} as Record<string, {
+        fetched: number;
+        inserted: number;
+        updated: number;
+        byCategory: Record<string, number>;
+        samples: Array<{ name: string; address: string | null; category: string; rating: number | null; types: string[] }>;
+      }>,
     };
 
     for (const cityName of requested) {
@@ -185,7 +191,20 @@ Deno.serve(async (req) => {
       }
       const all = [...dedup.values()];
       summary.fetched += all.length;
-      summary.perCity[cityName] = { fetched: all.length, inserted: 0, updated: 0 };
+
+      const byCategory: Record<string, number> = {};
+      for (const p of all) {
+        const cat = categoryFromTypes(p.types ?? []);
+        byCategory[cat] = (byCategory[cat] ?? 0) + 1;
+      }
+      const samples = all.slice(0, 5).map((p) => ({
+        name: p.displayName?.text ?? "?",
+        address: p.formattedAddress ?? null,
+        category: categoryFromTypes(p.types ?? []),
+        rating: typeof p.rating === "number" ? p.rating : null,
+        types: (p.types ?? []) as string[],
+      }));
+      summary.perCity[cityName] = { fetched: all.length, inserted: 0, updated: 0, byCategory, samples };
 
       if (dryRun) continue;
 
