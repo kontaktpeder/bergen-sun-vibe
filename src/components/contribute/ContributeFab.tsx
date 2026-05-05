@@ -98,18 +98,19 @@ export function ContributeFab() {
           ) : mode === "beer" ? (
             <BeerForm
               venueId={venueDbId}
-              onDone={async (price) => {
+              onDone={async (price, isConfirm) => {
                 if (!venueDbId) return toast.error("Velg et sted først.");
                 try {
                   const r = await addContribution.mutateAsync({
                     type: "beer_price",
                     venueId: venueDbId,
                     data: { price, label: "cheapest" },
+                    isConfirm,
                   });
                   toast.success(`+${r.awardedPoints} poeng 🍺`);
                   close();
-                } catch (e: any) {
-                  toast.error(e.message ?? "Noe gikk galt");
+                } catch (e: unknown) {
+                  toast.error(e instanceof Error ? e.message : "Noe gikk galt");
                 }
               }}
             />
@@ -128,8 +129,8 @@ export function ContributeFab() {
                   });
                   toast.success(`+${r.awardedPoints} poeng 📸`);
                   close();
-                } catch (e: any) {
-                  toast.error(e.message ?? "Opplasting feilet");
+                } catch (e: unknown) {
+                  toast.error(e instanceof Error ? e.message : "Opplasting feilet");
                 }
               }}
             />
@@ -140,8 +141,8 @@ export function ContributeFab() {
                   const r = await addContribution.mutateAsync({ type: "venue_add", data });
                   toast.success(`+${r.awardedPoints} poeng 📍`);
                   close();
-                } catch (e: any) {
-                  toast.error(e.message ?? "Noe gikk galt");
+                } catch (e: unknown) {
+                  toast.error(e instanceof Error ? e.message : "Noe gikk galt");
                 }
               }}
             />
