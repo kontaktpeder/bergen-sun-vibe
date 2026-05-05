@@ -183,12 +183,20 @@ export type Database = {
       }
       venues: {
         Row: {
+          address: string | null
           area: string | null
           category: string
+          city: string | null
           created_at: string
           deal_text: string | null
           description: string
           family_friendly: boolean
+          google_maps_url: string | null
+          google_photo_name: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_types: string[] | null
+          google_user_rating_count: number | null
           hours: string | null
           id: string
           image_url: string | null
@@ -200,19 +208,30 @@ export type Database = {
           rating: number
           reviews: number
           slug: string
+          source: string
+          status: string
           sun_score: number
           sun_status: string
           sun_until: string | null
           tags: string[]
           trending: boolean
+          website_url: string | null
         }
         Insert: {
+          address?: string | null
           area?: string | null
           category: string
+          city?: string | null
           created_at?: string
           deal_text?: string | null
           description?: string
           family_friendly?: boolean
+          google_maps_url?: string | null
+          google_photo_name?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_types?: string[] | null
+          google_user_rating_count?: number | null
           hours?: string | null
           id?: string
           image_url?: string | null
@@ -224,19 +243,30 @@ export type Database = {
           rating?: number
           reviews?: number
           slug: string
+          source?: string
+          status?: string
           sun_score?: number
           sun_status?: string
           sun_until?: string | null
           tags?: string[]
           trending?: boolean
+          website_url?: string | null
         }
         Update: {
+          address?: string | null
           area?: string | null
           category?: string
+          city?: string | null
           created_at?: string
           deal_text?: string | null
           description?: string
           family_friendly?: boolean
+          google_maps_url?: string | null
+          google_photo_name?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_types?: string[] | null
+          google_user_rating_count?: number | null
           hours?: string | null
           id?: string
           image_url?: string | null
@@ -248,11 +278,14 @@ export type Database = {
           rating?: number
           reviews?: number
           slug?: string
+          source?: string
+          status?: string
           sun_score?: number
           sun_status?: string
           sun_until?: string | null
           tags?: string[]
           trending?: boolean
+          website_url?: string | null
         }
         Relationships: []
       }
