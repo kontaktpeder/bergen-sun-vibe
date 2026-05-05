@@ -141,7 +141,21 @@ const Explore = () => {
 
       {/* List */}
       <section className="mt-6 px-5">
-        <h2 className="mb-3 font-display text-xl font-semibold">{filtered.length} steder i nærheten</h2>
+        {isLoading && <div className="text-sm text-muted-foreground">Laster steder…</div>}
+        {error && !isLoading && (
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+            Kunne ikke hente steder. Prøv igjen senere.
+          </div>
+        )}
+        {!isLoading && !error && filtered.length === 0 && (
+          <div className="rounded-2xl bg-card p-6 text-center shadow-soft">
+            <div className="font-display text-lg font-semibold">Ingen treff</div>
+            <p className="mt-1 text-sm text-muted-foreground">Prøv et annet filter eller søkeord.</p>
+          </div>
+        )}
+        {!isLoading && !error && filtered.length > 0 && (
+          <h2 className="mb-3 font-display text-xl font-semibold">{filtered.length} steder i nærheten</h2>
+        )}
         <div className="space-y-3">
           {filtered.map((v) => (
             <button
