@@ -79,11 +79,10 @@ const Home = () => {
               {sunCount} steder med sol akkurat nå
             </div>
             <h1 className="mt-3 font-display text-[2.4rem] font-semibold leading-[1.1] tracking-tight text-balance">
-              Hvor skal du se
-              <span className="mt-1 block bg-gradient-to-r from-sun via-primary-glow to-sunset-pink bg-clip-text pb-2 text-transparent">solen senke seg?</span>
+              Skal du ut i dag?
             </h1>
             <p className="mt-4 max-w-xs text-sm/relaxed opacity-90">
-              Oppdag {currentCity}s beste steder akkurat nå — basert på sol, tilbud og stemning.
+              Oppdag {currentCity}s beste steder akkurat nå — basert på sol og billig øl.
             </p>
           </div>
         </div>
