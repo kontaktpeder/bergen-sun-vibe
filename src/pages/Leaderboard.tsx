@@ -30,7 +30,7 @@ const Leaderboard = () => {
         )}
         {entries.map((e, i) => {
           const rank = i + 1;
-          const initials = (e.username ?? "??").slice(0, 2).toUpperCase();
+          const initials = (e.username ?? "Anonym").slice(0, 2).toUpperCase();
           return (
             <div
               key={e.id}
