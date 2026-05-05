@@ -121,7 +121,6 @@ const VenueDetail = () => {
             <span className="font-semibold">{venue.rating}</span>
             <span className="text-muted-foreground">({venue.reviews})</span>
           </span>
-          <span className="text-muted-foreground">{"kr".repeat(venue.priceLevel)}<span className="opacity-30">{"kr".repeat(4 - venue.priceLevel)}</span></span>
           <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{venue.area}</span>
         </div>
 
