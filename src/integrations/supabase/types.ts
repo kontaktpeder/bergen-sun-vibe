@@ -240,7 +240,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      submit_contribution: {
+        Args: {
+          _data: Json
+          _is_confirm?: boolean
+          _new_venue?: Json
+          _type: string
+          _venue_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
