@@ -69,12 +69,12 @@ function slugify(s: string) {
 function categoryFromTypes(primary: string | undefined, types: string[] | undefined): string {
   // Prefer primaryType when available
   const p = primary ?? "";
-  if (p === "night_club" || p === "bar" || p === "pub") return "bar";
+  if (p === "night_club" || p === "bar" || p === "pub" || p === "gastropub") return "bar";
   if (p === "cafe" || p === "coffee_shop") return "cafe";
-  if (p === "restaurant" || p === "meal_takeaway" || p === "gastropub") return "restaurant";
+  if (p === "restaurant" || p === "meal_takeaway") return "restaurant";
 
   const t = types ?? [];
-  if (t.includes("night_club") || t.includes("bar") || t.includes("pub")) return "bar";
+  if (t.includes("night_club") || t.includes("bar") || t.includes("pub") || t.includes("gastropub")) return "bar";
   if (t.includes("cafe") || t.includes("coffee_shop")) return "cafe";
   if (t.includes("restaurant") || t.includes("meal_takeaway")) return "restaurant";
   return "bar";
