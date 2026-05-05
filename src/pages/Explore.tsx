@@ -20,7 +20,7 @@ const BOUNDS = { minLat: 60.378, maxLat: 60.408, minLng: 5.305, maxLng: 5.335 };
 function project(lat: number, lng: number) {
   const x = ((lng - BOUNDS.minLng) / (BOUNDS.maxLng - BOUNDS.minLng)) * 100;
   const y = (1 - (lat - BOUNDS.minLat) / (BOUNDS.maxLat - BOUNDS.minLat)) * 100;
-  return { x: Math.max(6, Math.min(94, x)), y: Math.max(6, Math.min(94, y)) };
+  return { x: Math.max(8, Math.min(92, x)), y: Math.max(28, Math.min(88, y)) };
 }
 
 const Explore = () => {
