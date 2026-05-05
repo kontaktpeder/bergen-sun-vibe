@@ -19,7 +19,6 @@ const Profile = () => {
   const stats = [
     { label: "Lagret", value: favs.length, icon: Heart },
     { label: "Poeng", value: profile?.points ?? 0, icon: Sun },
-    { label: "Sol-dager", value: 47, icon: MapPin },
   ];
 
   const items = [
