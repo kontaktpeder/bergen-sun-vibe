@@ -234,7 +234,7 @@ function VenueAddSuccess({
         <SheetTitle className="text-center">Stedet er lagt til 🎉</SheetTitle>
       </SheetHeader>
       <p className="mt-2 text-sm text-muted-foreground">
-        Bra jobbet — du hjelper flere finne gode spots.
+        Stedet er lagt til. Gjør det nyttig ved å legge inn bilde, sol eller ølpris.
       </p>
       <div className="mt-5 grid gap-2">
         {success.venueSlug && (
