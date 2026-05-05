@@ -10,10 +10,21 @@ const VenueDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   useFavorites();
-  const { data: venue, isLoading } = useVenue(id);
+  const { data: venue, isLoading, error } = useVenue(id);
 
   if (isLoading) {
     return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Laster…</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="grid min-h-screen place-items-center p-6 text-center">
+        <div>
+          <p className="text-destructive">Noe gikk galt under lasting.</p>
+          <Link to="/" className="mt-4 inline-block text-primary">Tilbake</Link>
+        </div>
+      </div>
+    );
   }
 
   if (!venue) {

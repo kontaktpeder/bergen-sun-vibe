@@ -19,7 +19,7 @@ const filterOptions = [
 
 const Home = () => {
   const [filter, setFilter] = useState("all");
-  const { data: venues = [], isLoading } = useVenues();
+  const { data: venues = [], isLoading, error } = useVenues();
   const sunCount = venues.filter(v => v.sunStatus === "sun-now").length;
 
   const filteredSections = useMemo(() => {
@@ -97,6 +97,19 @@ const Home = () => {
 
       {isLoading && (
         <div className="mt-10 px-5 text-sm text-muted-foreground">Laster steder…</div>
+      )}
+
+      {error && !isLoading && (
+        <div className="mt-10 mx-5 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+          Kunne ikke hente steder. Sjekk tilkoblingen og prøv igjen.
+        </div>
+      )}
+
+      {!isLoading && !error && venues.length === 0 && (
+        <div className="mt-10 mx-5 rounded-2xl bg-card p-6 text-center shadow-soft">
+          <div className="font-display text-lg font-semibold">Ingen steder ennå</div>
+          <p className="mt-1 text-sm text-muted-foreground">Det kommer snart flere — kom tilbake litt senere.</p>
+        </div>
       )}
 
       {/* Featured spotlight */}
