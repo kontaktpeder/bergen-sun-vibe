@@ -14,36 +14,70 @@ const filters = [
   { id: "family", label: "Familie", emoji: "👨‍👩‍👧" },
 ];
 
-// Bounding box for Bergen pins → map onto SVG coordinates
-const BOUNDS = { minLat: 60.378, maxLat: 60.408, minLng: 5.305, maxLng: 5.335 };
+const cityOptions = [
+  { id: "Bergen", label: "Bergen", emoji: "🏔️" },
+  { id: "Oslo", label: "Oslo", emoji: "🏙️" },
+];
 
-function project(lat: number, lng: number) {
-  const x = ((lng - BOUNDS.minLng) / (BOUNDS.maxLng - BOUNDS.minLng)) * 100;
-  const y = (1 - (lat - BOUNDS.minLat) / (BOUNDS.maxLat - BOUNDS.minLat)) * 100;
-  return { x: Math.max(10, Math.min(90, x)), y: Math.max(40, Math.min(86, y)) };
+// Default bounds per city — used as fallback when we have few/no points.
+const CITY_BOUNDS: Record<string, { minLat: number; maxLat: number; minLng: number; maxLng: number }> = {
+  Bergen: { minLat: 60.378, maxLat: 60.408, minLng: 5.305, maxLng: 5.335 },
+  Oslo: { minLat: 59.905, maxLat: 59.935, minLng: 10.72, maxLng: 10.78 },
+};
+
+function computeBounds(points: { lat: number; lng: number }[], fallback: typeof CITY_BOUNDS[string]) {
+  if (points.length < 2) return fallback;
+  const lats = points.map(p => p.lat);
+  const lngs = points.map(p => p.lng);
+  const pad = 0.002;
+  return {
+    minLat: Math.min(...lats) - pad,
+    maxLat: Math.max(...lats) + pad,
+    minLng: Math.min(...lngs) - pad,
+    maxLng: Math.max(...lngs) + pad,
+  };
 }
 
 const Explore = () => {
   const [filter, setFilter] = useState("all");
+  const [city, setCity] = useState<"Bergen" | "Oslo">("Bergen");
   const { data: venues = [], isLoading, error } = useVenues();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
+  const cityVenues = useMemo(
+    () => venues.filter(v => (v.city ?? "Bergen") === city),
+    [venues, city],
+  );
+
   useEffect(() => {
-    if (!selectedId && venues.length) setSelectedId(venues[0].id);
-  }, [venues, selectedId]);
+    if (cityVenues.length && !cityVenues.find(v => v.id === selectedId)) {
+      setSelectedId(cityVenues[0].id);
+    }
+  }, [cityVenues, selectedId]);
 
   const filtered = useMemo(() => {
-    let v = venues;
+    let v = cityVenues;
     if (filter === "sun-now") v = v.filter(x => x.sunStatus === "sun-now");
     else if (filter === "deal") v = v.filter(x => x.dealText);
     else if (filter === "trending") v = v.filter(x => x.trending);
     else if (filter === "family") v = v.filter(x => x.familyFriendly);
     if (query) v = v.filter(x => (x.name + x.area + x.tags.join(" ")).toLowerCase().includes(query.toLowerCase()));
     return v;
-  }, [filter, query, venues]);
+  }, [filter, query, cityVenues]);
 
-  const selected = venues.find(v => v.id === selectedId) ?? null;
+  const bounds = useMemo(
+    () => computeBounds(filtered.length ? filtered : cityVenues, CITY_BOUNDS[city]),
+    [filtered, cityVenues, city],
+  );
+
+  function project(lat: number, lng: number) {
+    const x = ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 100;
+    const y = (1 - (lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * 100;
+    return { x: Math.max(10, Math.min(90, x)), y: Math.max(40, Math.min(86, y)) };
+  }
+
+  const selected = cityVenues.find(v => v.id === selectedId) ?? null;
 
   return (
     <div className="relative min-h-screen">
@@ -102,12 +136,13 @@ const Explore = () => {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Søk i Bergen..."
+                placeholder={`Søk i ${city}...`}
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 space-y-2">
+            <FilterChips options={cityOptions} active={city} onChange={(id) => setCity(id as "Bergen" | "Oslo")} />
             <FilterChips options={filters} active={filter} onChange={setFilter} />
           </div>
         </div>
@@ -154,7 +189,7 @@ const Explore = () => {
           </div>
         )}
         {!isLoading && !error && filtered.length > 0 && (
-          <h2 className="mb-3 font-display text-xl font-semibold">{filtered.length} steder i nærheten</h2>
+          <h2 className="mb-3 font-display text-xl font-semibold">{filtered.length} steder i {city}</h2>
         )}
         <div className="space-y-3">
           {filtered.map((v) => (

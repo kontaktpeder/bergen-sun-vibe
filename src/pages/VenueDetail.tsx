@@ -70,10 +70,14 @@ const VenueDetail = () => {
   };
 
   const openMap = () => {
+    if (venue.googleMapsUrl) {
+      window.open(venue.googleMapsUrl, "_blank");
+      return;
+    }
     const q = encodeURIComponent(
-      venue.name ? `${venue.name}, Bergen` : `${venue.lat},${venue.lng}`,
+      venue.name ? `${venue.name}, ${venue.city ?? "Bergen"}` : `${venue.lat},${venue.lng}`,
     );
-    const url = `https://www.google.com/maps/search/?api=1&query=${q}&query_place_id=&center=${venue.lat},${venue.lng}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${q}&center=${venue.lat},${venue.lng}`;
     window.open(url, "_blank");
   };
 

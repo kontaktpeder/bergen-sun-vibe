@@ -34,6 +34,10 @@ export interface Venue {
   description: string;
   hours: string;
   area: string;
+  city?: string;
+  address?: string;
+  googleMapsUrl?: string;
+  websiteUrl?: string;
   lat: number;
   lng: number;
   lastActivityAt: string;
@@ -79,18 +83,27 @@ export interface DbVenue {
   trending: boolean;
   tags: string[];
   last_activity_at: string;
+  city?: string | null;
+  address?: string | null;
+  google_maps_url?: string | null;
+  website_url?: string | null;
+  google_rating?: number | string | null;
+  google_user_rating_count?: number | null;
 }
 
 export function mapDbVenue(row: DbVenue): Venue {
   const priceLevel = Math.min(4, Math.max(1, Number(row.price_level) || 2)) as 1 | 2 | 3 | 4;
+  // Prefer Google rating/reviews when seeded data hasn't been overridden by users
+  const rating = Number(row.rating) || (row.google_rating != null ? Number(row.google_rating) : 0);
+  const reviews = (row.reviews ?? 0) || (row.google_user_rating_count ?? 0);
   return {
     id: row.slug,
     dbId: row.id,
     name: row.name,
     image: row.image_url || imageMap[row.slug] || fallbackImage,
     category: row.category,
-    rating: Number(row.rating) || 0,
-    reviews: row.reviews ?? 0,
+    rating,
+    reviews,
     priceLevel,
     sunScore: row.sun_score ?? 0,
     sunStatus: (row.sun_status as SunStatus) || "shade",
@@ -101,7 +114,11 @@ export function mapDbVenue(row: DbVenue): Venue {
     tags: row.tags || [],
     description: row.description || "",
     hours: row.hours || "",
-    area: row.area || "",
+    area: row.area || row.city || "",
+    city: row.city ?? undefined,
+    address: row.address ?? undefined,
+    googleMapsUrl: row.google_maps_url ?? undefined,
+    websiteUrl: row.website_url ?? undefined,
     lat: Number(row.lat),
     lng: Number(row.lng),
     lastActivityAt: row.last_activity_at,
