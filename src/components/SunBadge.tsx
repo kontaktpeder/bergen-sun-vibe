@@ -1,15 +1,19 @@
+import { forwardRef } from "react";
 import { Sun, CloudSun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SunStatus } from "@/data/venues";
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   status: SunStatus;
   until?: string;
   className?: string;
   size?: "sm" | "md";
 }
 
-export function SunBadge({ status, until, className, size = "sm" }: Props) {
+export const SunBadge = forwardRef<HTMLDivElement, Props>(function SunBadge(
+  { status, until, className, size = "sm", ...rest },
+  ref,
+) {
   const config = {
     "sun-now": {
       label: until ? `Sol til ${until}` : "Sol nå",
@@ -45,14 +49,21 @@ export function SunBadge({ status, until, className, size = "sm" }: Props) {
 
   const Icon = config.icon;
   return (
-    <div className={cn(
-      "inline-flex items-center gap-1.5 rounded-full font-medium shadow-soft backdrop-blur-md",
-      size === "sm" ? "px-2.5 py-1 text-xs" : "px-3.5 py-1.5 text-sm",
-      config.bg,
-      className,
-    )}>
-      <Icon className={cn(size === "sm" ? "h-3 w-3" : "h-4 w-4", config.pulse && "animate-sun-pulse")} strokeWidth={2.5} />
+    <div
+      ref={ref}
+      {...rest}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full font-medium shadow-soft backdrop-blur-md",
+        size === "sm" ? "px-2.5 py-1 text-xs" : "px-3.5 py-1.5 text-sm",
+        config.bg,
+        className,
+      )}
+    >
+      <Icon
+        className={cn(size === "sm" ? "h-3 w-3" : "h-4 w-4", config.pulse && "animate-sun-pulse")}
+        strokeWidth={2.5}
+      />
       <span className="whitespace-nowrap">{config.label}</span>
     </div>
   );
-}
+});

@@ -240,6 +240,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      similarity_or_zero: { Args: { a: string; b: string }; Returns: number }
       submit_contribution: {
         Args: {
           _data: Json
