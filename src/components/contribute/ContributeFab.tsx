@@ -19,6 +19,8 @@ import { FLAGS } from "@/lib/flags";
 import { subscribeContributeFab } from "@/lib/contribute-bus";
 import { useCity } from "@/context/CityContext";
 import { inferLegacyCity } from "@/lib/domain";
+import { useVenues } from "@/hooks/useVenues";
+import { findPossibleDuplicate } from "@/lib/dedupe-venues";
 
 const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Bergen: { lat: 60.3913, lng: 5.3221 },
