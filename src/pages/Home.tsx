@@ -7,6 +7,7 @@ import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
 import { FilterChips } from "@/components/FilterChips";
 import { useCity } from "@/context/CityContext";
+import { useVenueBadges } from "@/hooks/useVenueBadges";
 
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
