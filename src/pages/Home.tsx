@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
-import heroImg from "@/assets/hero-sunset.jpg";
+import heroImg from "@/assets/hero-oslo-sunset.jpg";
 import { buildSectionConfig, belongsToCity, type SectionDef } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
@@ -65,10 +65,35 @@ const Home = () => {
           decoding="async"
           // @ts-expect-error fetchpriority is valid HTML
           fetchpriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover object-[center_35%] [filter:saturate(0.88)_blur(0.5px)]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-night/40 via-night/55 to-night/85" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-primary/25 via-transparent to-transparent mix-blend-overlay" />
+        {/* Bottom→top dark gradient for legibility */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%)",
+          }}
+        />
+        {/* Soft dim behind top-left logo area */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-32"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0))",
+          }}
+        />
+        {/* Subtle film grain for a real, less stocky feel */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.12] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+            backgroundSize: "160px 160px",
+          }}
+        />
+        {/* Warm sunset tint */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-primary/15 via-transparent to-transparent mix-blend-overlay" />
 
         <div className="relative z-10 flex h-full flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)]">
           <div className="flex items-center justify-between text-white">
@@ -86,7 +111,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="mt-auto pb-24 text-white animate-float-up [text-shadow:0_2px_20px_rgba(0,0,0,0.35)]">
+          <div className="mt-auto pb-24 text-white animate-float-up [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_1px_2px_rgba(0,0,0,0.5)]">
             <div className="inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
