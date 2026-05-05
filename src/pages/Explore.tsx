@@ -173,10 +173,12 @@ const Explore = () => {
                       <span className="truncate">{selected.area}</span>
                     </div>
                     <h3 className="mt-0.5 truncate font-display text-base font-semibold">{selected.name}</h3>
-                    <div className="mt-0.5 flex items-center gap-2 text-xs">
-                      <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{selected.rating}</span>
-                      <span className="text-muted-foreground">· {"kr".repeat(selected.priceLevel)}</span>
-                    </div>
+                    {selected.rating > 0 && (
+                      <div className="mt-0.5 flex items-center gap-2 text-xs">
+                        <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{selected.rating}</span>
+                        {selected.reviews > 0 && <span className="text-muted-foreground">({selected.reviews})</span>}
+                      </div>
+                    )}
                     {badgeMap[selected.dbId]?.sun && (
                       <div className="mt-1.5"><DataSunBadge badge={badgeMap[selected.dbId]} /></div>
                     )}
@@ -225,10 +227,12 @@ const Explore = () => {
                   <div className="mt-1"><DataSunBadge badge={badgeMap[v.dbId]} /></div>
                 )}
               </div>
-              <div className="shrink-0 text-right">
-                <div className="inline-flex items-center gap-1 text-sm"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{v.rating}</div>
-                <div className="text-xs text-muted-foreground">{"kr".repeat(v.priceLevel)}</div>
-              </div>
+              {v.rating > 0 && (
+                <div className="shrink-0 text-right">
+                  <div className="inline-flex items-center gap-1 text-sm"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{v.rating}</div>
+                  {v.reviews > 0 && <div className="text-xs text-muted-foreground">({v.reviews})</div>}
+                </div>
+              )}
             </button>
           ))}
         </div>
