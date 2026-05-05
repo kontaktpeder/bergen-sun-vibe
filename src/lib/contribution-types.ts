@@ -16,6 +16,7 @@ export type VenueAddPayload = {
   lat: number;
   lng: number;
   category: "bar" | "cafe" | "restaurant";
+  city: "Bergen" | "Oslo";
   image_url?: string;
 };
 

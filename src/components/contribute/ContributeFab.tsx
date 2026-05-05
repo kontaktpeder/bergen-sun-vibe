@@ -433,7 +433,7 @@ function PhotoForm({ venueId, onDone }: { venueId?: string; onDone: (f: File) =>
 function VenueForm({
   onDone,
 }: {
-  onDone: (d: { name: string; lat: number; lng: number; category: "bar" | "cafe" | "restaurant" }) => void;
+  onDone: (d: { name: string; lat: number; lng: number; category: "bar" | "cafe" | "restaurant"; city: "Bergen" | "Oslo" }) => void;
 }) {
   const { currentCity } = useCity();
   const cityCenter = CITY_CENTERS[currentCity] ?? CITY_CENTERS.Bergen;
@@ -595,7 +595,7 @@ function VenueForm({
           if (!name.trim()) return toast.error("Navn er påkrevd.");
           if (!Number.isFinite(la) || la < -90 || la > 90) return toast.error("Ugyldig lat.");
           if (!Number.isFinite(ln) || ln < -180 || ln > 180) return toast.error("Ugyldig lng.");
-          onDone({ name: name.trim(), lat: la, lng: ln, category });
+          onDone({ name: name.trim(), lat: la, lng: ln, category, city: currentCity as "Bergen" | "Oslo" });
         }}
       >
         Legg til 📍
