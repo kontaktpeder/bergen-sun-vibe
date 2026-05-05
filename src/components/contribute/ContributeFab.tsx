@@ -19,6 +19,8 @@ import { FLAGS } from "@/lib/flags";
 import { subscribeContributeFab } from "@/lib/contribute-bus";
 import { useCity } from "@/context/CityContext";
 import { inferLegacyCity } from "@/lib/domain";
+import { useVenues } from "@/hooks/useVenues";
+import { findPossibleDuplicate } from "@/lib/dedupe-venues";
 
 const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Bergen: { lat: 60.3913, lng: 5.3221 },
@@ -437,6 +439,7 @@ function VenueForm({
   onDone: (d: { name: string; lat: number; lng: number; category: "bar" | "cafe" | "restaurant"; city: "Bergen" | "Oslo" }) => void;
 }) {
   const { currentCity } = useCity();
+  const { data: allVenues = [] } = useVenues();
   const cityCenter = CITY_CENTERS[currentCity] ?? CITY_CENTERS.Bergen;
   const [name, setName] = useState("");
   const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
@@ -446,6 +449,13 @@ function VenueForm({
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [geoState, setGeoState] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [geoErr, setGeoErr] = useState<string | null>(null);
+
+  const possibleDup = useMemo(() => {
+    const la = Number(lat);
+    const ln = Number(lng);
+    if (!name.trim() || !Number.isFinite(la) || !Number.isFinite(ln)) return null;
+    return findPossibleDuplicate(allVenues, name, la, ln, 50);
+  }, [allVenues, name, lat, lng]);
 
   const requestLocation = () => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
@@ -587,6 +597,14 @@ function VenueForm({
           </div>
         )}
       </div>
+      {possibleDup && (
+        <div className="mt-3 rounded-xl border border-amber-300/50 bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+          <div className="font-medium">Dette stedet finnes kanskje allerede?</div>
+          <div className="mt-0.5 text-xs opacity-90">
+            Vi fant <span className="font-semibold">{possibleDup.name}</span> like ved.
+          </div>
+        </div>
+      )}
       <Button
         className="mt-5 w-full"
         disabled={!name.trim() || !hasCoords}
