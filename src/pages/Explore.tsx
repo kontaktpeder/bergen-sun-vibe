@@ -78,6 +78,9 @@ const Explore = () => {
           </div>
         )}
 
+        {/* Bottom fade — lar bottom card flyte mykt opp fra kartet */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[450] h-24 bg-gradient-to-b from-transparent via-background/40 to-background" />
+
         {/* Top bar — z-[500] to sit above Leaflet panes */}
         <div className="absolute inset-x-0 top-0 z-[500] px-5 pt-[max(env(safe-area-inset-top),1rem)]">
           <div className="flex items-center gap-3">
