@@ -253,48 +253,37 @@ function VenueAddSuccess({
   );
 }
 
-function Menu({
-  onPick,
-  showVenuePicker,
-  venues,
-  selectedVenueDbId,
-  onPickVenue,
-}: {
-  onPick: (m: Mode) => void;
-  showVenuePicker: boolean;
-  venues: { id: string; name: string }[];
-  selectedVenueDbId?: string;
-  onPickVenue: (id: string) => void;
-}) {
-  const needsVenue = showVenuePicker && !selectedVenueDbId;
+function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boolean }) {
+  // Global menu = primary action is "add new venue".
+  // On a venue page the local module handles sun/beer/photo, so this menu
+  // is only used as a fallback (deep-link cleared) — keep simple.
+  if (!isOnVenue) {
+    return (
+      <div className="pb-4">
+        <SheetHeader>
+          <SheetTitle>Legg til nytt sted</SheetTitle>
+        </SheetHeader>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Mangler et sted i Bergen? Legg det til så andre kan finne det.
+        </p>
+        <div className="mt-5 grid">
+          <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
+        </div>
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          For å rapportere sol, ølpris eller bilde — åpne et sted først.
+        </p>
+      </div>
+    );
+  }
   return (
     <div className="pb-4">
       <SheetHeader>
         <SheetTitle>Hva vil du dele?</SheetTitle>
       </SheetHeader>
-
-      {showVenuePicker && (
-        <div className="mt-4">
-          <Label className="text-xs uppercase tracking-widest text-muted-foreground">Sted</Label>
-          <select
-            value={selectedVenueDbId ?? ""}
-            onChange={(e) => onPickVenue(e.target.value)}
-            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3"
-          >
-            <option value="">Velg sted…</option>
-            {venues.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="☀️" label="Er det sol?" disabled={needsVenue} onClick={() => onPick("sun")} />
-        <ActionCard emoji="🍺" label="Ølpris" disabled={needsVenue} onClick={() => onPick("beer")} />
-        <ActionCard emoji="📸" label="Bilde" disabled={needsVenue} onClick={() => onPick("photo")} />
+        <ActionCard emoji="☀️" label="Er det sol?" onClick={() => onPick("sun")} />
+        <ActionCard emoji="🍺" label="Ølpris" onClick={() => onPick("beer")} />
+        <ActionCard emoji="📸" label="Bilde" onClick={() => onPick("photo")} />
         <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
       </div>
     </div>
