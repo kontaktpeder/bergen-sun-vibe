@@ -102,12 +102,25 @@ export function mapDbVenue(row: DbVenue): Venue {
   };
 }
 
-// Seksjons-konfig (samme som tidligere mock).
-export const sectionConfig = [
-  { id: "best-now", title: "Best akkurat nå", subtitle: "Topp picks i Bergen i kveld", filter: (v: Venue) => v.rating >= 4.6 },
-  { id: "sun-now", title: "Sol nå ☀️", subtitle: "Sitt ute mens sola er fremme", filter: (v: Venue) => v.sunStatus === "sun-now" },
-  { id: "cheap-beer", title: "Billig øl 🍺", subtitle: "Under 80,- pils", filter: (v: Venue) => v.priceLevel === 1 || /billig|øl|pils/i.test(v.dealText || "") },
-  { id: "trending", title: "Populært i Bergen", subtitle: "Det alle snakker om", filter: (v: Venue) => v.trending === true },
-  { id: "family", title: "Familievennlig", subtitle: "Alle aldre velkommen", filter: (v: Venue) => v.familyFriendly },
-  { id: "evening-sun", title: "Kveldssol senere", subtitle: "Sol etter 19:00", filter: (v: Venue) => v.sunStatus === "evening-sun" || (!!v.sunUntil && parseInt(v.sunUntil) >= 19) },
-] as const;
+// Seksjons-konfig. `filter` mottar valgfritt et badgeMap så seksjoner kan
+// basere seg på ferske bidrag i stedet for legacy venue-felt.
+export type SectionBadgeMap = Record<string, { sun: "sunny" | "partial" | "shade" | "unknown" | null; beerPrice: number | null; photoCount: number }>;
+
+export interface SectionDef {
+  id: "best-now" | "sun-now" | "cheap-beer" | "trending" | "family" | "fresh-photos";
+  title: string;
+  subtitle: string;
+  filter: (v: Venue, badges?: SectionBadgeMap) => boolean;
+}
+
+export function buildSectionConfig(city: string): SectionDef[] {
+  return [
+    { id: "best-now", title: "Best akkurat nå", subtitle: `Topp picks i ${city} i kveld`, filter: (v) => v.rating >= 4.6 },
+    { id: "sun-now", title: "Sol nå ☀️", subtitle: "Bekreftet av brukere nylig", filter: (v, b) => b?.[v.dbId]?.sun === "sunny" },
+    { id: "cheap-beer", title: "Billig øl 🍺", subtitle: "Rapporterte priser", filter: (v, b) => (b?.[v.dbId]?.beerPrice ?? Infinity) <= 99 },
+    { id: "trending", title: `Populært i ${city}`, subtitle: "Det alle snakker om", filter: (v) => v.trending === true },
+    { id: "family", title: "Familievennlig", subtitle: "Alle aldre velkommen", filter: (v) => v.familyFriendly },
+    { id: "fresh-photos", title: "Ferske bilder 📸", subtitle: "Nylig delt av brukere", filter: (v, b) => (b?.[v.dbId]?.photoCount ?? 0) > 0 },
+  ];
+}
+

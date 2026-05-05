@@ -17,6 +17,12 @@ import { showRewardFeedback } from "@/lib/reward-feedback";
 import { toUserErrorMessage } from "@/lib/error-messages";
 import { FLAGS } from "@/lib/flags";
 import { subscribeContributeFab } from "@/lib/contribute-bus";
+import { useCity } from "@/context/CityContext";
+
+const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
+  Bergen: { lat: 60.3913, lng: 5.3221 },
+  Oslo: { lat: 59.9139, lng: 10.7522 },
+};
 
 type Mode = "menu" | "sun" | "beer" | "photo" | "venue";
 type SuccessState = { venueId: string; venueSlug?: string } | null;
@@ -266,7 +272,7 @@ function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boo
           <h2 className="font-display text-lg font-semibold">Legg til nytt sted</h2>
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
-          Mangler et sted i Bergen? Legg det til så andre kan finne det.
+          Mangler et sted? Legg det til så andre kan finne det.
         </p>
         <div className="mt-5 grid">
           <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
@@ -429,6 +435,8 @@ function VenueForm({
 }: {
   onDone: (d: { name: string; lat: number; lng: number; category: "bar" | "cafe" | "restaurant" }) => void;
 }) {
+  const { currentCity } = useCity();
+  const cityCenter = CITY_CENTERS[currentCity] ?? CITY_CENTERS.Bergen;
   const [name, setName] = useState("");
   const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
   const [lat, setLat] = useState<string>("");
@@ -472,8 +480,8 @@ function VenueForm({
     : null;
 
   if (showMapPicker) {
-    // Default center: existing pick, or Bergen city center.
-    const initial = selectedLocation ?? { lat: 60.3913, lng: 5.3221 };
+    // Default center: existing pick, or current city center.
+    const initial = selectedLocation ?? cityCenter;
     return (
       <div className="pb-4">
         <div className="text-center">
@@ -484,7 +492,7 @@ function VenueForm({
             mode="pick"
             initialLat={initial.lat}
             initialLng={initial.lng}
-            city="Bergen"
+            city={currentCity}
             selectedLocation={selectedLocation}
             onCancel={() => setShowMapPicker(false)}
             onSelectLocation={(la, ln) => {

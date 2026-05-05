@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
 import heroImg from "@/assets/hero-bergen.jpg";
-import { sectionConfig } from "@/lib/domain";
+import { buildSectionConfig, type SectionDef } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
 import { FilterChips } from "@/components/FilterChips";
@@ -30,10 +30,12 @@ const Home = () => {
   const { data: badgeMap = {} } = useVenueBadges(venues.map(v => v.dbId));
   const sunCount = Object.values(badgeMap).filter(b => b.sun === "sunny").length;
 
+  const sectionConfig = useMemo<SectionDef[]>(() => buildSectionConfig(currentCity), [currentCity]);
+
   const filteredSections = useMemo(() => {
     if (filter === "all") return sectionConfig;
-    const map: Record<string, typeof sectionConfig[number]["id"][]> = {
-      sun: ["sun-now", "evening-sun"],
+    const map: Record<string, SectionDef["id"][]> = {
+      sun: ["sun-now"],
       deals: ["cheap-beer"],
       trending: ["trending"],
       family: ["family"],
@@ -42,7 +44,7 @@ const Home = () => {
     };
     const ids = map[filter] || [];
     return sectionConfig.filter(s => ids.includes(s.id));
-  }, [filter]);
+  }, [filter, sectionConfig]);
 
   const featured = venues.find(v => v.id === "bergen-rooftop") ?? venues[0];
 
@@ -50,7 +52,7 @@ const Home = () => {
     <div className="pb-8">
       {/* Hero */}
       <header className="relative z-0 h-[580px] overflow-hidden">
-        <img src={heroImg} alt="Bergen ved solnedgang" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={heroImg} alt={`${currentCity} ved solnedgang`} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-night/40 via-night/55 to-night/85" />
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/25 via-transparent to-transparent mix-blend-overlay" />
 
@@ -135,7 +137,7 @@ const Home = () => {
 
       {/* Sections */}
       {filteredSections.map((section) => {
-        const items = venues.filter(section.filter);
+        const items = venues.filter(v => section.filter(v, badgeMap));
         if (!items.length) return null;
         const variant = section.id === "sun-now" || section.id === "trending" ? "default" : "compact";
         return (
@@ -157,7 +159,7 @@ const Home = () => {
       })}
 
       <div className="mt-12 px-5 text-center">
-        <p className="font-display text-sm italic text-muted-foreground">Laget med ☀️ i Bergen</p>
+        <p className="font-display text-sm italic text-muted-foreground">Laget med ☀️ i {currentCity}</p>
       </div>
     </div>
   );
