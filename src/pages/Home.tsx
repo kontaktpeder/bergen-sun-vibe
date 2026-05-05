@@ -137,7 +137,7 @@ const Home = () => {
 
       {/* Sections */}
       {filteredSections.map((section) => {
-        const items = venues.filter(section.filter);
+        const items = venues.filter(v => section.filter(v, badgeMap));
         if (!items.length) return null;
         const variant = section.id === "sun-now" || section.id === "trending" ? "default" : "compact";
         return (
