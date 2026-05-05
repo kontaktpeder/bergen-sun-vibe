@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Heart, LogOut, MapPin, Settings, Sun } from "lucide-react";
+import { Bell, Heart, LogOut, MapPin, Settings, Sun, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { supabase } from "@/integrations/supabase/client";
+import { getLevel, getNextLevelThreshold, getLevelProgress } from "@/lib/levels";
 
 const Profile = () => {
   const favs = useFavorites();
@@ -81,6 +82,42 @@ const Profile = () => {
             </div>
           ))}
         </div>
+
+        {(() => {
+          const points = profile?.points ?? 0;
+          const level = getLevel(points);
+          const next = getNextLevelThreshold(points);
+          const nextLevel = next != null ? getLevel(next) : null;
+          const progress = Math.round(getLevelProgress(points) * 100);
+          return (
+            <div className="mt-6 rounded-2xl bg-gradient-to-br from-primary/10 to-sunset-pink/10 p-5 shadow-soft">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Ditt nivå</div>
+                  <div className="font-display text-xl font-semibold">{level}</div>
+                </div>
+                <Trophy className="h-6 w-6 text-primary" />
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary">
+                <div
+                  className="h-full bg-gradient-to-r from-primary to-sunset-pink transition-all"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {next != null && nextLevel
+                  ? `Du er ${level} – ${next - points} poeng til ${nextLevel}`
+                  : `Du er ${level} – maks nivå nådd 🎉`}
+              </p>
+              <Link
+                to="/leaderboard"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary"
+              >
+                Se topplisten →
+              </Link>
+            </div>
+          );
+        })()}
 
         <div className="mt-6 overflow-hidden rounded-2xl bg-card shadow-soft">
           {items.map(({ icon: Icon, label, desc }, i) => (
