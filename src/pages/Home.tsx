@@ -139,7 +139,7 @@ const Home = () => {
               <h2 className="mt-1 font-display text-2xl font-semibold">Kveldens utvalgte</h2>
             </div>
           </div>
-          <VenueCard venue={featured} variant="feature" badge={badgeMap[featured.dbId] ?? null} />
+          <VenueCard venue={featured} variant="feature" badge={badgeMap[featured.dbId] ?? null} userPhotoUrl={photoMap[featured.dbId] ?? null} eager />
         </section>
       )}
 
@@ -164,7 +164,15 @@ const Home = () => {
             </div>
             <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide">
               {items.map((v, i) => (
-                <VenueCard key={v.id} venue={v} variant={variant} index={i} badge={badgeMap[v.dbId] ?? null} />
+                <VenueCard
+                  key={v.id}
+                  venue={v}
+                  variant={variant}
+                  index={i}
+                  badge={badgeMap[v.dbId] ?? null}
+                  userPhotoUrl={photoMap[v.dbId] ?? null}
+                  eager={i < 3}
+                />
               ))}
             </div>
           </section>
