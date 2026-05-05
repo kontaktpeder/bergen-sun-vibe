@@ -9,6 +9,7 @@ type Result = {
   newPoints: number;
   contributionId: string;
   venueId?: string;
+  venueSlug?: string;
 };
 
 type Profile = { id: string; points: number; username?: string | null; avatar_url?: string | null };
@@ -46,6 +47,7 @@ export function useAddContribution(userId: string | undefined) {
       const r = data as {
         contribution_id: string;
         venue_id: string | null;
+        venue_slug?: string | null;
         awarded_points: number;
         new_points: number;
       };
@@ -55,6 +57,7 @@ export function useAddContribution(userId: string | undefined) {
         newPoints: r.new_points,
         contributionId: r.contribution_id,
         venueId: r.venue_id ?? undefined,
+        venueSlug: r.venue_slug ?? undefined,
       };
     },
 
