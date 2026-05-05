@@ -14,7 +14,227 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      contributions: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          points_awarded: number
+          status: string
+          type: string
+          user_id: string
+          venue_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          points_awarded?: number
+          status?: string
+          type: string
+          user_id: string
+          venue_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          points_awarded?: number
+          status?: string
+          type?: string
+          user_id?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contributions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contributions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      point_events: {
+        Row: {
+          created_at: string
+          delta: number
+          id: string
+          source_id: string
+          source_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delta: number
+          id?: string
+          source_id: string
+          source_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delta?: number
+          id?: string
+          source_id?: string
+          source_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "point_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          points: number
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          points?: number
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          points?: number
+          username?: string | null
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          contribution_id: string
+          created_at: string
+          id: string
+          reason: string
+          reporter_user_id: string
+        }
+        Insert: {
+          contribution_id: string
+          created_at?: string
+          id?: string
+          reason: string
+          reporter_user_id: string
+        }
+        Update: {
+          contribution_id?: string
+          created_at?: string
+          id?: string
+          reason?: string
+          reporter_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_contribution_id_fkey"
+            columns: ["contribution_id"]
+            isOneToOne: false
+            referencedRelation: "contributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_user_id_fkey"
+            columns: ["reporter_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venues: {
+        Row: {
+          area: string | null
+          category: string
+          created_at: string
+          deal_text: string | null
+          description: string
+          family_friendly: boolean
+          hours: string | null
+          id: string
+          image_url: string | null
+          last_activity_at: string
+          lat: number
+          lng: number
+          name: string
+          price_level: number
+          rating: number
+          reviews: number
+          slug: string
+          sun_score: number
+          sun_status: string
+          sun_until: string | null
+          tags: string[]
+          trending: boolean
+        }
+        Insert: {
+          area?: string | null
+          category: string
+          created_at?: string
+          deal_text?: string | null
+          description?: string
+          family_friendly?: boolean
+          hours?: string | null
+          id?: string
+          image_url?: string | null
+          last_activity_at?: string
+          lat: number
+          lng: number
+          name: string
+          price_level?: number
+          rating?: number
+          reviews?: number
+          slug: string
+          sun_score?: number
+          sun_status?: string
+          sun_until?: string | null
+          tags?: string[]
+          trending?: boolean
+        }
+        Update: {
+          area?: string | null
+          category?: string
+          created_at?: string
+          deal_text?: string | null
+          description?: string
+          family_friendly?: boolean
+          hours?: string | null
+          id?: string
+          image_url?: string | null
+          last_activity_at?: string
+          lat?: number
+          lng?: number
+          name?: string
+          price_level?: number
+          rating?: number
+          reviews?: number
+          slug?: string
+          sun_score?: number
+          sun_status?: string
+          sun_until?: string | null
+          tags?: string[]
+          trending?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
