@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
 import heroImg from "@/assets/hero-sunset.jpg";
-import { buildSectionConfig, type SectionDef } from "@/lib/domain";
+import { buildSectionConfig, belongsToCity, type SectionDef } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
 import { FilterChips } from "@/components/FilterChips";
@@ -26,7 +26,7 @@ const Home = () => {
     profile?.username?.trim() || user?.email?.split("@")[0]?.trim() || "Gjest";
   const userInitials = userDisplayName.slice(0, 2).toUpperCase();
   const venues = useMemo(
-    () => allVenues.filter(v => (v.city ?? "Bergen") === currentCity),
+    () => allVenues.filter(v => belongsToCity(v, currentCity as "Bergen" | "Oslo")),
     [allVenues, currentCity],
   );
   const venueIds = useMemo(() => venues.map(v => v.dbId), [venues]);
