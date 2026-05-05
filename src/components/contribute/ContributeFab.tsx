@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Loader2, MapPin, Plus } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useVenue } from "@/hooks/useVenue";
-import { useVenues } from "@/hooks/useVenues";
 import { useAddContribution } from "@/hooks/useAddContribution";
 import { useUploadImage } from "@/hooks/useUploadImage";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
@@ -16,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { showRewardFeedback } from "@/lib/reward-feedback";
 import { toUserErrorMessage } from "@/lib/error-messages";
 import { FLAGS } from "@/lib/flags";
+import { subscribeContributeFab } from "@/lib/contribute-bus";
 
 type Mode = "menu" | "sun" | "beer" | "photo" | "venue";
 type SuccessState = { venueId: string; venueSlug?: string } | null;
@@ -32,10 +32,8 @@ export function ContributeFab() {
   const isOnVenue = location.pathname.startsWith("/venue/");
   const slug = isOnVenue ? params.id : undefined;
   const { data: currentVenue } = useVenue(slug);
-  const { data: venues = [] } = useVenues();
 
-  const [selectedVenueDbId, setSelectedVenueDbId] = useState<string | undefined>(undefined);
-  const venueDbId = currentVenue?.dbId ?? selectedVenueDbId;
+  const venueDbId = currentVenue?.dbId;
   const { data: venueContribs = [] } = useVenueContributions(venueDbId);
   const lastBeer = useMemo(() => {
     const c = venueContribs.find((x) => x.type === "beer_price");
@@ -50,7 +48,6 @@ export function ContributeFab() {
 
   const reset = () => {
     setMode("menu");
-    setSelectedVenueDbId(undefined);
     setSuccess(null);
   };
 
@@ -62,6 +59,14 @@ export function ContributeFab() {
     }
     setTimeout(reset, 300);
   };
+
+  // Bus subscription: BottomNav + plus opens this sheet
+  useEffect(() => {
+    return subscribeContributeFab((m) => {
+      setOpen(true);
+      setMode(m);
+    });
+  }, []);
 
   // Deep-link: ?contribute=sun|beer|photo opens sheet in mode (only when on a venue)
   useEffect(() => {
@@ -78,14 +83,6 @@ export function ContributeFab() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        aria-label="Bidra"
-        className="fixed bottom-24 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-primary to-sunset-pink text-white shadow-float tap-scale"
-      >
-        <Plus className="h-6 w-6" strokeWidth={2.5} />
-      </button>
-
       <Sheet open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
         <SheetContent side="bottom" className="rounded-t-3xl">
           {!isAuthed ? (
