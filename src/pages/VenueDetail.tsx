@@ -168,6 +168,16 @@ const VenueDetail = () => {
           Sist oppdatert {timeAgo(venue.lastActivityAt)}
         </div>
 
+        {/* Venue contribute module */}
+        {FLAGS.venueContributeModuleEnabled && (
+          <VenueContributeModule
+            onSun={() => openContribute("sun")}
+            onBeer={() => openContribute("beer")}
+            onPhoto={() => openContribute("photo")}
+            onReportInfo={() => toast("Trykk 🚩 på et bidrag i aktiviteten for å rapportere det.")}
+          />
+        )}
+
         {/* Mini-feed */}
         {contributions.length > 0 && (
           <div className="mt-4 rounded-2xl bg-card p-4 shadow-soft">
@@ -175,6 +185,28 @@ const VenueDetail = () => {
             <ul className="mt-3 space-y-3">
               {contributions.map((c) => {
                 const d = c.data as Record<string, unknown>;
+                if (c.type === "photo" && typeof d?.image_url === "string") {
+                  return (
+                    <li key={c.id} className="overflow-hidden rounded-xl bg-secondary/40">
+                      <img
+                        src={d.image_url as string}
+                        alt="Brukerbilde"
+                        className="h-48 w-full object-cover"
+                        loading="lazy"
+                      />
+                      <div className="flex items-center gap-3 px-3 py-2 text-sm">
+                        <span className="text-lg">📸</span>
+                        <div className="flex-1">
+                          <div className="font-medium">La til bilde</div>
+                          <div className="text-xs text-muted-foreground">
+                            Publisert {timeAgo(c.created_at)}
+                          </div>
+                        </div>
+                        <ReportButton contributionId={c.id} />
+                      </div>
+                    </li>
+                  );
+                }
                 let label = "Bidrag";
                 let emoji = "✨";
                 if (c.type === "sun_report") {
@@ -183,9 +215,6 @@ const VenueDetail = () => {
                 } else if (c.type === "beer_price") {
                   emoji = "🍺";
                   label = `Oppdaterte ølpris til kr ${d?.price}`;
-                } else if (c.type === "photo") {
-                  emoji = "📸";
-                  label = "La til bilde";
                 }
                 return (
                   <li key={c.id} className="flex items-center gap-3 text-sm">
@@ -194,9 +223,6 @@ const VenueDetail = () => {
                       <div className="font-medium">{label}</div>
                       <div className="text-xs text-muted-foreground">{timeAgo(c.created_at)}</div>
                     </div>
-                    {c.type === "photo" && typeof d?.image_url === "string" && (
-                      <img src={d.image_url} alt="" className="h-10 w-10 rounded-md object-cover" />
-                    )}
                     <ReportButton contributionId={c.id} />
                   </li>
                 );
