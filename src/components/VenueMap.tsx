@@ -1,41 +1,53 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import type { Venue } from "@/lib/domain";
 
-// Inline SVG marker — avoids missing default-icon assets and matches app style.
+// Compact, branded marker — smaller than before, with subtle glow for selected.
 function makeIcon(opts: { sun: boolean; selected: boolean; trending?: boolean }) {
   const { sun, selected, trending } = opts;
-  const fill = sun
-    ? "url(#sun-grad)"
-    : trending
-      ? "url(#pink-grad)"
-      : "#1f2937";
-  const ring = selected ? "stroke=\"#ffffff\" stroke-width=\"3\"" : "stroke=\"#ffffff\" stroke-width=\"1.5\"";
-  const size = selected ? 38 : 30;
+  const fill = sun ? "#f59e0b" : trending ? "#ec4899" : "#0f172a";
+  const size = selected ? 22 : 16;
+  const shadow = selected
+    ? '<circle cx="12" cy="12" r="11" fill="#f59e0b" opacity="0.25"/>'
+    : "";
   const html = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 6}" viewBox="0 0 40 46">
-      <defs>
-        <linearGradient id="sun-grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#fbbf24"/>
-          <stop offset="1" stop-color="#f97316"/>
-        </linearGradient>
-        <linearGradient id="pink-grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#ec4899"/>
-          <stop offset="1" stop-color="#8b5cf6"/>
-        </linearGradient>
-      </defs>
-      <path d="M20 44 L11 28 A12 12 0 1 1 29 28 Z" fill="${fill}" ${ring}/>
-      <circle cx="20" cy="18" r="5" fill="#ffffff" opacity="0.95"/>
-      ${sun ? '<circle cx="20" cy="18" r="2.5" fill="#f59e0b"/>' : ""}
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24">
+      ${shadow}
+      <circle cx="12" cy="12" r="6" fill="${fill}" stroke="#ffffff" stroke-width="2"/>
     </svg>
   `;
   return L.divIcon({
     html,
     className: "venue-leaflet-marker",
-    iconSize: [size, size + 6],
-    iconAnchor: [size / 2, size + 6],
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+}
+
+// Custom branded cluster icon
+function clusterIcon(cluster: { getChildCount: () => number }) {
+  const count = cluster.getChildCount();
+  const size = count < 10 ? 32 : count < 50 ? 38 : 44;
+  const html = `
+    <div style="
+      width:${size}px;height:${size}px;
+      display:grid;place-items:center;
+      border-radius:9999px;
+      background:linear-gradient(135deg,#fbbf24,#f97316);
+      color:#fff;font-weight:600;font-size:${count < 100 ? 13 : 11}px;
+      box-shadow:0 2px 8px rgba(249,115,22,0.35), 0 0 0 3px rgba(255,255,255,0.9);
+      font-family:-apple-system,system-ui,sans-serif;
+    ">${count}</div>
+  `;
+  return L.divIcon({
+    html,
+    className: "venue-cluster-marker",
+    iconSize: [size, size],
   });
 }
 
@@ -64,9 +76,7 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
   const center: [number, number] = validVenues.length
     ? [validVenues[0].lat, validVenues[0].lng]
     : fallbackCenter;
-  const markersRef = useRef<Record<string, L.Marker | null>>({});
 
-  // Pan to selected marker when selection changes externally
   function PanToSelected() {
     const map = useMap();
     useEffect(() => {
@@ -82,33 +92,40 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
       zoom={13}
       scrollWheelZoom={false}
       zoomControl={false}
-      attributionControl={false}
-      className="h-full w-full"
+      className="h-full w-full venue-map"
       style={{ background: "hsl(var(--secondary))" }}
     >
+      {/* Calmer, premium tile style */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        subdomains="abcd"
+        maxZoom={20}
       />
       <FitBounds venues={validVenues} />
       <PanToSelected />
-      {validVenues.map((v) => (
-        <Marker
-          key={v.id}
-          position={[v.lat, v.lng]}
-          icon={makeIcon({
-            sun: v.sunStatus === "sun-now",
-            selected: v.id === selectedId,
-            trending: v.trending,
-          })}
-          ref={(ref) => {
-            markersRef.current[v.id] = ref;
-          }}
-          eventHandlers={{
-            click: () => onSelect(v.id),
-          }}
-        />
-      ))}
+      <MarkerClusterGroup
+        chunkedLoading
+        showCoverageOnHover={false}
+        spiderfyOnMaxZoom
+        maxClusterRadius={50}
+        iconCreateFunction={clusterIcon}
+      >
+        {validVenues.map((v) => (
+          <Marker
+            key={v.id}
+            position={[v.lat, v.lng]}
+            icon={makeIcon({
+              sun: v.sunStatus === "sun-now",
+              selected: v.id === selectedId,
+              trending: v.trending,
+            })}
+            eventHandlers={{
+              click: () => onSelect(v.id),
+            }}
+          />
+        ))}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 }
