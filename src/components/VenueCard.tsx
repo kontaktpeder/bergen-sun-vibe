@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { Heart, Star, Sun, CloudSun, HelpCircle, Moon, Beer, Camera } from "lucide-react";
+import { Heart, Star, Beer, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Venue } from "@/lib/domain";
 import { SunBadge } from "./SunBadge";
+import { DataSunBadge } from "./DataSunBadge";
 import { VenueImage } from "./VenueImage";
 import { useLatestVenuePhoto } from "@/hooks/useLatestVenuePhoto";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
@@ -13,29 +14,6 @@ interface Props {
   variant?: "feature" | "default" | "compact";
   index?: number;
   badge?: VenueBadgeState | null;
-}
-
-function DataSunBadge({ badge, className, size = "sm" }: { badge: VenueBadgeState; className?: string; size?: "sm" | "md" }) {
-  if (!badge.sun) return null;
-  const map = {
-    sunny: { label: "Sol nå", Icon: Sun, bg: "bg-gradient-to-r from-sun to-primary text-white", pulse: true },
-    partial: { label: "Delvis sol", Icon: CloudSun, bg: "bg-gradient-to-r from-sun/80 to-sunset-pink text-white", pulse: false },
-    shade: { label: "Skygge", Icon: Moon, bg: "bg-night/90 text-white", pulse: false },
-    unknown: { label: "Ukjent", Icon: HelpCircle, bg: "bg-secondary text-foreground", pulse: false },
-  } as const;
-  const c = map[badge.sun];
-  const Icon = c.Icon;
-  return (
-    <div className={cn(
-      "inline-flex items-center gap-1.5 rounded-full font-medium shadow-soft backdrop-blur-md",
-      size === "sm" ? "px-2.5 py-1 text-xs" : "px-3.5 py-1.5 text-sm",
-      c.bg,
-      className,
-    )}>
-      <Icon className={cn(size === "sm" ? "h-3 w-3" : "h-4 w-4", c.pulse && "animate-sun-pulse")} strokeWidth={2.5} />
-      <span className="whitespace-nowrap">{c.label}</span>
-    </div>
-  );
 }
 
 export function VenueCard({ venue, variant = "default", index = 0, badge }: Props) {
