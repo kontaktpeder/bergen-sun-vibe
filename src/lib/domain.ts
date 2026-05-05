@@ -7,7 +7,8 @@ export interface Venue {
   id: string; // = slug, brukes som rute-param
   dbId: string; // venue uuid (for contributions/relasjoner)
   name: string;
-  image: string;
+  image: string | null;
+  googlePhotoName?: string | null;
   category: string;
   rating: number;
   reviews: number;
@@ -31,23 +32,9 @@ export interface Venue {
   lastActivityAt: string;
 }
 
-// Fallback-bilder per slug (DB-en har image_url=null inntil videre).
-const imageMap: Record<string, string> = {
-  "bryggen-bar": bryggen,
-  "bergen-rooftop": rooftop,
-  "fisketorget": fisketorget,
-  "studentbaren": student,
-  "nordnes-utebar": nordnes,
-  "torgallmenningen-pub": pizza,
-  "marg-bein": wine,
-  "7-fjell": brewery,
-  "kaffemisjonen": coffee,
-  "floyen-cafe": floyen,
-  "no-stress": cocktail,
-  "villa-blanca": family,
-};
+// Bilder hentes fra DB (image_url) eller Google Place Photo via edge function.
+// Ingen AI-placeholder-bilder lenger.
 
-const fallbackImage = rooftop;
 
 export interface DbVenue {
   id: string;
