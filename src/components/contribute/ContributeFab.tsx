@@ -29,7 +29,8 @@ export function ContributeFab() {
   const [selectedVenueDbId, setSelectedVenueDbId] = useState<string | undefined>(undefined);
   const venueDbId = currentVenue?.dbId ?? selectedVenueDbId;
 
-  const addContribution = useAddContribution(user?.id, profile?.points ?? 0);
+  void profile;
+  const addContribution = useAddContribution(user?.id);
   const { upload } = useUploadImage();
 
   const reset = () => {
