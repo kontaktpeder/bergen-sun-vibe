@@ -1,7 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Search, Star } from "lucide-react";
+import { ArrowLeft, LocateFixed, Search, Star } from "lucide-react";
+import { toast } from "sonner";
 import { useVenues } from "@/hooks/useVenues";
+import { useUserLocation } from "@/hooks/useUserLocation";
 import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
 import { VenueMap } from "@/components/VenueMap";
@@ -31,6 +33,7 @@ const Explore = () => {
   const { data: venues = [], isLoading, error } = useVenues();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const { location: userLoc, loading: locLoading, error: locError, locate } = useUserLocation();
 
   const cityVenues = useMemo(
     () => venues.filter(v => (v.city ?? "Bergen") === city),
@@ -54,6 +57,22 @@ const Explore = () => {
   }, [filter, query, cityVenues]);
 
   const selected = cityVenues.find(v => v.id === selectedId) ?? null;
+
+  useEffect(() => {
+    if (locError) toast.error(locError);
+  }, [locError]);
+
+  useEffect(() => {
+    if (!userLoc || !cityVenues.length) return;
+    let best: { id: string; d: number } | null = null;
+    for (const v of cityVenues) {
+      const dLat = v.lat - userLoc.lat;
+      const dLng = v.lng - userLoc.lng;
+      const d = dLat * dLat + dLng * dLng;
+      if (!best || d < best.d) best = { id: v.id, d };
+    }
+    if (best) setSelectedId(best.id);
+  }, [userLoc, cityVenues]);
 
   return (
     <div className="relative min-h-screen">
@@ -115,6 +134,21 @@ const Explore = () => {
             <FilterChips options={filters} active={filter} onChange={setFilter} />
           </div>
         </div>
+
+        {/* Floating "Du er her" knapp */}
+        <button
+          type="button"
+          onClick={locate}
+          disabled={locLoading}
+          className={cn(
+            "tap-scale absolute right-3 z-[550] inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-2 text-xs font-medium shadow-float backdrop-blur transition-all disabled:opacity-60",
+            selected ? "bottom-[140px]" : "bottom-3"
+          )}
+          aria-label="Finn min posisjon"
+        >
+          <LocateFixed className="h-3.5 w-3.5 text-primary" />
+          {locLoading ? "Finner posisjon..." : "Du er her"}
+        </button>
 
         {/* Valgt sted som flytende kort nederst i kart-arealet */}
         {selected && (
