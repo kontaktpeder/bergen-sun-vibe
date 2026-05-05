@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Loader2, MapPin } from "lucide-react";
 import { MobileSheet } from "@/components/ui/mobile-sheet";
+import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useVenue } from "@/hooks/useVenue";
 import { useAddContribution } from "@/hooks/useAddContribution";
