@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { Sun, CloudSun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { SunStatus } from "@/data/venues";
+import type { SunStatus } from "@/lib/domain";
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   status: SunStatus;
