@@ -58,6 +58,22 @@ const Explore = () => {
 
   const selected = cityVenues.find(v => v.id === selectedId) ?? null;
 
+  useEffect(() => {
+    if (locError) toast.error(locError);
+  }, [locError]);
+
+  useEffect(() => {
+    if (!userLoc || !cityVenues.length) return;
+    let best: { id: string; d: number } | null = null;
+    for (const v of cityVenues) {
+      const dLat = v.lat - userLoc.lat;
+      const dLng = v.lng - userLoc.lng;
+      const d = dLat * dLat + dLng * dLng;
+      if (!best || d < best.d) best = { id: v.id, d };
+    }
+    if (best) setSelectedId(best.id);
+  }, [userLoc, cityVenues]);
+
   return (
     <div className="relative min-h-screen">
       {/* Map — fyller mer av skjermen for app-feel */}
