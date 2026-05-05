@@ -8,6 +8,7 @@ import Explore from "./pages/Explore";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import VenueDetail from "./pages/VenueDetail";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/venue/:id" element={<VenueDetail />} />
           </Route>
+          <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

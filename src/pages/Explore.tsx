@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Search, Sun, Star } from "lucide-react";
-import { venues } from "@/data/venues";
+import { useVenues } from "@/hooks/useVenues";
 import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
 import { cn } from "@/lib/utils";
@@ -25,8 +25,13 @@ function project(lat: number, lng: number) {
 
 const Explore = () => {
   const [filter, setFilter] = useState("all");
-  const [selectedId, setSelectedId] = useState<string | null>(venues[0].id);
+  const { data: venues = [] } = useVenues();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (!selectedId && venues.length) setSelectedId(venues[0].id);
+  }, [venues, selectedId]);
 
   const filtered = useMemo(() => {
     let v = venues;
@@ -36,7 +41,7 @@ const Explore = () => {
     else if (filter === "family") v = v.filter(x => x.familyFriendly);
     if (query) v = v.filter(x => (x.name + x.area + x.tags.join(" ")).toLowerCase().includes(query.toLowerCase()));
     return v;
-  }, [filter, query]);
+  }, [filter, query, venues]);
 
   const selected = venues.find(v => v.id === selectedId) ?? null;
 

@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
 import heroImg from "@/assets/hero-bergen.jpg";
-import { sectionConfig, venues } from "@/data/venues";
+import { sectionConfig } from "@/lib/domain";
+import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
 import { FilterChips } from "@/components/FilterChips";
 
@@ -18,6 +19,7 @@ const filterOptions = [
 
 const Home = () => {
   const [filter, setFilter] = useState("all");
+  const { data: venues = [], isLoading } = useVenues();
   const sunCount = venues.filter(v => v.sunStatus === "sun-now").length;
 
   const filteredSections = useMemo(() => {
@@ -34,7 +36,7 @@ const Home = () => {
     return sectionConfig.filter(s => ids.includes(s.id));
   }, [filter]);
 
-  const featured = venues.find(v => v.id === "bergen-rooftop")!;
+  const featured = venues.find(v => v.id === "bergen-rooftop") ?? venues[0];
 
   return (
     <div className="pb-8">
@@ -93,16 +95,22 @@ const Home = () => {
         <FilterChips options={filterOptions} active={filter} onChange={setFilter} />
       </div>
 
+      {isLoading && (
+        <div className="mt-10 px-5 text-sm text-muted-foreground">Laster steder…</div>
+      )}
+
       {/* Featured spotlight */}
-      <section className="mt-7 px-5">
-        <div className="mb-3 flex items-baseline justify-between">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-widest text-primary">★ Spotlight</div>
-            <h2 className="mt-1 font-display text-2xl font-semibold">Kveldens utvalgte</h2>
+      {featured && (
+        <section className="mt-7 px-5">
+          <div className="mb-3 flex items-baseline justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-widest text-primary">★ Spotlight</div>
+              <h2 className="mt-1 font-display text-2xl font-semibold">Kveldens utvalgte</h2>
+            </div>
           </div>
-        </div>
-        <VenueCard venue={featured} variant="feature" />
-      </section>
+          <VenueCard venue={featured} variant="feature" />
+        </section>
+      )}
 
       {/* Sections */}
       {filteredSections.map((section) => {

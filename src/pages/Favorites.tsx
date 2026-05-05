@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { useFavorites } from "@/lib/favorites";
-import { venues } from "@/data/venues";
+import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
 
 const Favorites = () => {
   const favs = useFavorites();
+  const { data: venues = [] } = useVenues();
   const items = venues.filter(v => favs.includes(v.id));
 
   return (

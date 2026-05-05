@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Heart, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Venue } from "@/data/venues";
+import type { Venue } from "@/lib/domain";
 import { SunBadge } from "./SunBadge";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 
