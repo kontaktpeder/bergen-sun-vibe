@@ -431,6 +431,7 @@ function VenueForm({
   const [lat, setLat] = useState<string>("");
   const [lng, setLng] = useState<string>("");
   const [showManual, setShowManual] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
   const [geoState, setGeoState] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [geoErr, setGeoErr] = useState<string | null>(null);
 
