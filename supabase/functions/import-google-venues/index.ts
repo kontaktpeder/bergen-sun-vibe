@@ -206,11 +206,17 @@ Deno.serve(async (req) => {
     for (const cityName of requested) {
       const city = CITIES[cityName];
       const dedup = new Map<string, any>();
+      let excludedCount = 0;
       for (const t of TYPES) {
         try {
           const places = await nearbySearch(GKEY, city, t);
           for (const p of places) {
-            if (p?.id) dedup.set(p.id, p);
+            if (!p?.id) continue;
+            if (isExcluded(p)) {
+              excludedCount++;
+              continue;
+            }
+            dedup.set(p.id, p);
           }
         } catch (e) {
           summary.errors.push(`${cityName}/${t}: ${(e as Error).message}`);
@@ -221,17 +227,18 @@ Deno.serve(async (req) => {
 
       const byCategory: Record<string, number> = {};
       for (const p of all) {
-        const cat = categoryFromTypes(p.types ?? []);
+        const cat = categoryFromTypes(p.primaryType, p.types);
         byCategory[cat] = (byCategory[cat] ?? 0) + 1;
       }
       const samples = all.slice(0, 5).map((p) => ({
         name: p.displayName?.text ?? "?",
         address: p.formattedAddress ?? null,
-        category: categoryFromTypes(p.types ?? []),
+        category: categoryFromTypes(p.primaryType, p.types),
+        primaryType: p.primaryType ?? null,
         rating: typeof p.rating === "number" ? p.rating : null,
         types: (p.types ?? []) as string[],
       }));
-      summary.perCity[cityName] = { fetched: all.length, inserted: 0, updated: 0, byCategory, samples };
+      summary.perCity[cityName] = { fetched: all.length, inserted: 0, updated: 0, byCategory, samples, excludedHotels: excludedCount } as any;
 
       if (dryRun) continue;
 
