@@ -6,6 +6,7 @@ import { sectionConfig } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
 import { FilterChips } from "@/components/FilterChips";
+import { useCity } from "@/context/CityContext";
 
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
@@ -19,7 +20,12 @@ const filterOptions = [
 
 const Home = () => {
   const [filter, setFilter] = useState("all");
-  const { data: venues = [], isLoading, error } = useVenues();
+  const { currentCity } = useCity();
+  const { data: allVenues = [], isLoading, error } = useVenues();
+  const venues = useMemo(
+    () => allVenues.filter(v => (v.city ?? "Bergen") === currentCity),
+    [allVenues, currentCity],
+  );
   const sunCount = venues.filter(v => v.sunStatus === "sun-now").length;
 
   const filteredSections = useMemo(() => {
@@ -54,7 +60,7 @@ const Home = () => {
               </div>
               <div className="leading-tight">
                 <div className="font-display text-lg font-semibold">Uteliv</div>
-                <div className="text-[10px] uppercase tracking-widest opacity-80">Bergen</div>
+                <div className="text-[10px] uppercase tracking-widest opacity-80">{currentCity}</div>
               </div>
             </div>
             <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-full glass-dark text-white tap-scale">
@@ -75,7 +81,7 @@ const Home = () => {
               <span className="mt-1 block bg-gradient-to-r from-sun via-primary-glow to-sunset-pink bg-clip-text pb-2 text-transparent">solen senke seg?</span>
             </h1>
             <p className="mt-4 max-w-xs text-sm/relaxed opacity-90">
-              Oppdag Bergens beste steder akkurat nå — basert på sol, tilbud og stemning.
+              Oppdag {currentCity}s beste steder akkurat nå — basert på sol, tilbud og stemning.
             </p>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
 import { VenueMap } from "@/components/VenueMap";
 import { VenueImage } from "@/components/VenueImage";
+import { useCity, type City } from "@/context/CityContext";
 import { cn } from "@/lib/utils";
 
 const filters = [
@@ -30,7 +31,7 @@ const CITY_CENTERS: Record<string, [number, number]> = {
 
 const Explore = () => {
   const [filter, setFilter] = useState("all");
-  const [city, setCity] = useState<"Bergen" | "Oslo">("Bergen");
+  const { currentCity: city, setCurrentCity } = useCity();
   const { data: venues = [], isLoading, error } = useVenues();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -118,7 +119,7 @@ const Explore = () => {
               {cityOptions.map(opt => (
                 <button
                   key={opt.id}
-                  onClick={() => setCity(opt.id as "Bergen" | "Oslo")}
+                  onClick={() => setCurrentCity(opt.id as City)}
                   className={cn(
                     "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
                     city === opt.id ? "bg-foreground text-background" : "text-muted-foreground"
