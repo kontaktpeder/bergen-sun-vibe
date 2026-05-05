@@ -34,6 +34,10 @@ export interface Venue {
   description: string;
   hours: string;
   area: string;
+  city?: string;
+  address?: string;
+  googleMapsUrl?: string;
+  websiteUrl?: string;
   lat: number;
   lng: number;
   lastActivityAt: string;
