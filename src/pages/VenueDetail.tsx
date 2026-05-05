@@ -66,7 +66,7 @@ const VenueDetail = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-5 left-5 right-5">
+        <div className="absolute bottom-16 left-5 right-5">
           <SunBadge status={venue.sunStatus} until={venue.sunUntil} size="md" />
         </div>
       </div>
