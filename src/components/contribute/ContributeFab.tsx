@@ -439,6 +439,7 @@ function VenueForm({
   onDone: (d: { name: string; lat: number; lng: number; category: "bar" | "cafe" | "restaurant"; city: "Bergen" | "Oslo" }) => void;
 }) {
   const { currentCity } = useCity();
+  const { data: allVenues = [] } = useVenues();
   const cityCenter = CITY_CENTERS[currentCity] ?? CITY_CENTERS.Bergen;
   const [name, setName] = useState("");
   const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
@@ -448,6 +449,13 @@ function VenueForm({
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [geoState, setGeoState] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [geoErr, setGeoErr] = useState<string | null>(null);
+
+  const possibleDup = useMemo(() => {
+    const la = Number(lat);
+    const ln = Number(lng);
+    if (!name.trim() || !Number.isFinite(la) || !Number.isFinite(ln)) return null;
+    return findPossibleDuplicate(allVenues, name, la, ln, 50);
+  }, [allVenues, name, lat, lng]);
 
   const requestLocation = () => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
