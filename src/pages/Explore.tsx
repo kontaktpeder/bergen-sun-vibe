@@ -1,9 +1,10 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Search, Sun, Star } from "lucide-react";
+import { ArrowLeft, Search, Star } from "lucide-react";
 import { useVenues } from "@/hooks/useVenues";
 import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
+import { VenueMap } from "@/components/VenueMap";
 import { cn } from "@/lib/utils";
 
 const filters = [
