@@ -167,7 +167,7 @@ const VenueDetail = () => {
             <div className="text-xs font-semibold uppercase tracking-widest text-primary">Aktivitet</div>
             <ul className="mt-3 space-y-3">
               {contributions.map((c) => {
-                const d = c.data as any;
+                const d = c.data as Record<string, unknown>;
                 let label = "Bidrag";
                 let emoji = "✨";
                 if (c.type === "sun_report") {
@@ -187,7 +187,7 @@ const VenueDetail = () => {
                       <div className="font-medium">{label}</div>
                       <div className="text-xs text-muted-foreground">{timeAgo(c.created_at)}</div>
                     </div>
-                    {c.type === "photo" && d?.image_url && (
+                    {c.type === "photo" && typeof d?.image_url === "string" && (
                       <img src={d.image_url} alt="" className="h-10 w-10 rounded-md object-cover" />
                     )}
                     <ReportButton contributionId={c.id} />
