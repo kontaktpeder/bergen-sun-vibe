@@ -20,29 +20,10 @@ const cityOptions = [
   { id: "Oslo", label: "Oslo", emoji: "🏙️" },
 ];
 
-// Default bounds per city — kept as fallback for older code paths.
-const CITY_BOUNDS: Record<string, { minLat: number; maxLat: number; minLng: number; maxLng: number }> = {
-  Bergen: { minLat: 60.378, maxLat: 60.408, minLng: 5.305, maxLng: 5.335 },
-  Oslo: { minLat: 59.905, maxLat: 59.935, minLng: 10.72, maxLng: 10.78 },
-};
-
 const CITY_CENTERS: Record<string, [number, number]> = {
   Bergen: [60.3913, 5.3221],
   Oslo: [59.9139, 10.7522],
 };
-
-function computeBounds(points: { lat: number; lng: number }[], fallback: typeof CITY_BOUNDS[string]) {
-  if (points.length < 2) return fallback;
-  const lats = points.map(p => p.lat);
-  const lngs = points.map(p => p.lng);
-  const pad = 0.002;
-  return {
-    minLat: Math.min(...lats) - pad,
-    maxLat: Math.max(...lats) + pad,
-    minLng: Math.min(...lngs) - pad,
-    maxLng: Math.max(...lngs) + pad,
-  };
-}
 
 const Explore = () => {
   const [filter, setFilter] = useState("all");
