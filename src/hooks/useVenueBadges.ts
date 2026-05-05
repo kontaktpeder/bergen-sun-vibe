@@ -21,7 +21,7 @@ interface ContribRow {
 }
 
 function emptyState(): VenueBadgeState {
-  return { sun: null, sunAt: null, beerPrice: null, photoCount: 0 };
+  return { sun: null, sunAt: null, beerPrice: null, photoCount: 0, latestPhotoUrl: null };
 }
 
 function mapSun(status: unknown): VenueBadgeSun | null {
