@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { ContributionPayload } from "@/lib/contribution-types";
+import type { VenueContribution } from "@/hooks/useVenueContributions";
+import { POINTS } from "@/lib/contribution-types";
 
 type Result = {
   awardedPoints: number;
@@ -8,6 +10,13 @@ type Result = {
   contributionId: string;
   venueId?: string;
 };
+
+type Profile = { id: string; points: number; username?: string | null; avatar_url?: string | null };
+
+function estimatePoints(p: ContributionPayload): number {
+  if (p.type === "beer_price") return p.isConfirm ? POINTS.beer_price_confirm : POINTS.beer_price;
+  return POINTS[p.type];
+}
 
 export function useAddContribution(userId: string | undefined) {
   const qc = useQueryClient();
@@ -49,10 +58,63 @@ export function useAddContribution(userId: string | undefined) {
       };
     },
 
+    onMutate: async (payload) => {
+      if (!userId) return;
+      const venueId = payload.type === "venue_add" ? undefined : payload.venueId;
+      const estPoints = estimatePoints(payload);
+
+      // Cancel outgoing refetches
+      await Promise.all([
+        venueId ? qc.cancelQueries({ queryKey: ["contributions", venueId] }) : Promise.resolve(),
+        qc.cancelQueries({ queryKey: ["profile", userId] }),
+      ]);
+
+      const prevContribs = venueId
+        ? qc.getQueryData<VenueContribution[]>(["contributions", venueId])
+        : undefined;
+      const prevProfile = qc.getQueryData<Profile>(["profile", userId]);
+
+      // Optimistic feed insert
+      if (venueId && payload.type !== "venue_add") {
+        const tempId = `temp-${Date.now()}`;
+        const optimistic: VenueContribution = {
+          id: tempId,
+          type: payload.type,
+          data: payload.data as Record<string, unknown>,
+          created_at: new Date().toISOString(),
+          user_id: userId,
+          points_awarded: estPoints,
+        };
+        qc.setQueryData<VenueContribution[]>(["contributions", venueId], (old) =>
+          [optimistic, ...(old ?? [])].slice(0, 10),
+        );
+      }
+
+      // Optimistic points bump
+      if (prevProfile) {
+        qc.setQueryData<Profile>(["profile", userId], {
+          ...prevProfile,
+          points: (prevProfile.points ?? 0) + estPoints,
+        });
+      }
+
+      return { prevContribs, prevProfile, venueId };
+    },
+
+    onError: (_err, _payload, ctx) => {
+      if (!ctx || !userId) return;
+      if (ctx.venueId && ctx.prevContribs !== undefined) {
+        qc.setQueryData(["contributions", ctx.venueId], ctx.prevContribs);
+      }
+      if (ctx.prevProfile) {
+        qc.setQueryData(["profile", userId], ctx.prevProfile);
+      }
+    },
+
     onSuccess: ({ venueId }) => {
       qc.invalidateQueries({ queryKey: ["venues"] });
       qc.invalidateQueries({ queryKey: ["venue"] });
-      qc.invalidateQueries({ queryKey: ["profile"] });
+      if (userId) qc.invalidateQueries({ queryKey: ["profile", userId] });
       if (venueId) qc.invalidateQueries({ queryKey: ["contributions", venueId] });
     },
   });
