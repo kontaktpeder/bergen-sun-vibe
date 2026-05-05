@@ -14,15 +14,27 @@ interface Props {
   variant?: "feature" | "default" | "compact";
   index?: number;
   badge?: VenueBadgeState | null;
+  /** Preferred: pass user photo url from a batched lookup. If undefined, falls back to per-card query. */
+  userPhotoUrl?: string | null;
+  /** Eager-load image (set true for first 2-3 cards in a list). */
+  eager?: boolean;
 }
 
-export function VenueCard({ venue, variant = "default", index = 0, badge }: Props) {
+// Standardized thumbnail size for all card variants → one cache entry per venue
+const CARD_SIZE = { w: 600, h: 600 };
+const FEATURE_SIZE = { w: 800, h: 1000 };
+
+export function VenueCard({ venue, variant = "default", index = 0, badge, userPhotoUrl: userPhotoProp, eager }: Props) {
   useFavorites();
-  const { data: userPhotoUrl } = useLatestVenuePhoto(venue.dbId);
+  // Only run per-card query if no batched photo was passed (legacy callers / Favorites page)
+  const { data: fetchedPhoto } = useLatestVenuePhoto(userPhotoProp === undefined ? venue.dbId : undefined);
+  const userPhotoUrl = userPhotoProp !== undefined ? userPhotoProp : fetchedPhoto;
   const fav = isFavorite(venue.id);
   const price = "kr".repeat(venue.priceLevel);
 
-  // If a data-driven badge state is provided, use it; otherwise fall back to legacy venue.sunStatus.
+  const loading = eager ? "eager" : "lazy";
+  const fetchPriority = eager ? "high" : "auto";
+
   const renderSunBadge = (className?: string, size: "sm" | "md" = "sm") =>
     badge !== undefined
       ? badge && badge.sun
@@ -37,7 +49,14 @@ export function VenueCard({ venue, variant = "default", index = 0, badge }: Prop
     return (
       <Link to={`/venue/${venue.id}`} className="group block tap-scale animate-stagger" style={{ animationDelay: `${index * 60}ms` }}>
         <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-card">
-          <VenueImage venue={venue} userPhotoUrl={userPhotoUrl} size={{ w: 800, h: 1000 }} imgClassName="absolute inset-0 transition-transform duration-700 group-hover:scale-110" />
+          <VenueImage
+            venue={venue}
+            userPhotoUrl={userPhotoUrl}
+            size={FEATURE_SIZE}
+            loading="eager"
+            fetchPriority="high"
+            imgClassName="absolute inset-0 transition-transform duration-700 group-hover:scale-110"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/20 to-transparent" />
 
           <div className="absolute top-4 left-4 right-4 flex items-start justify-between gap-2">
@@ -73,7 +92,14 @@ export function VenueCard({ venue, variant = "default", index = 0, badge }: Prop
     return (
       <Link to={`/venue/${venue.id}`} className="group block w-[180px] shrink-0 tap-scale animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
         <div className="relative aspect-square overflow-hidden rounded-2xl shadow-soft">
-          <VenueImage venue={venue} userPhotoUrl={userPhotoUrl} size={{ w: 400, h: 400 }} imgClassName="transition-transform duration-500 group-hover:scale-105" />
+          <VenueImage
+            venue={venue}
+            userPhotoUrl={userPhotoUrl}
+            size={CARD_SIZE}
+            loading={loading}
+            fetchPriority={fetchPriority}
+            imgClassName="transition-transform duration-500 group-hover:scale-105"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" />
           {renderSunBadge("absolute top-2 left-2")}
         </div>
@@ -92,7 +118,14 @@ export function VenueCard({ venue, variant = "default", index = 0, badge }: Prop
   return (
     <Link to={`/venue/${venue.id}`} className="group block w-[280px] shrink-0 tap-scale animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
       <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-card">
-        <VenueImage venue={venue} userPhotoUrl={userPhotoUrl} size={{ w: 600, h: 450 }} imgClassName="transition-transform duration-500 group-hover:scale-105" />
+        <VenueImage
+          venue={venue}
+          userPhotoUrl={userPhotoUrl}
+          size={CARD_SIZE}
+          loading={loading}
+          fetchPriority={fetchPriority}
+          imgClassName="transition-transform duration-500 group-hover:scale-105"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-night/60 via-transparent to-transparent" />
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
           {renderSunBadge()}
