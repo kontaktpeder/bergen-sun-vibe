@@ -596,7 +596,12 @@ function VenueForm({
           if (!name.trim()) return toast.error("Navn er påkrevd.");
           if (!Number.isFinite(la) || la < -90 || la > 90) return toast.error("Ugyldig lat.");
           if (!Number.isFinite(ln) || ln < -180 || ln > 180) return toast.error("Ugyldig lng.");
-          onDone({ name: name.trim(), lat: la, lng: ln, category, city: currentCity as "Bergen" | "Oslo" });
+          // Derive city from actual coordinates, not the selected city filter.
+          const inferredCity = inferLegacyCity(la, ln);
+          if (!inferredCity) {
+            return toast.error("Posisjonen er utenfor Bergen og Oslo. Juster plassering på kartet.");
+          }
+          onDone({ name: name.trim(), lat: la, lng: ln, category, city: inferredCity });
         }}
       >
         Legg til 📍
