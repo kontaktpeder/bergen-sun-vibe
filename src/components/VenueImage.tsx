@@ -5,7 +5,7 @@ import { VenueFallback } from "./VenueFallback";
 import type { Venue } from "@/lib/domain";
 
 type Props = {
-  venue: Pick<Venue, "image" | "googlePhotoName" | "name" | "category">;
+  venue: Pick<Venue, "image" | "googlePhotoName" | "name" | "category"> & { id?: string };
   userPhotoUrl?: string | null;
   className?: string;
   imgClassName?: string;

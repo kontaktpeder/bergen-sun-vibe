@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import type { Venue } from "@/lib/domain";
 
 type Props = {
-  venue: Pick<Venue, "name" | "category" | "id">;
+  venue: Pick<Venue, "name" | "category"> & { id?: string };
   className?: string;
   compact?: boolean;
   showCta?: boolean;
@@ -32,6 +32,7 @@ export function VenueFallback({ venue, className, compact, showCta = true }: Pro
   const handleCta = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!venue.id) return;
     navigate(`/venue/${venue.id}?contribute=photo`);
   };
 
@@ -65,7 +66,7 @@ export function VenueFallback({ venue, className, compact, showCta = true }: Pro
       </div>
 
       {/* subtle "Bidra med bilde" CTA at bottom */}
-      {showCta && !compact && (
+      {showCta && !compact && venue.id && (
         <button
           type="button"
           onClick={handleCta}
