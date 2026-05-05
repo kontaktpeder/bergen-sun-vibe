@@ -1,19 +1,37 @@
 import { Link } from "react-router-dom";
-import { Heart, Star } from "lucide-react";
+import { Heart, Star, Beer, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Venue } from "@/lib/domain";
 import { SunBadge } from "./SunBadge";
+import { DataSunBadge } from "./DataSunBadge";
 import { VenueImage } from "./VenueImage";
 import { useLatestVenuePhoto } from "@/hooks/useLatestVenuePhoto";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
+import type { VenueBadgeState } from "@/hooks/useVenueBadges";
 
-interface Props { venue: Venue; variant?: "feature" | "default" | "compact"; index?: number; }
+interface Props {
+  venue: Venue;
+  variant?: "feature" | "default" | "compact";
+  index?: number;
+  badge?: VenueBadgeState | null;
+}
 
-export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
+export function VenueCard({ venue, variant = "default", index = 0, badge }: Props) {
   useFavorites();
   const { data: userPhotoUrl } = useLatestVenuePhoto(venue.dbId);
   const fav = isFavorite(venue.id);
   const price = "kr".repeat(venue.priceLevel);
+
+  // If a data-driven badge state is provided, use it; otherwise fall back to legacy venue.sunStatus.
+  const renderSunBadge = (className?: string, size: "sm" | "md" = "sm") =>
+    badge !== undefined
+      ? badge && badge.sun
+        ? <DataSunBadge badge={badge} className={className} size={size} />
+        : null
+      : <SunBadge status={venue.sunStatus} until={venue.sunUntil} className={className} size={size} />;
+
+  const beerPrice = badge?.beerPrice ?? null;
+  const photoCount = badge?.photoCount ?? 0;
 
   if (variant === "feature") {
     return (
@@ -23,7 +41,7 @@ export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
           <div className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/20 to-transparent" />
 
           <div className="absolute top-4 left-4 right-4 flex items-start justify-between gap-2">
-            <SunBadge status={venue.sunStatus} until={venue.sunUntil} />
+            {renderSunBadge()}
             <button
               onClick={(e) => { e.preventDefault(); toggleFavorite(venue.id); }}
               className="grid h-9 w-9 place-items-center rounded-full glass shadow-soft tap-scale"
@@ -57,7 +75,7 @@ export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
         <div className="relative aspect-square overflow-hidden rounded-2xl shadow-soft">
           <VenueImage venue={venue} userPhotoUrl={userPhotoUrl} size={{ w: 400, h: 400 }} imgClassName="transition-transform duration-500 group-hover:scale-105" />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" />
-          <SunBadge status={venue.sunStatus} until={venue.sunUntil} className="absolute top-2 left-2" />
+          {renderSunBadge("absolute top-2 left-2")}
         </div>
         <div className="mt-2.5 px-1">
           <h4 className="truncate font-display text-base font-semibold">{venue.name}</h4>
@@ -77,7 +95,7 @@ export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
         <VenueImage venue={venue} userPhotoUrl={userPhotoUrl} size={{ w: 600, h: 450 }} imgClassName="transition-transform duration-500 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-night/60 via-transparent to-transparent" />
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
-          <SunBadge status={venue.sunStatus} until={venue.sunUntil} />
+          {renderSunBadge()}
           <button
             onClick={(e) => { e.preventDefault(); toggleFavorite(venue.id); }}
             className="grid h-8 w-8 place-items-center rounded-full glass shadow-soft tap-scale"
@@ -100,6 +118,12 @@ export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
         <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{venue.rating}</span>
           <span>·</span><span>{venue.category}</span><span>·</span><span>{venue.area}</span>
+          {beerPrice != null && (
+            <><span>·</span><span className="inline-flex items-center gap-1"><Beer className="h-3 w-3" />{beerPrice} kr</span></>
+          )}
+          {photoCount > 0 && (
+            <><span>·</span><span className="inline-flex items-center gap-1"><Camera className="h-3 w-3" />{photoCount}</span></>
+          )}
         </div>
       </div>
     </Link>

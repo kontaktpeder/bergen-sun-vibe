@@ -120,6 +120,7 @@ export function useAddContribution(userId: string | undefined) {
       if (userId) qc.invalidateQueries({ queryKey: ["profile", userId] });
       if (venueId) qc.invalidateQueries({ queryKey: ["contributions", venueId] });
       if (venueId) qc.invalidateQueries({ queryKey: ["venue-latest-photo", venueId] });
+      qc.invalidateQueries({ queryKey: ["venue-badges"] });
     },
   });
 }

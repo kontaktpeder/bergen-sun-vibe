@@ -6,6 +6,8 @@ import { useVenues } from "@/hooks/useVenues";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
+import { DataSunBadge } from "@/components/DataSunBadge";
+import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { VenueMap } from "@/components/VenueMap";
 import { VenueImage } from "@/components/VenueImage";
 import { useCity, type City } from "@/context/CityContext";
@@ -41,6 +43,8 @@ const Explore = () => {
     () => venues.filter(v => (v.city ?? "Bergen") === city),
     [venues, city],
   );
+
+  const { data: badgeMap = {} } = useVenueBadges(cityVenues.map(v => v.dbId));
 
   useEffect(() => {
     if (cityVenues.length && !cityVenues.find(v => v.id === selectedId)) {
@@ -172,7 +176,9 @@ const Explore = () => {
                       <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{selected.rating}</span>
                       <span className="text-muted-foreground">· {"kr".repeat(selected.priceLevel)}</span>
                     </div>
-                    <div className="mt-1.5"><SunBadge status={selected.sunStatus} until={selected.sunUntil} /></div>
+                    {badgeMap[selected.dbId]?.sun && (
+                      <div className="mt-1.5"><DataSunBadge badge={badgeMap[selected.dbId]} /></div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -214,7 +220,9 @@ const Explore = () => {
               <div className="min-w-0 flex-1">
                 <div className="truncate font-display text-base font-semibold">{v.name}</div>
                 <div className="truncate text-xs text-muted-foreground">{v.area} · {v.category}</div>
-                <div className="mt-1"><SunBadge status={v.sunStatus} until={v.sunUntil} /></div>
+                {badgeMap[v.dbId]?.sun && (
+                  <div className="mt-1"><DataSunBadge badge={badgeMap[v.dbId]} /></div>
+                )}
               </div>
               <div className="shrink-0 text-right">
                 <div className="inline-flex items-center gap-1 text-sm"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{v.rating}</div>
