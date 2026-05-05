@@ -30,7 +30,7 @@ function makeIcon(opts: { sun: boolean; selected: boolean; trending?: boolean })
 }
 
 // Custom branded cluster icon
-function clusterIcon(cluster: L.MarkerCluster) {
+function clusterIcon(cluster: { getChildCount: () => number }) {
   const count = cluster.getChildCount();
   const size = count < 10 ? 32 : count < 50 ? 38 : 44;
   const html = `
