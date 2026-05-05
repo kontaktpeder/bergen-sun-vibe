@@ -28,6 +28,7 @@ export function VenueFallback({ venue, className, compact, showCta = true }: Pro
   const Icon = pickIcon(venue.category);
   const angle = angleFromName(venue.name || "Solguiden");
   const navigate = useNavigate();
+  const initial = (venue.name || "·").trim().charAt(0).toUpperCase();
 
   const handleCta = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,38 +45,50 @@ export function VenueFallback({ venue, className, compact, showCta = true }: Pro
       }}
       aria-label={`${venue.name} – mangler bilde`}
     >
+      {/* soft glows */}
       <div
-        className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-40 blur-2xl"
+        className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-40 blur-2xl"
         style={{ background: "hsl(var(--sun))" }}
       />
       <div
-        className="pointer-events-none absolute -left-10 bottom-0 h-28 w-28 rounded-full opacity-25 blur-2xl"
+        className="pointer-events-none absolute -left-8 bottom-0 h-24 w-24 rounded-full opacity-25 blur-2xl"
         style={{ background: "hsl(var(--primary))" }}
       />
 
-      {/* centered category icon */}
+      {/* large faded category icon as decorative backdrop */}
+      <Icon
+        className={cn(
+          "pointer-events-none absolute -bottom-3 -right-3 text-white/20",
+          compact ? "h-16 w-16" : "h-24 w-24",
+        )}
+        strokeWidth={1.5}
+      />
+
+      {/* venue initial — clean, no boxy tile */}
       <div className="absolute inset-0 grid place-items-center">
-        <div
+        <span
           className={cn(
-            "grid place-items-center rounded-2xl border border-white/30 bg-white/15 text-white backdrop-blur-md",
-            compact ? "h-10 w-10" : "h-14 w-14",
+            "font-display font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]",
+            compact ? "text-3xl" : "text-5xl",
           )}
         >
-          <Icon className={compact ? "h-5 w-5" : "h-7 w-7"} />
-        </div>
+          {initial}
+        </span>
       </div>
 
-      {/* subtle "Bidra med bilde" CTA at bottom */}
+      {/* tiny "+ bilde" pill in corner — only when there's room */}
       {showCta && !compact && venue.id && (
         <button
           type="button"
           onClick={handleCta}
-          className="absolute inset-x-2 bottom-2 z-10 inline-flex items-center justify-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-md transition-colors hover:bg-white/30"
+          aria-label="Bidra med bilde"
+          className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full border border-white/30 bg-white/20 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-md transition-colors hover:bg-white/30"
         >
-          <ImagePlus className="h-3.5 w-3.5" />
-          Bidra med bilde
+          <ImagePlus className="h-3 w-3" />
+          Bilde
         </button>
       )}
     </div>
   );
 }
+
