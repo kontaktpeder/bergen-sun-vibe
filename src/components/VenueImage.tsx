@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { resolveVenueImage } from "@/lib/venue-image";
+import { resolveVenueImage, type ResolvedVenueImage } from "@/lib/venue-image";
+import { VenueFallback } from "./VenueFallback";
 import type { Venue } from "@/lib/domain";
 
 type Props = {
-  venue: Pick<Venue, "image" | "googlePhotoName" | "name">;
+  venue: Pick<Venue, "image" | "googlePhotoName" | "name" | "category">;
   userPhotoUrl?: string | null;
   className?: string;
   imgClassName?: string;
@@ -12,9 +13,8 @@ type Props = {
   alt?: string;
   loading?: "lazy" | "eager";
   showAttribution?: boolean;
+  compactFallback?: boolean;
 };
-
-const PLACEHOLDER = "/placeholder.svg";
 
 type Status = "loading" | "loaded" | "error";
 
@@ -27,41 +27,40 @@ export function VenueImage({
   alt,
   loading = "lazy",
   showAttribution = true,
+  compactFallback,
 }: Props) {
   const initial = resolveVenueImage(venue, userPhotoUrl, size);
-  const [src, setSrc] = useState(initial.src);
-  const [isGoogle, setIsGoogle] = useState(initial.isGoogle);
-  const [status, setStatus] = useState<Status>("loading");
+  const [resolved, setResolved] = useState<ResolvedVenueImage>(initial);
+  const [status, setStatus] = useState<Status>(
+    initial.kind === "fallback" ? "loaded" : "loading",
+  );
 
   useEffect(() => {
     const r = resolveVenueImage(venue, userPhotoUrl, size);
-    setSrc(r.src);
-    setIsGoogle(r.isGoogle);
-    setStatus(r.src === PLACEHOLDER ? "loaded" : "loading");
+    setResolved(r);
+    setStatus(r.kind === "fallback" ? "loaded" : "loading");
   }, [venue, userPhotoUrl, size]);
 
   const handleError = () => {
-    // Quietly fall back to placeholder, no console spam.
-    if (src !== PLACEHOLDER) {
-      setSrc(PLACEHOLDER);
-      setIsGoogle(false);
-      setStatus("loaded");
-    } else {
-      setStatus("error");
-    }
+    // Quietly fall back to branded placeholder, no console spam.
+    setResolved({ kind: "fallback", src: null });
+    setStatus("loaded");
   };
 
-  const showImg = status !== "error";
-  const showSkeleton = status === "loading";
+  if (resolved.kind === "fallback") {
+    return (
+      <VenueFallback venue={venue} className={className} compact={compactFallback} />
+    );
+  }
 
   return (
     <div className={cn("relative h-full w-full overflow-hidden bg-secondary/40", className)}>
-      {showSkeleton && (
+      {status === "loading" && (
         <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-secondary/60 to-secondary/30" />
       )}
-      {showImg && (
+      {status !== "error" && (
         <img
-          src={src}
+          src={resolved.src}
           alt={alt ?? venue.name}
           loading={loading}
           onLoad={() => setStatus("loaded")}
@@ -73,7 +72,7 @@ export function VenueImage({
           )}
         />
       )}
-      {isGoogle && status === "loaded" && showAttribution && (
+      {resolved.kind === "google" && status === "loaded" && showAttribution && (
         <span className="pointer-events-none absolute bottom-1 right-1 rounded bg-black/55 px-1.5 py-0.5 text-[9px] font-medium leading-none text-white">
           Google
         </span>
