@@ -60,7 +60,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="mt-auto pb-10 text-white animate-float-up">
+          <div className="mt-auto pb-24 text-white animate-float-up [text-shadow:0_2px_20px_rgba(0,0,0,0.35)]">
             <div className="inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
