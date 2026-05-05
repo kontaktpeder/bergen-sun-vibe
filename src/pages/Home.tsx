@@ -39,10 +39,10 @@ const Home = () => {
   return (
     <div className="pb-8">
       {/* Hero */}
-      <header className="relative h-[520px] overflow-hidden">
+      <header className="relative h-[580px] overflow-hidden">
         <img src={heroImg} alt="Bergen ved solnedgang" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-night/30 via-night/40 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 via-transparent to-transparent mix-blend-overlay" />
+        <div className="absolute inset-0 bg-gradient-to-b from-night/40 via-night/55 to-night/85" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/25 via-transparent to-transparent mix-blend-overlay" />
 
         <div className="relative z-10 flex h-full flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)]">
           <div className="flex items-center justify-between text-white">
