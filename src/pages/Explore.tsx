@@ -57,9 +57,8 @@ const Explore = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* Map */}
-      <div className="relative h-[60vh] overflow-hidden bg-secondary">
-        {/* Real Leaflet map */}
+      {/* Map — fyller mer av skjermen for app-feel */}
+      <div className="relative h-[82vh] overflow-hidden bg-secondary">
         <div className="absolute inset-0">
           <VenueMap
             venues={filtered}
@@ -69,7 +68,6 @@ const Explore = () => {
           />
         </div>
 
-        {/* Empty-state overlay when no venues have coords */}
         {filtered.length === 0 && !isLoading && (
           <div className="pointer-events-none absolute inset-0 z-[400] grid place-items-center">
             <div className="rounded-2xl bg-card/95 px-4 py-3 text-center text-sm shadow-card backdrop-blur">
@@ -78,17 +76,17 @@ const Explore = () => {
           </div>
         )}
 
-        {/* Bottom fade — lar bottom card flyte mykt opp fra kartet */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[450] h-24 bg-gradient-to-b from-transparent via-background/40 to-background" />
+        {/* Bottom fade slik at flytende kort hviler mykt over kartet */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[450] h-32 bg-gradient-to-b from-transparent via-background/30 to-background/80" />
 
-        {/* Top bar — z-[500] to sit above Leaflet panes */}
-        <div className="absolute inset-x-0 top-0 z-[500] px-5 pt-[max(env(safe-area-inset-top),1rem)]">
-          <div className="flex items-center gap-3">
-            <Link to="/" className="grid h-10 w-10 place-items-center rounded-full glass shadow-soft tap-scale">
+        {/* Kompakt topbar: tilbake + søk + by-toggle på én linje */}
+        <div className="absolute inset-x-0 top-0 z-[500] px-3 pt-[max(env(safe-area-inset-top),0.75rem)]">
+          <div className="flex items-center gap-2">
+            <Link to="/" className="grid h-9 w-9 shrink-0 place-items-center rounded-full glass shadow-soft tap-scale">
               <ArrowLeft className="h-4 w-4" />
             </Link>
-            <div className="flex flex-1 items-center gap-2 rounded-full glass px-4 py-2.5 shadow-soft">
-              <Search className="h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-1 items-center gap-2 rounded-full glass px-3 py-2 shadow-soft">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -96,39 +94,54 @@ const Explore = () => {
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
+            <div className="flex shrink-0 items-center rounded-full glass p-0.5 shadow-soft">
+              {cityOptions.map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setCity(opt.id as "Bergen" | "Oslo")}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
+                    city === opt.id ? "bg-foreground text-background" : "text-muted-foreground"
+                  )}
+                  aria-label={opt.label}
+                >
+                  {opt.emoji}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="mt-3 space-y-2">
-            <FilterChips options={cityOptions} active={city} onChange={(id) => setCity(id as "Bergen" | "Oslo")} />
+          {/* Filter-chips horisontalt scrollbar — tar ikke ekstra rad-plass */}
+          <div className="mt-2 -mx-3 overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <FilterChips options={filters} active={filter} onChange={setFilter} />
           </div>
         </div>
-      </div>
 
-      {/* Selected card sheet */}
-      {selected && (
-        <div className="relative z-[600] -mt-10 px-5">
-          <Link to={`/venue/${selected.id}`} key={selected.id} className="block animate-scale-in">
-            <div className="overflow-hidden rounded-3xl bg-card shadow-float">
-              <div className="flex gap-3 p-3">
-                <img src={selected.image} alt={selected.name} className="h-24 w-24 shrink-0 rounded-2xl object-cover" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{selected.category}</span>
-                    <span>·</span>
-                    <span>{selected.area}</span>
+        {/* Valgt sted som flytende kort nederst i kart-arealet */}
+        {selected && (
+          <div className="absolute inset-x-3 bottom-3 z-[600]">
+            <Link to={`/venue/${selected.id}`} key={selected.id} className="block animate-scale-in">
+              <div className="overflow-hidden rounded-2xl bg-card/95 shadow-float backdrop-blur">
+                <div className="flex gap-3 p-2.5">
+                  <img src={selected.image} alt={selected.name} className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span>{selected.category}</span>
+                      <span>·</span>
+                      <span className="truncate">{selected.area}</span>
+                    </div>
+                    <h3 className="mt-0.5 truncate font-display text-base font-semibold">{selected.name}</h3>
+                    <div className="mt-0.5 flex items-center gap-2 text-xs">
+                      <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{selected.rating}</span>
+                      <span className="text-muted-foreground">· {"kr".repeat(selected.priceLevel)}</span>
+                    </div>
+                    <div className="mt-1.5"><SunBadge status={selected.sunStatus} until={selected.sunUntil} /></div>
                   </div>
-                  <h3 className="mt-0.5 truncate font-display text-lg font-semibold">{selected.name}</h3>
-                  <div className="mt-1 flex items-center gap-2 text-sm">
-                    <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{selected.rating}</span>
-                    <span className="text-muted-foreground">· {"kr".repeat(selected.priceLevel)}</span>
-                  </div>
-                  <div className="mt-2"><SunBadge status={selected.sunStatus} until={selected.sunUntil} /></div>
                 </div>
               </div>
-            </div>
-          </Link>
-        </div>
-      )}
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* List */}
       <section className="mt-6 px-5">
