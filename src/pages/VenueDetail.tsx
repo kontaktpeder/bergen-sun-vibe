@@ -6,6 +6,8 @@ import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
 import { ReportButton } from "@/components/ReportButton";
 import { VenueContributeModule } from "@/components/contribute/VenueContributeModule";
+import { VenueStatusBadges } from "@/components/VenueStatusBadges";
+import { VenuePhotoGallery } from "@/components/VenuePhotoGallery";
 import { FLAGS } from "@/lib/flags";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import { timeAgo } from "@/lib/time";
@@ -68,7 +70,11 @@ const VenueDetail = () => {
   };
 
   const openMap = () => {
-    window.open(`https://www.google.com/maps/search/?api=1&query=${venue.lat},${venue.lng}`, "_blank");
+    const q = encodeURIComponent(
+      venue.name ? `${venue.name}, Bergen` : `${venue.lat},${venue.lng}`,
+    );
+    const url = `https://www.google.com/maps/search/?api=1&query=${q}&query_place_id=&center=${venue.lat},${venue.lng}`;
+    window.open(url, "_blank");
   };
 
   return (
@@ -112,6 +118,18 @@ const VenueDetail = () => {
           <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{venue.area}</span>
         </div>
 
+        {/* Live status badges (sun / beer / photos) */}
+        <VenueStatusBadges contributions={contributions} />
+
+        {/* Venue contribute module */}
+        {FLAGS.venueContributeModuleEnabled && (
+          <VenueContributeModule
+            onSun={() => openContribute("sun")}
+            onBeer={() => openContribute("beer")}
+            onPhoto={() => openContribute("photo")}
+          />
+        )}
+
         {venue.dealText && (
           <div className="mt-4 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-primary to-sunset-pink p-4 text-white shadow-card">
             <span className="text-2xl">🍻</span>
@@ -121,6 +139,9 @@ const VenueDetail = () => {
             </div>
           </div>
         )}
+
+        {/* Photo gallery */}
+        <VenuePhotoGallery contributions={contributions} onAdd={() => openContribute("photo")} />
 
         {/* Tags */}
         <div className="mt-5 flex flex-wrap gap-2">
@@ -144,69 +165,21 @@ const VenueDetail = () => {
           <span className="ml-auto rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-700">Åpent nå</span>
         </div>
 
-        {/* Sun forecast strip */}
-        <div className="mt-4 rounded-2xl bg-gradient-to-br from-sun/15 via-primary/10 to-sunset-pink/15 p-4">
-          <div className="text-xs font-semibold uppercase tracking-widest text-primary">Solprognose i dag</div>
-          <div className="mt-2 flex items-end gap-1.5">
-            {Array.from({ length: 12 }).map((_, i) => {
-              const hour = 10 + i;
-              const score = Math.max(0, Math.min(100, venue.sunScore - Math.abs(15 - hour) * 8));
-              return (
-                <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                  <div className="flex h-16 w-full items-end overflow-hidden rounded-md bg-white/40">
-                    <div className="w-full rounded-md bg-gradient-to-t from-primary to-sun" style={{ height: `${score}%` }} />
-                  </div>
-                  <span className="text-[9px] text-muted-foreground">{hour}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Last updated */}
         <div className="mt-4 text-xs text-muted-foreground">
           Sist oppdatert {timeAgo(venue.lastActivityAt)}
         </div>
 
-        {/* Venue contribute module */}
-        {FLAGS.venueContributeModuleEnabled && (
-          <VenueContributeModule
-            onSun={() => openContribute("sun")}
-            onBeer={() => openContribute("beer")}
-            onPhoto={() => openContribute("photo")}
-            onReportInfo={() => toast("Trykk 🚩 på et bidrag i aktiviteten for å rapportere det.")}
-          />
-        )}
-
         {/* Mini-feed */}
         {contributions.length > 0 && (
           <div className="mt-4 rounded-2xl bg-card p-4 shadow-soft">
-            <div className="text-xs font-semibold uppercase tracking-widest text-primary">Aktivitet</div>
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-widest text-primary">Aktivitet</div>
+              <span className="text-[10px] text-muted-foreground">Rapporter feil med 🚩 på bidraget</span>
+            </div>
             <ul className="mt-3 space-y-3">
               {contributions.map((c) => {
                 const d = c.data as Record<string, unknown>;
-                if (c.type === "photo" && typeof d?.image_url === "string") {
-                  return (
-                    <li key={c.id} className="overflow-hidden rounded-xl bg-secondary/40">
-                      <img
-                        src={d.image_url as string}
-                        alt="Brukerbilde"
-                        className="h-48 w-full object-cover"
-                        loading="lazy"
-                      />
-                      <div className="flex items-center gap-3 px-3 py-2 text-sm">
-                        <span className="text-lg">📸</span>
-                        <div className="flex-1">
-                          <div className="font-medium">La til bilde</div>
-                          <div className="text-xs text-muted-foreground">
-                            Publisert {timeAgo(c.created_at)}
-                          </div>
-                        </div>
-                        <ReportButton contributionId={c.id} />
-                      </div>
-                    </li>
-                  );
-                }
                 let label = "Bidrag";
                 let emoji = "✨";
                 if (c.type === "sun_report") {
@@ -215,6 +188,9 @@ const VenueDetail = () => {
                 } else if (c.type === "beer_price") {
                   emoji = "🍺";
                   label = `Oppdaterte ølpris til kr ${d?.price}`;
+                } else if (c.type === "photo") {
+                  emoji = "📸";
+                  label = "La til bilde";
                 }
                 return (
                   <li key={c.id} className="flex items-center gap-3 text-sm">

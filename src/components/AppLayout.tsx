@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { BottomNav } from "./BottomNav";
 import { ContributeFab } from "./contribute/ContributeFab";
+import { RewardOverlayHost } from "./RewardOverlay";
 import { FLAGS } from "@/lib/flags";
 
 export function AppLayout() {
@@ -9,6 +10,7 @@ export function AppLayout() {
       <Outlet />
       {FLAGS.contributionsEnabled && <ContributeFab />}
       <BottomNav />
+      <RewardOverlayHost />
     </div>
   );
 }

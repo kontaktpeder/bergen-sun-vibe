@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Loader2, MapPin, Plus } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useVenue } from "@/hooks/useVenue";
-import { useVenues } from "@/hooks/useVenues";
 import { useAddContribution } from "@/hooks/useAddContribution";
 import { useUploadImage } from "@/hooks/useUploadImage";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
@@ -16,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { showRewardFeedback } from "@/lib/reward-feedback";
 import { toUserErrorMessage } from "@/lib/error-messages";
 import { FLAGS } from "@/lib/flags";
+import { subscribeContributeFab } from "@/lib/contribute-bus";
 
 type Mode = "menu" | "sun" | "beer" | "photo" | "venue";
 type SuccessState = { venueId: string; venueSlug?: string } | null;
@@ -32,10 +32,8 @@ export function ContributeFab() {
   const isOnVenue = location.pathname.startsWith("/venue/");
   const slug = isOnVenue ? params.id : undefined;
   const { data: currentVenue } = useVenue(slug);
-  const { data: venues = [] } = useVenues();
 
-  const [selectedVenueDbId, setSelectedVenueDbId] = useState<string | undefined>(undefined);
-  const venueDbId = currentVenue?.dbId ?? selectedVenueDbId;
+  const venueDbId = currentVenue?.dbId;
   const { data: venueContribs = [] } = useVenueContributions(venueDbId);
   const lastBeer = useMemo(() => {
     const c = venueContribs.find((x) => x.type === "beer_price");
@@ -50,7 +48,6 @@ export function ContributeFab() {
 
   const reset = () => {
     setMode("menu");
-    setSelectedVenueDbId(undefined);
     setSuccess(null);
   };
 
@@ -62,6 +59,14 @@ export function ContributeFab() {
     }
     setTimeout(reset, 300);
   };
+
+  // Bus subscription: BottomNav + plus opens this sheet
+  useEffect(() => {
+    return subscribeContributeFab((m) => {
+      setOpen(true);
+      setMode(m);
+    });
+  }, []);
 
   // Deep-link: ?contribute=sun|beer|photo opens sheet in mode (only when on a venue)
   useEffect(() => {
@@ -78,14 +83,6 @@ export function ContributeFab() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        aria-label="Bidra"
-        className="fixed bottom-24 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-primary to-sunset-pink text-white shadow-float tap-scale"
-      >
-        <Plus className="h-6 w-6" strokeWidth={2.5} />
-      </button>
-
       <Sheet open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
         <SheetContent side="bottom" className="rounded-t-3xl">
           {!isAuthed ? (
@@ -108,24 +105,16 @@ export function ContributeFab() {
                 if (success.venueSlug) navigate(`/venue/${success.venueSlug}`);
               }}
               onAddPhoto={() => {
-                setSuccess(null);
-                setSelectedVenueDbId(success.venueId);
-                setMode("photo");
+                close();
+                if (success.venueSlug) navigate(`/venue/${success.venueSlug}?contribute=photo`);
               }}
               onAddBeer={() => {
-                setSuccess(null);
-                setSelectedVenueDbId(success.venueId);
-                setMode("beer");
+                close();
+                if (success.venueSlug) navigate(`/venue/${success.venueSlug}?contribute=beer`);
               }}
             />
           ) : mode === "menu" ? (
-            <Menu
-              onPick={(m) => setMode(m)}
-              showVenuePicker={!isOnVenue}
-              venues={venues.map((v) => ({ id: v.dbId, name: v.name }))}
-              selectedVenueDbId={selectedVenueDbId}
-              onPickVenue={setSelectedVenueDbId}
-            />
+            <Menu onPick={(m) => setMode(m)} isOnVenue={isOnVenue} />
           ) : mode === "sun" ? (
             <SunForm
               venueId={venueDbId}
@@ -245,7 +234,7 @@ function VenueAddSuccess({
         <SheetTitle className="text-center">Stedet er lagt til 🎉</SheetTitle>
       </SheetHeader>
       <p className="mt-2 text-sm text-muted-foreground">
-        Bra jobbet — du hjelper flere finne gode spots.
+        Stedet er lagt til. Gjør det nyttig ved å legge inn bilde, sol eller ølpris.
       </p>
       <div className="mt-5 grid gap-2">
         {success.venueSlug && (
@@ -264,48 +253,37 @@ function VenueAddSuccess({
   );
 }
 
-function Menu({
-  onPick,
-  showVenuePicker,
-  venues,
-  selectedVenueDbId,
-  onPickVenue,
-}: {
-  onPick: (m: Mode) => void;
-  showVenuePicker: boolean;
-  venues: { id: string; name: string }[];
-  selectedVenueDbId?: string;
-  onPickVenue: (id: string) => void;
-}) {
-  const needsVenue = showVenuePicker && !selectedVenueDbId;
+function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boolean }) {
+  // Global menu = primary action is "add new venue".
+  // On a venue page the local module handles sun/beer/photo, so this menu
+  // is only used as a fallback (deep-link cleared) — keep simple.
+  if (!isOnVenue) {
+    return (
+      <div className="pb-4">
+        <SheetHeader>
+          <SheetTitle>Legg til nytt sted</SheetTitle>
+        </SheetHeader>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Mangler et sted i Bergen? Legg det til så andre kan finne det.
+        </p>
+        <div className="mt-5 grid">
+          <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
+        </div>
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          For å rapportere sol, ølpris eller bilde — åpne et sted først.
+        </p>
+      </div>
+    );
+  }
   return (
     <div className="pb-4">
       <SheetHeader>
         <SheetTitle>Hva vil du dele?</SheetTitle>
       </SheetHeader>
-
-      {showVenuePicker && (
-        <div className="mt-4">
-          <Label className="text-xs uppercase tracking-widest text-muted-foreground">Sted</Label>
-          <select
-            value={selectedVenueDbId ?? ""}
-            onChange={(e) => onPickVenue(e.target.value)}
-            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3"
-          >
-            <option value="">Velg sted…</option>
-            {venues.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="☀️" label="Er det sol?" disabled={needsVenue} onClick={() => onPick("sun")} />
-        <ActionCard emoji="🍺" label="Ølpris" disabled={needsVenue} onClick={() => onPick("beer")} />
-        <ActionCard emoji="📸" label="Bilde" disabled={needsVenue} onClick={() => onPick("photo")} />
+        <ActionCard emoji="☀️" label="Er det sol?" onClick={() => onPick("sun")} />
+        <ActionCard emoji="🍺" label="Ølpris" onClick={() => onPick("beer")} />
+        <ActionCard emoji="📸" label="Bilde" onClick={() => onPick("photo")} />
         <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
       </div>
     </div>
