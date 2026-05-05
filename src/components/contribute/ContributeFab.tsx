@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Loader2, MapPin, Plus } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useVenue } from "@/hooks/useVenue";
