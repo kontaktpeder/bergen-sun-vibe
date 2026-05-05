@@ -1,4 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
 import type { Venue } from "@/lib/domain";
 
 const FUNCTIONS_BASE = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1`;
@@ -16,11 +15,12 @@ export function googlePlacePhotoUrl(
 const FALLBACK = "/placeholder.svg";
 
 /**
- * Resolve image for a venue using priority:
- * 1. User-uploaded photo (if provided)
- * 2. Existing image_url (custom upload from venue_add)
- * 3. Google Place photo via edge function
- * 4. Placeholder
+ * Resolve image source for a venue.
+ * Priority:
+ *  1. user-uploaded photo (passed in)
+ *  2. venue.image (custom DB image_url)
+ *  3. Google Place Photo via edge function
+ *  4. placeholder
  */
 export function resolveVenueImage(
   venue: Pick<Venue, "image" | "googlePhotoName">,
@@ -28,14 +28,8 @@ export function resolveVenueImage(
   size?: { w?: number; h?: number },
 ): { src: string; isGoogle: boolean } {
   if (userPhotoUrl) return { src: userPhotoUrl, isGoogle: false };
-  if (venue.image && !venue.image.startsWith("/src/") && venue.image !== FALLBACK) {
-    // image was set explicitly (custom upload) — use it
-    return { src: venue.image, isGoogle: false };
-  }
+  if (venue.image) return { src: venue.image, isGoogle: false };
   const g = googlePlacePhotoUrl(venue.googlePhotoName, size);
   if (g) return { src: g, isGoogle: true };
   return { src: FALLBACK, isGoogle: false };
 }
-
-// Re-export supabase for callers that want signed URL fetching later
-export { supabase };
