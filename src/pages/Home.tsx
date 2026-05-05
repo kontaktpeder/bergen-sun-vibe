@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
-import heroImg from "@/assets/hero-bergen.jpg";
+import heroImg from "@/assets/hero-sunset.jpg";
 import { buildSectionConfig, type SectionDef } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
@@ -12,11 +12,7 @@ import { useVenueBadges } from "@/hooks/useVenueBadges";
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
   { id: "sun", label: "Sol nå", emoji: "☀️" },
-  { id: "deals", label: "Tilbud", emoji: "🍻" },
-  { id: "trending", label: "Trending", emoji: "🔥" },
-  { id: "family", label: "Familie", emoji: "👨‍👩‍👧" },
-  { id: "cheap", label: "Billig", emoji: "💸" },
-  { id: "date", label: "Date", emoji: "💛" },
+  { id: "cheap", label: "Billigst øl", emoji: "🍺" },
 ];
 
 const Home = () => {
@@ -36,17 +32,19 @@ const Home = () => {
     if (filter === "all") return sectionConfig;
     const map: Record<string, SectionDef["id"][]> = {
       sun: ["sun-now"],
-      deals: ["cheap-beer"],
-      trending: ["trending"],
-      family: ["family"],
       cheap: ["cheap-beer"],
-      date: ["best-now", "trending"],
     };
     const ids = map[filter] || [];
     return sectionConfig.filter(s => ids.includes(s.id));
   }, [filter, sectionConfig]);
 
-  const featured = venues.find(v => v.id === "bergen-rooftop") ?? venues[0];
+  const featured = useMemo(() => {
+    if (!venues.length) return null;
+    const withSun = venues.find(v => badgeMap[v.dbId]?.sun === "sunny");
+    if (withSun) return withSun;
+    const withImage = [...venues].sort((a, b) => (b.rating || 0) - (a.rating || 0)).find(v => v.image);
+    return withImage ?? venues[0];
+  }, [venues, badgeMap]);
 
   return (
     <div className="pb-8">
@@ -137,7 +135,12 @@ const Home = () => {
 
       {/* Sections */}
       {filteredSections.map((section) => {
-        const items = venues.filter(v => section.filter(v, badgeMap));
+        let items = venues.filter(v => section.filter(v, badgeMap));
+        if (section.id === "cheap-beer") {
+          items = [...items].sort(
+            (a, b) => (badgeMap[a.dbId]?.beerPrice ?? Infinity) - (badgeMap[b.dbId]?.beerPrice ?? Infinity),
+          );
+        }
         if (!items.length) return null;
         const variant = section.id === "sun-now" || section.id === "trending" ? "default" : "compact";
         return (

@@ -22,8 +22,8 @@ const Profile = () => {
   ];
 
   const items = [
-    { icon: Bell, label: "Varsler", desc: "Sol-alerts og tilbud" },
-    { icon: Settings, label: "Innstillinger", desc: "Konto og preferanser" },
+    { icon: Bell, label: "Varsler", desc: "Kommer snart" },
+    { icon: Settings, label: "Innstillinger", desc: "Kommer snart" },
   ];
 
   const handleSignOut = async () => {
@@ -151,7 +151,13 @@ const Profile = () => {
 
         <div className="mt-4 overflow-hidden rounded-2xl bg-card shadow-soft">
           {items.map(({ icon: Icon, label, desc }, i) => (
-            <button key={label} className={`tap-scale flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-secondary ${i > 0 ? "border-t border-border" : ""}`}>
+            <button
+              key={label}
+              type="button"
+              disabled
+              aria-disabled="true"
+              className={`flex w-full items-center gap-4 px-5 py-4 text-left opacity-60 ${i > 0 ? "border-t border-border" : ""}`}
+            >
               <div className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
                 <Icon className="h-4 w-4" />
               </div>
@@ -159,7 +165,7 @@ const Profile = () => {
                 <div className="font-medium">{label}</div>
                 <div className="text-xs text-muted-foreground">{desc}</div>
               </div>
-              <span className="text-muted-foreground">›</span>
+              <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Snart</span>
             </button>
           ))}
         </div>
