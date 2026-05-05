@@ -6,12 +6,15 @@ import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useIsAdmin } from "@/hooks/useReports";
 import { supabase } from "@/integrations/supabase/client";
 import { getLevel, getNextLevelThreshold, getLevelProgress } from "@/lib/levels";
+import { useCity, type City } from "@/context/CityContext";
 
 const Profile = () => {
   const favs = useFavorites();
   const navigate = useNavigate();
   const { user, profile, isAuthed, loading } = useAuthProfile();
   const { data: isAdmin } = useIsAdmin(user?.id);
+  const { currentCity, setCurrentCity } = useCity();
+  const cities: City[] = ["Bergen", "Oslo"];
 
   const stats = [
     { label: "Lagret", value: favs.length, icon: Heart },
@@ -21,7 +24,6 @@ const Profile = () => {
 
   const items = [
     { icon: Bell, label: "Varsler", desc: "Sol-alerts og tilbud" },
-    { icon: MapPin, label: "Mitt område", desc: "Bergen sentrum" },
     { icon: Settings, label: "Innstillinger", desc: "Konto og preferanser" },
   ];
 
