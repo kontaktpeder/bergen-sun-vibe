@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Heart, LogOut, MapPin, Settings, Sun, Trophy } from "lucide-react";
+import { Bell, Heart, LogOut, MapPin, Settings, Shield, Sun, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
+import { useIsAdmin } from "@/hooks/useReports";
 import { supabase } from "@/integrations/supabase/client";
 import { getLevel, getNextLevelThreshold, getLevelProgress } from "@/lib/levels";
 
@@ -10,6 +11,7 @@ const Profile = () => {
   const favs = useFavorites();
   const navigate = useNavigate();
   const { user, profile, isAuthed, loading } = useAuthProfile();
+  const { data: isAdmin } = useIsAdmin(user?.id);
 
   const stats = [
     { label: "Lagret", value: favs.length, icon: Heart },
@@ -140,6 +142,15 @@ const Profile = () => {
           <p className="mt-1 text-sm opacity-85">Eksklusive tilbud, push-varsler når sola treffer favorittstedene dine.</p>
           <button className="tap-scale mt-4 rounded-full bg-sun px-5 py-2.5 text-sm font-semibold text-night">Prøv 7 dager gratis</button>
         </div>
+
+        {isAdmin && (
+          <Link
+            to="/admin/reports"
+            className="tap-scale mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-card py-3.5 text-sm font-medium shadow-soft"
+          >
+            <Shield className="h-4 w-4" /> Adminpanel
+          </Link>
+        )}
 
         <button
           onClick={handleSignOut}
