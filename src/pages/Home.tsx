@@ -38,7 +38,13 @@ const Home = () => {
     return sectionConfig.filter(s => ids.includes(s.id));
   }, [filter, sectionConfig]);
 
-  const featured = venues.find(v => v.id === "bergen-rooftop") ?? venues[0];
+  const featured = useMemo(() => {
+    if (!venues.length) return null;
+    const withSun = venues.find(v => badgeMap[v.dbId]?.sun === "sunny");
+    if (withSun) return withSun;
+    const withImage = [...venues].sort((a, b) => (b.rating || 0) - (a.rating || 0)).find(v => v.image);
+    return withImage ?? venues[0];
+  }, [venues, badgeMap]);
 
   return (
     <div className="pb-8">
