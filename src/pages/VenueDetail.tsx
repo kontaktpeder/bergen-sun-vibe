@@ -5,11 +5,9 @@ import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
 import { ReportButton } from "@/components/ReportButton";
-import { VenueContributeModule } from "@/components/contribute/VenueContributeModule";
 import { VenueStatusBadges } from "@/components/VenueStatusBadges";
 import { VenuePhotoGallery } from "@/components/VenuePhotoGallery";
 import { VenueImage } from "@/components/VenueImage";
-import { FLAGS } from "@/lib/flags";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
@@ -127,17 +125,13 @@ const VenueDetail = () => {
           <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{venue.area}</span>
         </div>
 
-        {/* Live status badges (sun / beer / photos) */}
-        <VenueStatusBadges contributions={contributions} />
-
-        {/* Venue contribute module */}
-        {FLAGS.venueContributeModuleEnabled && (
-          <VenueContributeModule
-            onSun={() => openContribute("sun")}
-            onBeer={() => openContribute("beer")}
-            onPhoto={() => openContribute("photo")}
-          />
-        )}
+        {/* Live status + contribute (combined) */}
+        <VenueStatusBadges
+          contributions={contributions}
+          onSun={() => openContribute("sun")}
+          onBeer={() => openContribute("beer")}
+          onPhoto={() => openContribute("photo")}
+        />
 
         {venue.dealText && (
           <div className="mt-4 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-primary to-sunset-pink p-4 text-white shadow-card">
