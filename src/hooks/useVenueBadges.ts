@@ -8,6 +8,7 @@ export interface VenueBadgeState {
   sunAt: string | null;
   beerPrice: number | null;
   photoCount: number;
+  latestPhotoUrl: string | null;
 }
 
 const FRESH_MS = 60 * 60 * 1000; // 60 min
