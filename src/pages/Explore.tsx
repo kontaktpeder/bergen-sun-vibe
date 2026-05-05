@@ -15,11 +15,9 @@ import { useCity, type City } from "@/context/CityContext";
 import { cn } from "@/lib/utils";
 
 const filters = [
-  { id: "all", label: "Alle", emoji: "📍" },
-  { id: "sun-now", label: "Sol nå", emoji: "☀️" },
-  { id: "deal", label: "Tilbud", emoji: "🏷️" },
-  { id: "trending", label: "Trending", emoji: "🔥" },
-  { id: "family", label: "Familie", emoji: "👨‍👩‍👧" },
+  { id: "all", label: "Alt", emoji: "✨" },
+  { id: "sun", label: "Sol nå", emoji: "☀️" },
+  { id: "cheap", label: "Billigst øl", emoji: "🍺" },
 ];
 
 const cityOptions = [
@@ -55,10 +53,12 @@ const Explore = () => {
 
   const filtered = useMemo(() => {
     let v = cityVenues;
-    if (filter === "sun-now") v = v.filter(x => badgeMap[x.dbId]?.sun === "sunny");
-    else if (filter === "deal") v = v.filter(x => x.dealText);
-    else if (filter === "trending") v = v.filter(x => x.trending);
-    else if (filter === "family") v = v.filter(x => x.familyFriendly);
+    if (filter === "sun") v = v.filter(x => badgeMap[x.dbId]?.sun === "sunny");
+    else if (filter === "cheap") {
+      v = [...v].sort(
+        (a, b) => (badgeMap[a.dbId]?.beerPrice ?? Infinity) - (badgeMap[b.dbId]?.beerPrice ?? Infinity),
+      );
+    }
     if (query) v = v.filter(x => (x.name + x.area + x.tags.join(" ")).toLowerCase().includes(query.toLowerCase()));
     return v;
   }, [filter, query, cityVenues, badgeMap]);
