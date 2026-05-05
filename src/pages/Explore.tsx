@@ -54,13 +54,13 @@ const Explore = () => {
 
   const filtered = useMemo(() => {
     let v = cityVenues;
-    if (filter === "sun-now") v = v.filter(x => x.sunStatus === "sun-now");
+    if (filter === "sun-now") v = v.filter(x => badgeMap[x.dbId]?.sun === "sunny");
     else if (filter === "deal") v = v.filter(x => x.dealText);
     else if (filter === "trending") v = v.filter(x => x.trending);
     else if (filter === "family") v = v.filter(x => x.familyFriendly);
     if (query) v = v.filter(x => (x.name + x.area + x.tags.join(" ")).toLowerCase().includes(query.toLowerCase()));
     return v;
-  }, [filter, query, cityVenues]);
+  }, [filter, query, cityVenues, badgeMap]);
 
   const selected = cityVenues.find(v => v.id === selectedId) ?? null;
 
