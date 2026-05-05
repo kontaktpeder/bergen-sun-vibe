@@ -58,55 +58,45 @@ async function nearbySearch(
   city: City,
   type: string,
 ): Promise<any[]> {
-  const all: any[] = [];
-  let pageToken: string | undefined;
-  for (let page = 0; page < 3; page++) {
-    const body: Record<string, unknown> = {
-      includedTypes: [type],
-      maxResultCount: 20,
-      locationRestriction: {
-        circle: {
-          center: { latitude: city.lat, longitude: city.lng },
-          radius: city.radius,
-        },
+  // Places API (New) searchNearby returns up to 20 results, no pagination.
+  const body = {
+    includedTypes: [type],
+    maxResultCount: 20,
+    locationRestriction: {
+      circle: {
+        center: { latitude: city.lat, longitude: city.lng },
+        radius: city.radius,
       },
-    };
-    if (pageToken) (body as any).pageToken = pageToken;
+    },
+  };
 
-    let attempt = 0;
-    let res: Response | null = null;
-    while (attempt < 3) {
-      res = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Goog-Api-Key": apiKey,
-          "X-Goog-FieldMask": FIELD_MASK + ",nextPageToken",
-        },
-        body: JSON.stringify(body),
-      });
-      if (res.ok) break;
-      if (res.status === 429 || res.status >= 500) {
-        await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
-        attempt++;
-        continue;
-      }
-      break;
+  let attempt = 0;
+  let res: Response | null = null;
+  while (attempt < 3) {
+    res = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": FIELD_MASK,
+      },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) break;
+    if (res.status === 429 || res.status >= 500) {
+      await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
+      attempt++;
+      continue;
     }
-    if (!res || !res.ok) {
-      const text = res ? await res.text() : "no response";
-      console.error(`[google] ${city.name}/${type} failed: ${res?.status} ${text}`);
-      break;
-    }
-    const json = await res.json();
-    const places = (json.places ?? []) as any[];
-    all.push(...places);
-    pageToken = json.nextPageToken;
-    if (!pageToken) break;
-    // Token needs a short delay before it becomes valid
-    await new Promise((r) => setTimeout(r, 1500));
+    break;
   }
-  return all;
+  if (!res || !res.ok) {
+    const text = res ? await res.text() : "no response";
+    console.error(`[google] ${city.name}/${type} failed: ${res?.status} ${text}`);
+    return [];
+  }
+  const json = await res.json();
+  return (json.places ?? []) as any[];
 }
 
 Deno.serve(async (req) => {
