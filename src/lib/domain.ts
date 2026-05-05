@@ -102,6 +102,19 @@ export function mapDbVenue(row: DbVenue): Venue {
   };
 }
 
+// City helpers — avoid hard "?? 'Bergen'" fallback. Legacy rows without city
+// are inferred from coordinates; otherwise hidden from city-scoped lists.
+export function inferLegacyCity(lat: number, lng: number): "Bergen" | "Oslo" | null {
+  if (lat >= 60.34 && lat <= 60.44 && lng >= 5.20 && lng <= 5.45) return "Bergen";
+  if (lat >= 59.82 && lat <= 59.99 && lng >= 10.60 && lng <= 10.95) return "Oslo";
+  return null;
+}
+
+export function belongsToCity(v: Venue, currentCity: "Bergen" | "Oslo"): boolean {
+  if (v.city) return v.city === currentCity;
+  return inferLegacyCity(v.lat, v.lng) === currentCity;
+}
+
 // Seksjons-konfig. `filter` mottar valgfritt et badgeMap så seksjoner kan
 // basere seg på ferske bidrag i stedet for legacy venue-felt.
 export type SectionBadgeMap = Record<string, { sun: "sunny" | "partial" | "shade" | "unknown" | null; beerPrice: number | null; photoCount: number }>;

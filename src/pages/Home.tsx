@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
 import heroImg from "@/assets/hero-sunset.jpg";
-import { buildSectionConfig, type SectionDef } from "@/lib/domain";
+import { buildSectionConfig, belongsToCity, type SectionDef } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
 import { FilterChips } from "@/components/FilterChips";
