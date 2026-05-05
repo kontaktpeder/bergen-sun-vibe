@@ -1,17 +1,5 @@
 // App-typer som UI bruker. DB-rader mappes via `mapDbVenue` for å isolere
 // kolonneforskjeller (slug, image_url, sun_status osv).
-import bryggen from "@/assets/venue-bryggen.jpg";
-import rooftop from "@/assets/venue-rooftop.jpg";
-import fisketorget from "@/assets/venue-fisketorget.jpg";
-import student from "@/assets/venue-student.jpg";
-import nordnes from "@/assets/venue-nordnes.jpg";
-import family from "@/assets/venue-family.jpg";
-import wine from "@/assets/venue-wine.jpg";
-import brewery from "@/assets/venue-brewery.jpg";
-import coffee from "@/assets/venue-coffee.jpg";
-import floyen from "@/assets/venue-floyen.jpg";
-import cocktail from "@/assets/venue-cocktail.jpg";
-import pizza from "@/assets/venue-pizza.jpg";
 
 export type SunStatus = "sun-now" | "sun-until" | "evening-sun" | "shade-soon" | "shade";
 
