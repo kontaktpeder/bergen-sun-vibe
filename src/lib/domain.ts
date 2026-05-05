@@ -64,6 +64,7 @@ export interface DbVenue {
   website_url?: string | null;
   google_rating?: number | string | null;
   google_user_rating_count?: number | null;
+  google_photo_name?: string | null;
 }
 
 export function mapDbVenue(row: DbVenue): Venue {
@@ -75,7 +76,8 @@ export function mapDbVenue(row: DbVenue): Venue {
     id: row.slug,
     dbId: row.id,
     name: row.name,
-    image: row.image_url || imageMap[row.slug] || fallbackImage,
+    image: row.image_url || null,
+    googlePhotoName: row.google_photo_name ?? null,
     category: row.category,
     rating,
     reviews,
