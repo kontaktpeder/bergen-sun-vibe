@@ -4,12 +4,14 @@ import { cn } from "@/lib/utils";
 import type { Venue } from "@/lib/domain";
 import { SunBadge } from "./SunBadge";
 import { VenueImage } from "./VenueImage";
+import { useLatestVenuePhoto } from "@/hooks/useLatestVenuePhoto";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 
 interface Props { venue: Venue; variant?: "feature" | "default" | "compact"; index?: number; }
 
 export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
   useFavorites();
+  const { data: userPhotoUrl } = useLatestVenuePhoto(venue.dbId);
   const fav = isFavorite(venue.id);
   const price = "kr".repeat(venue.priceLevel);
 
