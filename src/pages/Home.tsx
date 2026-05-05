@@ -58,7 +58,7 @@ const Home = () => {
   return (
     <div className="pb-8">
       {/* Hero */}
-      <header className="relative z-0 h-[580px] overflow-hidden">
+      <header className="relative z-0 min-h-[100svh] overflow-hidden">
         <img
           src={heroImg}
           alt={`${currentCity} ved solnedgang`}
@@ -66,43 +66,34 @@ const Home = () => {
           decoding="async"
           // @ts-expect-error fetchpriority is valid HTML
           fetchpriority="high"
-          className="absolute inset-0 h-full w-full object-cover object-[center_35%] [filter:saturate(0.88)_blur(0.5px)]"
+          className="absolute inset-0 h-full w-full object-cover object-[center_40%] [filter:saturate(0.92)]"
         />
-        {/* Bottom→top dark gradient for legibility */}
+        {/* Warm gradient overlay – avoid pure black, use deep brown/green */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%)",
+              "linear-gradient(180deg, rgba(27,29,42,0.35) 0%, rgba(27,29,42,0.05) 35%, rgba(47,58,35,0.15) 65%, rgba(27,29,42,0.75) 100%)",
           }}
         />
-        {/* Soft dim behind top-left logo area */}
+        {/* Subtle film grain */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-32"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0))",
-          }}
-        />
-        {/* Subtle film grain for a real, less stocky feel */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.12] mix-blend-overlay"
+          className="pointer-events-none absolute inset-0 opacity-[0.10] mix-blend-overlay"
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
             backgroundSize: "160px 160px",
           }}
         />
-        {/* Warm sunset tint */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-primary/15 via-transparent to-transparent mix-blend-overlay" />
 
-        <div className="relative z-10 flex h-full flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)]">
+        <div className="relative z-10 flex min-h-[100svh] flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-8">
+          {/* Top bar */}
           <div className="flex items-center justify-between text-white">
             <div className="flex items-center gap-2">
               <div className="grid h-9 w-9 place-items-center rounded-full bg-sun shadow-glow">
                 <Sun className="h-5 w-5 text-night" strokeWidth={2.5} />
               </div>
-              <div className="leading-tight">
+              <div className="leading-tight [text-shadow:0_1px_8px_rgba(0,0,0,0.4)]">
                 <div className="font-display text-lg font-semibold">Uteliv</div>
                 <div className="text-[10px] uppercase tracking-widest opacity-80">{currentCity}</div>
               </div>
@@ -112,37 +103,55 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="mt-auto pb-24 text-white animate-float-up [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_1px_2px_rgba(0,0,0,0.5)]">
-            <div className="inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium">
+          {/* Centered hero content */}
+          <div className="flex flex-1 flex-col items-center justify-center text-center">
+            <div className="inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-sun" />
               </span>
               {sunCount} steder med sol akkurat nå
             </div>
-            <h1 className="mt-3 font-display text-[2.4rem] font-semibold leading-[1.1] tracking-tight text-balance">
-              Skal du ut i dag?
+
+            <img
+              src={logoImg}
+              alt="Utefolket"
+              width={180}
+              height={180}
+              className="mt-6 h-36 w-36 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+            />
+
+            <h1
+              className="mt-2 font-display text-[3.2rem] font-semibold leading-[1] tracking-tight text-balance"
+              style={{ color: "#F7F5F2", textShadow: "0 4px 24px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.4)" }}
+            >
+              Utefolket
             </h1>
-            <p className="mt-4 max-w-xs text-sm/relaxed opacity-90">
-              Oppdag {currentCity}s beste steder akkurat nå — basert på sol og billig øl.
+            <p
+              className="mt-3 text-sm font-medium tracking-wide"
+              style={{ color: "#F7F5F2", opacity: 0.78, textShadow: "0 1px 8px rgba(0,0,0,0.45)" }}
+            >
+              Akkurat nå i {currentCity}
             </p>
+
+            {/* Search */}
+            <Link
+              to="/explore"
+              className="mt-8 flex w-full items-center gap-3 rounded-full border border-white/30 bg-white/95 px-5 py-3.5 shadow-[0_8px_28px_rgba(0,0,0,0.25)] backdrop-blur-xl tap-scale"
+            >
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Søk barer, områder, stemning...</span>
+              <Sparkles className="ml-auto h-4 w-4 text-primary" />
+            </Link>
+
+            {/* Filter chips */}
+            <div className="mt-4 w-full">
+              <FilterChips options={filterOptions} active={filter} onChange={setFilter} />
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Search */}
-      <div className="relative z-20 -mt-8 px-5">
-        <Link to="/explore" className="flex items-center gap-3 rounded-full border border-border/70 bg-card/95 px-5 py-3.5 shadow-card backdrop-blur-xl tap-scale">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Søk barer, områder, stemning...</span>
-          <Sparkles className="ml-auto h-4 w-4 text-primary" />
-        </Link>
-      </div>
-
-      {/* Filters */}
-      <div className="mt-6 px-5">
-        <FilterChips options={filterOptions} active={filter} onChange={setFilter} />
-      </div>
 
       {isLoading && (
         <div className="mt-10 px-5 text-sm text-muted-foreground">Laster steder…</div>
