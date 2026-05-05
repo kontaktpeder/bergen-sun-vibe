@@ -90,8 +90,8 @@ export function ContributeFab() {
                   });
                   toast.success(`+${r.awardedPoints} poeng ☀️`);
                   close();
-                } catch (e: any) {
-                  toast.error(e.message ?? "Noe gikk galt");
+                } catch (e: unknown) {
+                  toast.error(e instanceof Error ? e.message : "Noe gikk galt");
                 }
               }}
             />
