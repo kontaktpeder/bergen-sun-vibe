@@ -39,7 +39,7 @@ const Home = () => {
   return (
     <div className="pb-8">
       {/* Hero */}
-      <header className="relative h-[440px] overflow-hidden">
+      <header className="relative h-[520px] overflow-hidden">
         <img src={heroImg} alt="Bergen ved solnedgang" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-night/30 via-night/40 to-background" />
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 via-transparent to-transparent mix-blend-overlay" />
@@ -60,7 +60,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="mt-auto pb-6 text-white animate-float-up">
+          <div className="mt-auto pb-10 text-white animate-float-up">
             <div className="inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
@@ -68,11 +68,11 @@ const Home = () => {
               </span>
               {sunCount} steder med sol akkurat nå
             </div>
-            <h1 className="mt-3 font-display text-5xl font-semibold leading-[0.95] text-balance">
-              Hvor skal du<br />
-              <span className="bg-gradient-to-r from-sun via-primary-glow to-sunset-pink bg-clip-text text-transparent">solen senke seg?</span>
+            <h1 className="mt-3 font-display text-[2.4rem] font-semibold leading-[1.1] tracking-tight text-balance">
+              Hvor skal du se
+              <span className="mt-1 block bg-gradient-to-r from-sun via-primary-glow to-sunset-pink bg-clip-text pb-2 text-transparent">solen senke seg?</span>
             </h1>
-            <p className="mt-2 max-w-xs text-sm/relaxed opacity-90">
+            <p className="mt-4 max-w-xs text-sm/relaxed opacity-90">
               Oppdag Bergens beste steder akkurat nå — basert på sol, tilbud og stemning.
             </p>
           </div>
