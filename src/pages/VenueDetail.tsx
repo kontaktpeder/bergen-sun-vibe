@@ -2,8 +2,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Clock, Star, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import { useVenue } from "@/hooks/useVenue";
+import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
+import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
 const VenueDetail = () => {
@@ -11,6 +13,7 @@ const VenueDetail = () => {
   const navigate = useNavigate();
   useFavorites();
   const { data: venue, isLoading, error } = useVenue(id);
+  const { data: contributions = [] } = useVenueContributions(venue?.dbId);
 
   if (isLoading) {
     return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Laster…</div>;
@@ -151,6 +154,47 @@ const VenueDetail = () => {
             })}
           </div>
         </div>
+
+        {/* Last updated */}
+        <div className="mt-4 text-xs text-muted-foreground">
+          Sist oppdatert {timeAgo(venue.lastActivityAt)}
+        </div>
+
+        {/* Mini-feed */}
+        {contributions.length > 0 && (
+          <div className="mt-4 rounded-2xl bg-card p-4 shadow-soft">
+            <div className="text-xs font-semibold uppercase tracking-widest text-primary">Aktivitet</div>
+            <ul className="mt-3 space-y-3">
+              {contributions.map((c) => {
+                const d = c.data as any;
+                let label = "Bidrag";
+                let emoji = "✨";
+                if (c.type === "sun_report") {
+                  emoji = d?.status === "sun" ? "☀️" : "🌥️";
+                  label = d?.status === "sun" ? "Rapporterte sol" : "Rapporterte skygge";
+                } else if (c.type === "beer_price") {
+                  emoji = "🍺";
+                  label = `Oppdaterte ølpris til kr ${d?.price}`;
+                } else if (c.type === "photo") {
+                  emoji = "📸";
+                  label = "La til bilde";
+                }
+                return (
+                  <li key={c.id} className="flex items-center gap-3 text-sm">
+                    <span className="text-lg">{emoji}</span>
+                    <div className="flex-1">
+                      <div className="font-medium">{label}</div>
+                      <div className="text-xs text-muted-foreground">{timeAgo(c.created_at)}</div>
+                    </div>
+                    {c.type === "photo" && d?.image_url && (
+                      <img src={d.image_url} alt="" className="h-10 w-10 rounded-md object-cover" />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="mt-6 grid grid-cols-2 gap-3">
