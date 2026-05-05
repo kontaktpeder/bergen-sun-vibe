@@ -83,8 +83,7 @@ export function ContributeFab() {
 
   return (
     <>
-      <Sheet open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
-        <SheetContent side="bottom" className="rounded-t-3xl">
+      <MobileSheet open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
           {!isAuthed ? (
             <div className="py-6 text-center">
               <div className="text-center">
