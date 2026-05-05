@@ -216,7 +216,7 @@ const Explore = () => {
               )}
             >
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-                <VenueImage venue={v} size={{ w: 600, h: 600 }} />
+                <VenueImage venue={v} userPhotoUrl={badgeMap[v.dbId]?.latestPhotoUrl} size={{ w: 600, h: 600 }} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-display text-base font-semibold">{v.name}</div>
