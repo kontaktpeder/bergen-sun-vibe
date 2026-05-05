@@ -3,6 +3,7 @@ import { Heart, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Venue } from "@/lib/domain";
 import { SunBadge } from "./SunBadge";
+import { VenueImage } from "./VenueImage";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 
 interface Props { venue: Venue; variant?: "feature" | "default" | "compact"; index?: number; }
@@ -16,7 +17,7 @@ export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
     return (
       <Link to={`/venue/${venue.id}`} className="group block tap-scale animate-stagger" style={{ animationDelay: `${index * 60}ms` }}>
         <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-card">
-          <img src={venue.image} alt={venue.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+          <VenueImage venue={venue} size={{ w: 800, h: 1000 }} imgClassName="absolute inset-0 transition-transform duration-700 group-hover:scale-110" />
           <div className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/20 to-transparent" />
 
           <div className="absolute top-4 left-4 right-4 flex items-start justify-between gap-2">
@@ -52,7 +53,7 @@ export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
     return (
       <Link to={`/venue/${venue.id}`} className="group block w-[180px] shrink-0 tap-scale animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
         <div className="relative aspect-square overflow-hidden rounded-2xl shadow-soft">
-          <img src={venue.image} alt={venue.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <VenueImage venue={venue} size={{ w: 400, h: 400 }} imgClassName="transition-transform duration-500 group-hover:scale-105" />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" />
           <SunBadge status={venue.sunStatus} until={venue.sunUntil} className="absolute top-2 left-2" />
         </div>
@@ -71,7 +72,7 @@ export function VenueCard({ venue, variant = "default", index = 0 }: Props) {
   return (
     <Link to={`/venue/${venue.id}`} className="group block w-[280px] shrink-0 tap-scale animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
       <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-card">
-        <img src={venue.image} alt={venue.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <VenueImage venue={venue} size={{ w: 600, h: 450 }} imgClassName="transition-transform duration-500 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-night/60 via-transparent to-transparent" />
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
           <SunBadge status={venue.sunStatus} until={venue.sunUntil} />
