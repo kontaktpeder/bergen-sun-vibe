@@ -68,12 +68,12 @@ const Home = () => {
           fetchpriority="high"
           className="absolute inset-0 h-full w-full object-cover object-[center_40%] [filter:saturate(0.92)]"
         />
-        {/* Warm gradient overlay – avoid pure black, use deep brown/green */}
+        {/* Soft bottom gradient for breathing room */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(27,29,42,0.35) 0%, rgba(27,29,42,0.05) 35%, rgba(47,58,35,0.15) 65%, rgba(27,29,42,0.75) 100%)",
+              "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.4) 100%)",
           }}
         />
         {/* Subtle film grain */}
@@ -103,9 +103,31 @@ const Home = () => {
             </Link>
           </div>
 
-          {/* Centered hero content */}
-          <div className="flex flex-1 flex-col items-center justify-center text-center">
-            <div className="inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
+          {/* Centered hero content – logo sits ~40% from top */}
+          <div className="flex flex-1 flex-col items-center text-center pt-[18vh]">
+            <img
+              src={logoImg}
+              alt="Utefolket"
+              width={180}
+              height={180}
+              className="h-[160px] w-auto max-w-[180px] object-contain"
+              style={{ filter: "drop-shadow(0 8px 30px rgba(0,0,0,0.25))" }}
+            />
+
+            <h1
+              className="mt-5 font-display text-[2.75rem] font-semibold leading-[1] tracking-[0.5px]"
+              style={{ color: "#F7F5F2", textShadow: "0 2px 18px rgba(0,0,0,0.45)" }}
+            >
+              Utefolket
+            </h1>
+            <p
+              className="mt-2 text-sm font-medium tracking-wide"
+              style={{ color: "#F7F5F2", opacity: 0.75, textShadow: "0 1px 8px rgba(0,0,0,0.45)" }}
+            >
+              Akkurat nå i {currentCity}
+            </p>
+
+            <div className="mt-8 inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-sun" />
@@ -113,26 +135,7 @@ const Home = () => {
               {sunCount} steder med sol akkurat nå
             </div>
 
-            <img
-              src={logoImg}
-              alt="Utefolket"
-              width={180}
-              height={180}
-              className="mt-6 h-36 w-36 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
-            />
-
-            <h1
-              className="mt-2 font-display text-[3.2rem] font-semibold leading-[1] tracking-tight text-balance"
-              style={{ color: "#F7F5F2", textShadow: "0 4px 24px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.4)" }}
-            >
-              Utefolket
-            </h1>
-            <p
-              className="mt-3 text-sm font-medium tracking-wide"
-              style={{ color: "#F7F5F2", opacity: 0.78, textShadow: "0 1px 8px rgba(0,0,0,0.45)" }}
-            >
-              Akkurat nå i {currentCity}
-            </p>
+            <div className="flex-1" />
 
             {/* Search */}
             <Link
