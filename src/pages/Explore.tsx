@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Search, Sun, Star } from "lucide-react";
-import { venues } from "@/data/venues";
+import { useVenues } from "@/hooks/useVenues";
 import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
 import { cn } from "@/lib/utils";
