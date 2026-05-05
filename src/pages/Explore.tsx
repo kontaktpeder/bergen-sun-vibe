@@ -33,6 +33,7 @@ const Explore = () => {
   const { data: venues = [], isLoading, error } = useVenues();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const { location: userLoc, loading: locLoading, error: locError, locate } = useUserLocation();
 
   const cityVenues = useMemo(
     () => venues.filter(v => (v.city ?? "Bergen") === city),
