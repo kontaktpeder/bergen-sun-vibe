@@ -2,8 +2,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Clock, Star, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import { useVenue } from "@/hooks/useVenue";
+import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
+import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
 const VenueDetail = () => {
@@ -11,6 +13,7 @@ const VenueDetail = () => {
   const navigate = useNavigate();
   useFavorites();
   const { data: venue, isLoading, error } = useVenue(id);
+  const { data: contributions = [] } = useVenueContributions(venue?.dbId);
 
   if (isLoading) {
     return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Laster…</div>;
