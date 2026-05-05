@@ -480,8 +480,8 @@ function VenueForm({
     : null;
 
   if (showMapPicker) {
-    // Default center: existing pick, or Bergen city center.
-    const initial = selectedLocation ?? { lat: 60.3913, lng: 5.3221 };
+    // Default center: existing pick, or current city center.
+    const initial = selectedLocation ?? cityCenter;
     return (
       <div className="pb-4">
         <div className="text-center">
@@ -492,7 +492,7 @@ function VenueForm({
             mode="pick"
             initialLat={initial.lat}
             initialLng={initial.lng}
-            city="Bergen"
+            city={currentCity}
             selectedLocation={selectedLocation}
             onCancel={() => setShowMapPicker(false)}
             onSelectLocation={(la, ln) => {
