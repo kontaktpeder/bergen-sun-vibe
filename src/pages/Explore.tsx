@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, LocateFixed, Search, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useVenues } from "@/hooks/useVenues";
+import { belongsToCity } from "@/lib/domain";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { FilterChips } from "@/components/FilterChips";
 import { SunBadge } from "@/components/SunBadge";
@@ -40,7 +41,7 @@ const Explore = () => {
   const { location: userLoc, loading: locLoading, error: locError, locate } = useUserLocation();
 
   const cityVenues = useMemo(
-    () => venues.filter(v => (v.city ?? "Bergen") === city),
+    () => venues.filter(v => belongsToCity(v, city as "Bergen" | "Oslo")),
     [venues, city],
   );
 

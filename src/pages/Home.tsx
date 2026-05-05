@@ -26,7 +26,7 @@ const Home = () => {
     profile?.username?.trim() || user?.email?.split("@")[0]?.trim() || "Gjest";
   const userInitials = userDisplayName.slice(0, 2).toUpperCase();
   const venues = useMemo(
-    () => allVenues.filter(v => (v.city ?? "Bergen") === currentCity),
+    () => allVenues.filter(v => belongsToCity(v, currentCity as "Bergen" | "Oslo")),
     [allVenues, currentCity],
   );
   const venueIds = useMemo(() => venues.map(v => v.dbId), [venues]);
