@@ -8,6 +8,7 @@ import { VenueCard } from "@/components/VenueCard";
 import { FilterChips } from "@/components/FilterChips";
 import { useCity } from "@/context/CityContext";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
+import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
@@ -23,7 +24,9 @@ const Home = () => {
     () => allVenues.filter(v => (v.city ?? "Bergen") === currentCity),
     [allVenues, currentCity],
   );
-  const { data: badgeMap = {} } = useVenueBadges(venues.map(v => v.dbId));
+  const venueIds = useMemo(() => venues.map(v => v.dbId), [venues]);
+  const { data: badgeMap = {} } = useVenueBadges(venueIds);
+  const { data: photoMap = {} } = useVenuePhotos(venueIds);
   const sunCount = Object.values(badgeMap).filter(b => b.sun === "sunny").length;
 
   const sectionConfig = useMemo<SectionDef[]>(() => buildSectionConfig(currentCity), [currentCity]);
@@ -50,7 +53,15 @@ const Home = () => {
     <div className="pb-8">
       {/* Hero */}
       <header className="relative z-0 h-[580px] overflow-hidden">
-        <img src={heroImg} alt={`${currentCity} ved solnedgang`} className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={heroImg}
+          alt={`${currentCity} ved solnedgang`}
+          loading="eager"
+          decoding="async"
+          // @ts-expect-error fetchpriority is valid HTML
+          fetchpriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-night/40 via-night/55 to-night/85" />
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/25 via-transparent to-transparent mix-blend-overlay" />
 
@@ -128,7 +139,7 @@ const Home = () => {
               <h2 className="mt-1 font-display text-2xl font-semibold">Kveldens utvalgte</h2>
             </div>
           </div>
-          <VenueCard venue={featured} variant="feature" badge={badgeMap[featured.dbId] ?? null} />
+          <VenueCard venue={featured} variant="feature" badge={badgeMap[featured.dbId] ?? null} userPhotoUrl={photoMap[featured.dbId] ?? null} eager />
         </section>
       )}
 
@@ -153,7 +164,15 @@ const Home = () => {
             </div>
             <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide">
               {items.map((v, i) => (
-                <VenueCard key={v.id} venue={v} variant={variant} index={i} badge={badgeMap[v.dbId] ?? null} />
+                <VenueCard
+                  key={v.id}
+                  venue={v}
+                  variant={variant}
+                  index={i}
+                  badge={badgeMap[v.dbId] ?? null}
+                  userPhotoUrl={photoMap[v.dbId] ?? null}
+                  eager={i < 3}
+                />
               ))}
             </div>
           </section>

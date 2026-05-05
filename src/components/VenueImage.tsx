@@ -12,6 +12,7 @@ type Props = {
   size?: { w?: number; h?: number };
   alt?: string;
   loading?: "lazy" | "eager";
+  fetchPriority?: "high" | "low" | "auto";
   showAttribution?: boolean;
   compactFallback?: boolean;
 };
@@ -26,6 +27,7 @@ export function VenueImage({
   size,
   alt,
   loading = "lazy",
+  fetchPriority = "auto",
   showAttribution = true,
   compactFallback,
 }: Props) {
@@ -42,7 +44,6 @@ export function VenueImage({
   }, [venue, userPhotoUrl, size]);
 
   const handleError = () => {
-    // Quietly fall back to branded placeholder, no console spam.
     setResolved({ kind: "fallback", src: null });
     setStatus("loaded");
   };
@@ -63,6 +64,9 @@ export function VenueImage({
           src={resolved.src}
           alt={alt ?? venue.name}
           loading={loading}
+          decoding="async"
+          // @ts-expect-error fetchpriority is valid HTML but missing from React types in older versions
+          fetchpriority={fetchPriority}
           onLoad={() => setStatus("loaded")}
           onError={handleError}
           className={cn(

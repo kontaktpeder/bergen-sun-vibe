@@ -163,7 +163,7 @@ const Explore = () => {
               <div className="overflow-hidden rounded-2xl bg-card/95 shadow-float backdrop-blur">
                 <div className="flex gap-3 p-2.5">
                   <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl">
-                    <VenueImage venue={selected} size={{ w: 200, h: 200 }} />
+                    <VenueImage venue={selected} size={{ w: 600, h: 600 }} loading="eager" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -215,7 +215,7 @@ const Explore = () => {
               )}
             >
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-                <VenueImage venue={v} size={{ w: 160, h: 160 }} />
+                <VenueImage venue={v} size={{ w: 600, h: 600 }} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-display text-base font-semibold">{v.name}</div>
