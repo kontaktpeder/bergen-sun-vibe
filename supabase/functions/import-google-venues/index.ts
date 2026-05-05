@@ -268,7 +268,7 @@ Deno.serve(async (req) => {
           }
           const photoName = p.photos?.[0]?.name ?? null;
           const types = (p.types ?? []) as string[];
-          const category = categoryFromTypes(types);
+          const category = categoryFromTypes(p.primaryType, types);
 
           const updatePayload = {
             google_maps_url: p.googleMapsUri ?? null,
