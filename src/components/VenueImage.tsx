@@ -31,17 +31,24 @@ export function VenueImage({
   showAttribution = true,
   compactFallback,
 }: Props) {
-  const initial = resolveVenueImage(venue, userPhotoUrl, size);
+  const sizeW = size?.w;
+  const sizeH = size?.h;
+  const initial = resolveVenueImage(venue, userPhotoUrl, { w: sizeW, h: sizeH });
   const [resolved, setResolved] = useState<ResolvedVenueImage>(initial);
   const [status, setStatus] = useState<Status>(
     initial.kind === "fallback" ? "loaded" : "loading",
   );
 
   useEffect(() => {
-    const r = resolveVenueImage(venue, userPhotoUrl, size);
-    setResolved(r);
-    setStatus(r.kind === "fallback" ? "loaded" : "loading");
-  }, [venue, userPhotoUrl, size]);
+    const r = resolveVenueImage(venue, userPhotoUrl, { w: sizeW, h: sizeH });
+    setResolved(prev => (prev.kind === r.kind && prev.src === r.src ? prev : r));
+    setStatus(prev => {
+      if (r.kind === "fallback") return "loaded";
+      // Only reset to loading if the source actually changed
+      return prev === "loaded" && resolved.src === r.src ? prev : "loading";
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [venue.image, venue.googlePhotoName, userPhotoUrl, sizeW, sizeH]);
 
   const handleError = () => {
     setResolved({ kind: "fallback", src: null });
