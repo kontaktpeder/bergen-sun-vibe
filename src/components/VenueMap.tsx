@@ -82,6 +82,7 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
       zoom={13}
       scrollWheelZoom={false}
       zoomControl={false}
+      attributionControl={false}
       className="h-full w-full"
       style={{ background: "hsl(var(--secondary))" }}
     >
