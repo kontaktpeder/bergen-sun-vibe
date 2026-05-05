@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Loader2, MapPin, Plus } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
@@ -7,20 +7,28 @@ import { useVenue } from "@/hooks/useVenue";
 import { useVenues } from "@/hooks/useVenues";
 import { useAddContribution } from "@/hooks/useAddContribution";
 import { useUploadImage } from "@/hooks/useUploadImage";
+import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { showRewardFeedback } from "@/lib/reward-feedback";
+import { toUserErrorMessage } from "@/lib/error-messages";
+import { FLAGS } from "@/lib/flags";
 
 type Mode = "menu" | "sun" | "beer" | "photo" | "venue";
+type SuccessState = { venueId: string; venueSlug?: string } | null;
 
 export function ContributeFab() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("menu");
+  const [success, setSuccess] = useState<SuccessState>(null);
   const { isAuthed, user, profile, loading } = useAuthProfile();
   const params = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isOnVenue = location.pathname.startsWith("/venue/");
   const slug = isOnVenue ? params.id : undefined;
   const { data: currentVenue } = useVenue(slug);
@@ -28,6 +36,13 @@ export function ContributeFab() {
 
   const [selectedVenueDbId, setSelectedVenueDbId] = useState<string | undefined>(undefined);
   const venueDbId = currentVenue?.dbId ?? selectedVenueDbId;
+  const { data: venueContribs = [] } = useVenueContributions(venueDbId);
+  const lastBeer = useMemo(() => {
+    const c = venueContribs.find((x) => x.type === "beer_price");
+    const p = c?.data?.price as number | string | undefined;
+    const n = typeof p === "number" ? p : typeof p === "string" ? Number(p) : NaN;
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }, [venueContribs]);
 
   void profile;
   const addContribution = useAddContribution(user?.id);
@@ -36,12 +51,28 @@ export function ContributeFab() {
   const reset = () => {
     setMode("menu");
     setSelectedVenueDbId(undefined);
+    setSuccess(null);
   };
 
   const close = () => {
     setOpen(false);
+    if (searchParams.get("contribute")) {
+      searchParams.delete("contribute");
+      setSearchParams(searchParams, { replace: true });
+    }
     setTimeout(reset, 300);
   };
+
+  // Deep-link: ?contribute=sun|beer|photo opens sheet in mode (only when on a venue)
+  useEffect(() => {
+    const c = searchParams.get("contribute");
+    if (!c) return;
+    if (!["sun", "beer", "photo", "venue"].includes(c)) return;
+    setOpen(true);
+    setMode(c as Mode);
+  }, [searchParams]);
+
+  const beforePoints = profile?.points ?? 0;
 
   if (loading) return null;
 
@@ -69,6 +100,24 @@ export function ContributeFab() {
                 <Button className="mt-6 w-full">Logg inn</Button>
               </Link>
             </div>
+          ) : success ? (
+            <VenueAddSuccess
+              success={success}
+              onSeeVenue={() => {
+                close();
+                if (success.venueSlug) navigate(`/venue/${success.venueSlug}`);
+              }}
+              onAddPhoto={() => {
+                setSuccess(null);
+                setSelectedVenueDbId(success.venueId);
+                setMode("photo");
+              }}
+              onAddBeer={() => {
+                setSuccess(null);
+                setSelectedVenueDbId(success.venueId);
+                setMode("beer");
+              }}
+            />
           ) : mode === "menu" ? (
             <Menu
               onPick={(m) => setMode(m)}
@@ -88,16 +137,22 @@ export function ContributeFab() {
                     venueId: venueDbId,
                     data: { status },
                   });
-                  toast.success(`+${r.awardedPoints} poeng ☀️`);
+                  showRewardFeedback({
+                    type: "sun_report",
+                    awardedPoints: r.awardedPoints,
+                    beforePoints,
+                    afterPoints: r.newPoints,
+                  });
                   close();
-                } catch (e: unknown) {
-                  toast.error(e instanceof Error ? e.message : "Noe gikk galt");
+                } catch (e) {
+                  toast.error(toUserErrorMessage(e));
                 }
               }}
             />
           ) : mode === "beer" ? (
             <BeerForm
               venueId={venueDbId}
+              lastPrice={FLAGS.beerConfirmFlowEnabled ? lastBeer : null}
               onDone={async (price, isConfirm) => {
                 if (!venueDbId) return toast.error("Velg et sted først.");
                 try {
@@ -107,10 +162,16 @@ export function ContributeFab() {
                     data: { price, label: "cheapest" },
                     isConfirm,
                   });
-                  toast.success(`+${r.awardedPoints} poeng 🍺`);
+                  showRewardFeedback({
+                    type: "beer_price",
+                    awardedPoints: r.awardedPoints,
+                    beforePoints,
+                    afterPoints: r.newPoints,
+                    isBeerConfirm: isConfirm,
+                  });
                   close();
-                } catch (e: unknown) {
-                  toast.error(e instanceof Error ? e.message : "Noe gikk galt");
+                } catch (e) {
+                  toast.error(toUserErrorMessage(e));
                 }
               }}
             />
@@ -127,10 +188,15 @@ export function ContributeFab() {
                     venueId: venueDbId,
                     data: { image_url: url },
                   });
-                  toast.success(`+${r.awardedPoints} poeng 📸`);
+                  showRewardFeedback({
+                    type: "photo",
+                    awardedPoints: r.awardedPoints,
+                    beforePoints,
+                    afterPoints: r.newPoints,
+                  });
                   close();
-                } catch (e: unknown) {
-                  toast.error(e instanceof Error ? e.message : "Opplasting feilet");
+                } catch (e) {
+                  toast.error(toUserErrorMessage(e));
                 }
               }}
             />
@@ -139,10 +205,19 @@ export function ContributeFab() {
               onDone={async (data) => {
                 try {
                   const r = await addContribution.mutateAsync({ type: "venue_add", data });
-                  toast.success(`+${r.awardedPoints} poeng 📍`);
-                  close();
-                } catch (e: unknown) {
-                  toast.error(e instanceof Error ? e.message : "Noe gikk galt");
+                  showRewardFeedback({
+                    type: "venue_add",
+                    awardedPoints: r.awardedPoints,
+                    beforePoints,
+                    afterPoints: r.newPoints,
+                  });
+                  if (FLAGS.venueAddSuccessStateEnabled && r.venueId) {
+                    setSuccess({ venueId: r.venueId, venueSlug: r.venueSlug });
+                  } else {
+                    close();
+                  }
+                } catch (e) {
+                  toast.error(toUserErrorMessage(e));
                 }
               }}
             />
@@ -150,6 +225,42 @@ export function ContributeFab() {
         </SheetContent>
       </Sheet>
     </>
+  );
+}
+
+function VenueAddSuccess({
+  success,
+  onSeeVenue,
+  onAddPhoto,
+  onAddBeer,
+}: {
+  success: { venueId: string; venueSlug?: string };
+  onSeeVenue: () => void;
+  onAddPhoto: () => void;
+  onAddBeer: () => void;
+}) {
+  return (
+    <div className="pb-4 text-center">
+      <SheetHeader>
+        <SheetTitle className="text-center">Stedet er lagt til 🎉</SheetTitle>
+      </SheetHeader>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Bra jobbet — du hjelper flere finne gode spots.
+      </p>
+      <div className="mt-5 grid gap-2">
+        {success.venueSlug && (
+          <Button className="w-full" onClick={onSeeVenue}>
+            Se stedet
+          </Button>
+        )}
+        <Button variant="secondary" className="w-full" onClick={onAddPhoto}>
+          📸 Legg til bilde
+        </Button>
+        <Button variant="secondary" className="w-full" onClick={onAddBeer}>
+          🍺 Legg til ølpris
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -179,7 +290,7 @@ function Menu({
           <select
             value={selectedVenueDbId ?? ""}
             onChange={(e) => onPickVenue(e.target.value)}
-            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3"
           >
             <option value="">Velg sted…</option>
             {venues.map((v) => (
@@ -240,24 +351,54 @@ function SunForm({ venueId, onDone }: { venueId?: string; onDone: (s: "sun" | "s
 
 function BeerForm({
   venueId,
+  lastPrice,
   onDone,
 }: {
   venueId?: string;
+  lastPrice: number | null;
   onDone: (price: number, isConfirm: boolean) => void;
 }) {
+  // overview shown only if there's an existing price
+  const [editing, setEditing] = useState<boolean>(lastPrice == null);
   const [price, setPrice] = useState("");
-  const submit = (isConfirm: boolean) => {
+
+  const submitNew = () => {
     const n = Number(price);
     if (!Number.isFinite(n) || n <= 0 || n > 1000) {
       toast.error("Ugyldig pris (1–1000 kr).");
       return;
     }
-    onDone(n, isConfirm);
+    onDone(n, false);
   };
+
+  if (!editing && lastPrice != null) {
+    return (
+      <div className="pb-4">
+        <SheetHeader>
+          <SheetTitle>Billigste pils</SheetTitle>
+        </SheetHeader>
+        <div className="mt-4 rounded-2xl bg-secondary/60 p-4 text-center">
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Sist registrerte pris
+          </div>
+          <div className="mt-1 font-display text-3xl font-semibold">kr {lastPrice}</div>
+        </div>
+        <div className="mt-5 grid gap-2">
+          <Button className="w-full" disabled={!venueId} onClick={() => onDone(lastPrice, true)}>
+            Bekreft at {lastPrice} kr stemmer ✓ +3p
+          </Button>
+          <Button variant="secondary" className="w-full" onClick={() => setEditing(true)}>
+            Endre pris
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pb-4">
       <SheetHeader>
-        <SheetTitle>Billigste pils</SheetTitle>
+        <SheetTitle>Ny ølpris</SheetTitle>
       </SheetHeader>
       <div className="mt-4 space-y-2">
         <Label>Pris (kr)</Label>
@@ -270,21 +411,15 @@ function BeerForm({
         />
       </div>
       <div className="mt-5 grid gap-2">
-        <Button className="w-full" disabled={!venueId} onClick={() => submit(false)}>
-          Ny pris 🍺 +10p
+        <Button className="w-full" disabled={!venueId} onClick={submitNew}>
+          Send ny pris 🍺 +10p
         </Button>
-        <Button
-          variant="secondary"
-          className="w-full"
-          disabled={!venueId}
-          onClick={() => submit(true)}
-        >
-          Bekreft ølpris ✓ +3p
-        </Button>
+        {lastPrice != null && (
+          <Button variant="ghost" className="w-full" onClick={() => setEditing(false)}>
+            Tilbake
+          </Button>
+        )}
       </div>
-      <p className="mt-2 text-center text-xs text-muted-foreground">
-        Bekreft hvis prisen stemmer fortsatt — gir mindre poeng, men hjelper andre.
-      </p>
     </div>
   );
 }
@@ -346,7 +481,6 @@ function VenueForm({
     );
   };
 
-  // Auto-request once when form opens
   useEffect(() => {
     requestLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -369,7 +503,7 @@ function VenueForm({
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value as never)}
-            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3"
           >
             <option value="bar">Bar</option>
             <option value="cafe">Café</option>
