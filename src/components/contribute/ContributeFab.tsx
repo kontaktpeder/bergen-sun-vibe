@@ -17,6 +17,12 @@ import { showRewardFeedback } from "@/lib/reward-feedback";
 import { toUserErrorMessage } from "@/lib/error-messages";
 import { FLAGS } from "@/lib/flags";
 import { subscribeContributeFab } from "@/lib/contribute-bus";
+import { useCity } from "@/context/CityContext";
+
+const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
+  Bergen: { lat: 60.3913, lng: 5.3221 },
+  Oslo: { lat: 59.9139, lng: 10.7522 },
+};
 
 type Mode = "menu" | "sun" | "beer" | "photo" | "venue";
 type SuccessState = { venueId: string; venueSlug?: string } | null;
@@ -429,6 +435,8 @@ function VenueForm({
 }: {
   onDone: (d: { name: string; lat: number; lng: number; category: "bar" | "cafe" | "restaurant" }) => void;
 }) {
+  const { currentCity } = useCity();
+  const cityCenter = CITY_CENTERS[currentCity] ?? CITY_CENTERS.Bergen;
   const [name, setName] = useState("");
   const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
   const [lat, setLat] = useState<string>("");
