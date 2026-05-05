@@ -597,6 +597,14 @@ function VenueForm({
           </div>
         )}
       </div>
+      {possibleDup && (
+        <div className="mt-3 rounded-xl border border-amber-300/50 bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+          <div className="font-medium">Dette stedet finnes kanskje allerede?</div>
+          <div className="mt-0.5 text-xs opacity-90">
+            Vi fant <span className="font-semibold">{possibleDup.name}</span> like ved.
+          </div>
+        </div>
+      )}
       <Button
         className="mt-5 w-full"
         disabled={!name.trim() || !hasCoords}
