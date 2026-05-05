@@ -52,6 +52,9 @@ export function useVenueBadges(venueIds: string[]) {
       const out: Record<string, VenueBadgeState> = {};
       for (const id of ids) out[id] = emptyState();
 
+      // Collect photo rows separately to apply best-cover selection (oldest mature).
+      const photosByVenue: Record<string, ContribRow[]> = {};
+
       for (const r of (data ?? []) as ContribRow[]) {
         if (!r.venue_id) continue;
         const s = out[r.venue_id] ?? emptyState();
@@ -70,14 +73,35 @@ export function useVenueBadges(venueIds: string[]) {
           if (Number.isFinite(n) && n > 0) s.beerPrice = n;
         } else if (r.type === "photo") {
           s.photoCount += 1;
-          if (!s.latestPhotoUrl) {
-            const url = (r.data as Record<string, unknown> | null)?.image_url;
-            if (typeof url === "string" && url.length > 0) s.latestPhotoUrl = url;
-          }
+          (photosByVenue[r.venue_id] ||= []).push(r);
         }
 
         out[r.venue_id] = s;
       }
+
+      // Best photo = oldest mature (>10min). Fallback = oldest available.
+      const MATURE_MS = 10 * 60 * 1000;
+      const now = Date.now();
+      for (const [vid, rows] of Object.entries(photosByVenue)) {
+        // rows arrive DESC; sort ASC for stable oldest-first
+        const asc = [...rows].sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+        );
+        let pick: string | null = null;
+        let fallback: string | null = null;
+        for (const r of asc) {
+          const url = (r.data as Record<string, unknown> | null)?.image_url;
+          if (typeof url !== "string" || url.length === 0) continue;
+          if (!fallback) fallback = url;
+          if (now - new Date(r.created_at).getTime() >= MATURE_MS) {
+            pick = url;
+            break;
+          }
+        }
+        const s = out[vid];
+        if (s) s.latestPhotoUrl = pick ?? fallback;
+      }
+
       return out;
     },
   });
