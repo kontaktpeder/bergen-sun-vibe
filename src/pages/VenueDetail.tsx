@@ -167,7 +167,7 @@ const VenueDetail = () => {
             <div className="text-xs font-semibold uppercase tracking-widest text-primary">Aktivitet</div>
             <ul className="mt-3 space-y-3">
               {contributions.map((c) => {
-                const d = c.data as any;
+                const d = c.data as Record<string, unknown>;
                 let label = "Bidrag";
                 let emoji = "✨";
                 if (c.type === "sun_report") {
