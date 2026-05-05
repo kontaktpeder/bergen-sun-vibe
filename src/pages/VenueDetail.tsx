@@ -187,7 +187,7 @@ const VenueDetail = () => {
                       <div className="font-medium">{label}</div>
                       <div className="text-xs text-muted-foreground">{timeAgo(c.created_at)}</div>
                     </div>
-                    {c.type === "photo" && d?.image_url && (
+                    {c.type === "photo" && typeof d?.image_url === "string" && (
                       <img src={d.image_url} alt="" className="h-10 w-10 rounded-md object-cover" />
                     )}
                     <ReportButton contributionId={c.id} />
