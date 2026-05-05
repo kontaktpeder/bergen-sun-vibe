@@ -135,6 +135,21 @@ const Explore = () => {
           </div>
         </div>
 
+        {/* Floating "Du er her" knapp */}
+        <button
+          type="button"
+          onClick={locate}
+          disabled={locLoading}
+          className={cn(
+            "tap-scale absolute right-3 z-[550] inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-2 text-xs font-medium shadow-float backdrop-blur transition-all disabled:opacity-60",
+            selected ? "bottom-[140px]" : "bottom-3"
+          )}
+          aria-label="Finn min posisjon"
+        >
+          <LocateFixed className="h-3.5 w-3.5 text-primary" />
+          {locLoading ? "Finner posisjon..." : "Du er her"}
+        </button>
+
         {/* Valgt sted som flytende kort nederst i kart-arealet */}
         {selected && (
           <div className="absolute inset-x-3 bottom-3 z-[600]">
