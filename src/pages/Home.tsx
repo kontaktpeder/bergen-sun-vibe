@@ -19,7 +19,7 @@ const filterOptions = [
 
 const Home = () => {
   const [filter, setFilter] = useState("all");
-  const { data: venues = [], isLoading } = useVenues();
+  const { data: venues = [], isLoading, error } = useVenues();
   const sunCount = venues.filter(v => v.sunStatus === "sun-now").length;
 
   const filteredSections = useMemo(() => {
