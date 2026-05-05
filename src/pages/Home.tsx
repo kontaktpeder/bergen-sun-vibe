@@ -39,7 +39,7 @@ const Home = () => {
   return (
     <div className="pb-8">
       {/* Hero */}
-      <header className="relative h-[580px] overflow-hidden">
+      <header className="relative z-0 h-[580px] overflow-hidden">
         <img src={heroImg} alt="Bergen ved solnedgang" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-night/40 via-night/55 to-night/85" />
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/25 via-transparent to-transparent mix-blend-overlay" />
@@ -80,8 +80,8 @@ const Home = () => {
       </header>
 
       {/* Search */}
-      <div className="-mt-6 px-5">
-        <Link to="/explore" className="flex items-center gap-3 rounded-full bg-card px-5 py-3.5 shadow-card tap-scale">
+      <div className="relative z-20 -mt-8 px-5">
+        <Link to="/explore" className="flex items-center gap-3 rounded-full border border-border/70 bg-card/95 px-5 py-3.5 shadow-card backdrop-blur-xl tap-scale">
           <Search className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Søk barer, områder, stemning...</span>
           <Sparkles className="ml-auto h-4 w-4 text-primary" />
