@@ -18,7 +18,29 @@ const CITIES: Record<string, City> = {
   Oslo: { name: "Oslo", lat: 59.9139, lng: 10.7522, radius: 5000 },
 };
 
-const TYPES = ["bar", "restaurant", "cafe", "night_club"] as const;
+const TYPES = ["bar", "pub", "restaurant", "cafe", "night_club"] as const;
+
+// Types that signal "this is a hotel, not a real venue" — we drop these entirely.
+const EXCLUDED_TYPES = new Set([
+  "lodging",
+  "hotel",
+  "motel",
+  "hostel",
+  "resort_hotel",
+  "extended_stay_hotel",
+  "bed_and_breakfast",
+  "guest_house",
+  "inn",
+  "campground",
+]);
+
+function isExcluded(p: any): boolean {
+  const types = (p?.types ?? []) as string[];
+  if (types.some((t) => EXCLUDED_TYPES.has(t))) return true;
+  const primary = p?.primaryType as string | undefined;
+  if (primary && EXCLUDED_TYPES.has(primary)) return true;
+  return false;
+}
 
 const FIELD_MASK = [
   "places.id",
@@ -44,12 +66,17 @@ function slugify(s: string) {
     .slice(0, 60) || "venue";
 }
 
-function categoryFromTypes(types: string[] | undefined): string {
-  if (!types || !types.length) return "bar";
-  if (types.includes("night_club")) return "bar";
-  if (types.includes("bar")) return "bar";
-  if (types.includes("cafe") || types.includes("coffee_shop")) return "cafe";
-  if (types.includes("restaurant") || types.includes("meal_takeaway")) return "restaurant";
+function categoryFromTypes(primary: string | undefined, types: string[] | undefined): string {
+  // Prefer primaryType when available
+  const p = primary ?? "";
+  if (p === "night_club" || p === "bar" || p === "pub") return "bar";
+  if (p === "cafe" || p === "coffee_shop") return "cafe";
+  if (p === "restaurant" || p === "meal_takeaway" || p === "gastropub") return "restaurant";
+
+  const t = types ?? [];
+  if (t.includes("night_club") || t.includes("bar") || t.includes("pub")) return "bar";
+  if (t.includes("cafe") || t.includes("coffee_shop")) return "cafe";
+  if (t.includes("restaurant") || t.includes("meal_takeaway")) return "restaurant";
   return "bar";
 }
 
