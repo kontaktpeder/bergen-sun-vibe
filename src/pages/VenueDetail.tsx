@@ -1,10 +1,12 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Clock, Star, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
 import { ReportButton } from "@/components/ReportButton";
+import { VenueContributeModule } from "@/components/contribute/VenueContributeModule";
+import { FLAGS } from "@/lib/flags";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
@@ -12,9 +14,14 @@ import { cn } from "@/lib/utils";
 const VenueDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   useFavorites();
   const { data: venue, isLoading, error } = useVenue(id);
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
+
+  const openContribute = (mode: "sun" | "beer" | "photo") => {
+    setSearchParams({ contribute: mode }, { replace: false });
+  };
 
   if (isLoading) {
     return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Laster…</div>;
