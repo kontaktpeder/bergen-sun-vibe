@@ -167,11 +167,17 @@ const VenueDetail = () => {
           <div className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
             <Clock className="h-4 w-4" />
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground">Åpningstider</div>
-            <div className="font-medium">{venue.hours}</div>
-          </div>
-          <span className="ml-auto rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-700">Åpent nå</span>
+          {venue.hours ? (
+            <div>
+              <div className="text-xs text-muted-foreground">Åpningstider</div>
+              <div className="font-medium">{venue.hours}</div>
+            </div>
+          ) : (
+            <div>
+              <div className="text-xs text-muted-foreground">Åpningstider</div>
+              <div className="text-sm text-muted-foreground">Ikke lagt inn ennå</div>
+            </div>
+          )}
         </div>
 
         {/* Last updated */}
