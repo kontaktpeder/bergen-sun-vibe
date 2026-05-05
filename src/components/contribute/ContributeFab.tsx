@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Loader2, MapPin } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { MobileSheet } from "@/components/ui/mobile-sheet";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useVenue } from "@/hooks/useVenue";
 import { useAddContribution } from "@/hooks/useAddContribution";
