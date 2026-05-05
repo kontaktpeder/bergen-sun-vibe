@@ -9,6 +9,7 @@ import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import VenueDetail from "./pages/VenueDetail";
 import Auth from "./pages/Auth";
+import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/venue/:id" element={<VenueDetail />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
           </Route>
           <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
