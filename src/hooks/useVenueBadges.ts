@@ -8,6 +8,7 @@ export interface VenueBadgeState {
   sunAt: string | null;
   beerPrice: number | null;
   photoCount: number;
+  latestPhotoUrl: string | null;
 }
 
 const FRESH_MS = 60 * 60 * 1000; // 60 min
@@ -20,7 +21,7 @@ interface ContribRow {
 }
 
 function emptyState(): VenueBadgeState {
-  return { sun: null, sunAt: null, beerPrice: null, photoCount: 0 };
+  return { sun: null, sunAt: null, beerPrice: null, photoCount: 0, latestPhotoUrl: null };
 }
 
 function mapSun(status: unknown): VenueBadgeSun | null {
@@ -69,6 +70,10 @@ export function useVenueBadges(venueIds: string[]) {
           if (Number.isFinite(n) && n > 0) s.beerPrice = n;
         } else if (r.type === "photo") {
           s.photoCount += 1;
+          if (!s.latestPhotoUrl) {
+            const url = (r.data as Record<string, unknown> | null)?.image_url;
+            if (typeof url === "string" && url.length > 0) s.latestPhotoUrl = url;
+          }
         }
 
         out[r.venue_id] = s;
