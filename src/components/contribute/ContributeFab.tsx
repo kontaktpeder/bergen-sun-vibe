@@ -204,8 +204,8 @@ export function ContributeFab() {
           ) : (
             <VenueForm
               onDone={async (data) => {
-                try {
-                  const r = await addContribution.mutateAsync({ type: "venue_add", data });
+                const submit = async (payload: VenueAddPayload) => {
+                  const r = await addContribution.mutateAsync({ type: "venue_add", data: payload });
                   showRewardFeedback({
                     type: "venue_add",
                     awardedPoints: r.awardedPoints,
@@ -217,11 +217,16 @@ export function ContributeFab() {
                   } else {
                     close();
                   }
+                };
+
+                try {
+                  await submit(data);
                 } catch (e) {
                   const raw = e instanceof Error ? e.message : String(e);
-                  const dupMatch = raw.match(/duplicate_google_place:([\w-]+)/);
-                  if (dupMatch) {
-                    const slug = dupMatch[1];
+
+                  const dupGoogle = raw.match(/duplicate_google_place:([\w-]+)/);
+                  if (dupGoogle) {
+                    const slug = dupGoogle[1];
                     toast.error("Stedet finnes allerede", {
                       action: {
                         label: "Åpne",
@@ -233,6 +238,43 @@ export function ContributeFab() {
                     });
                     return;
                   }
+
+                  const dupClose = raw.match(/duplicate_venue_close:([\w-]+):(.+)$/);
+                  if (dupClose) {
+                    const slug = dupClose[1];
+                    const name = dupClose[2];
+                    toast.error(`"${name}" finnes allerede her i nærheten`, {
+                      action: {
+                        label: "Åpne",
+                        onClick: () => {
+                          close();
+                          navigate(`/venue/${slug}`);
+                        },
+                      },
+                    });
+                    return;
+                  }
+
+                  const confirmDistinct = raw.match(/confirm_distinct_required:([\w-]+):(.+)$/);
+                  if (confirmDistinct) {
+                    const name = confirmDistinct[2];
+                    toast("Et sted med lignende navn finnes i byen", {
+                      description: `"${name}" finnes allerede et annet sted. Er dette et annet sted?`,
+                      action: {
+                        label: "Ja, legg til",
+                        onClick: async () => {
+                          try {
+                            await submit({ ...data, confirm_distinct: true });
+                          } catch (err) {
+                            toast.error(toUserErrorMessage(err));
+                          }
+                        },
+                      },
+                      duration: 10000,
+                    });
+                    return;
+                  }
+
                   toast.error(toUserErrorMessage(e));
                 }
               }}
