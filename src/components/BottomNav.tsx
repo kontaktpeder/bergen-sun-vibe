@@ -3,6 +3,7 @@ import { Home, Map, Heart, User, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { openContributeFab } from "@/lib/contribute-bus";
 import { FLAGS } from "@/lib/flags";
+import { useHideOnScroll } from "@/hooks/useScrollDirection";
 
 const items = [
   { to: "/", icon: Home, label: "Hjem" },
@@ -14,9 +15,16 @@ const items = [
 export function BottomNav() {
   const location = useLocation();
   const onAuth = location.pathname.startsWith("/auth");
+  const hidden = useHideOnScroll(48);
 
   return (
-    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-[max(env(safe-area-inset-bottom),0.5rem)]">
+    <nav
+      className={cn(
+        "pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-[max(env(safe-area-inset-bottom),0.5rem)] transition-all duration-300 ease-out",
+        hidden ? "translate-y-[120%] opacity-0" : "translate-y-0 opacity-100",
+      )}
+      aria-hidden={hidden}
+    >
       <div className="mx-auto max-w-md px-4">
         <div className="pointer-events-auto flex items-center justify-around rounded-full glass shadow-float py-2">
           {items.slice(0, 2).map(({ to, icon: Icon, label }) => (
