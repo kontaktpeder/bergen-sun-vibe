@@ -63,6 +63,25 @@ function FitBounds({ venues }: { venues: Venue[] }) {
   return null;
 }
 
+function PanToSelected({ venues, selectedId }: { venues: Venue[]; selectedId: string | null }) {
+  const map = useMap();
+  const isFirst = useRef(true);
+  useEffect(() => {
+    const v = venues.find((x) => x.id === selectedId);
+    if (!v) return;
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
+    const t = setTimeout(() => {
+      map.invalidateSize();
+      map.flyTo([v.lat, v.lng], 17, { animate: true, duration: 0.9 });
+    }, 350);
+    return () => clearTimeout(t);
+  }, [map, selectedId, venues]);
+  return null;
+}
+
 interface VenueMapProps {
   venues: Venue[];
   selectedId: string | null;
