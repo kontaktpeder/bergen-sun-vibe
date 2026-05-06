@@ -1,15 +1,15 @@
-export type LevelName = "Livsnyter" | "Lokalkjent" | "Soljeger" | "Utelivskonge" | "Legende";
+export type LevelName = "Nyter" | "Lokalkjent" | "Soljeger" | "Utelivsekspert" | "Legende";
 
 const LEVELS = [
-  { min: 0, max: 49, name: "Livsnyter" as const },
-  { min: 50, max: 149, name: "Lokalkjent" as const },
-  { min: 150, max: 349, name: "Soljeger" as const },
-  { min: 350, max: 749, name: "Utelivskonge" as const },
-  { min: 750, max: Number.POSITIVE_INFINITY, name: "Legende" as const },
+  { min: 0, max: 99, name: "Nyter" as const },
+  { min: 100, max: 299, name: "Lokalkjent" as const },
+  { min: 300, max: 749, name: "Soljeger" as const },
+  { min: 750, max: 1499, name: "Utelivsekspert" as const },
+  { min: 1500, max: Number.POSITIVE_INFINITY, name: "Legende" as const },
 ];
 
 export function getLevel(points: number): LevelName {
-  return LEVELS.find((l) => points >= l.min && points <= l.max)?.name ?? "Livsnyter";
+  return LEVELS.find((l) => points >= l.min && points <= l.max)?.name ?? "Nyter";
 }
 
 export function getNextLevelThreshold(points: number): number | null {
