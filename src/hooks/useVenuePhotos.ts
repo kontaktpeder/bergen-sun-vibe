@@ -6,15 +6,14 @@ export type VenuePhotoMap = Record<string, string | undefined>;
 
 
 /**
- * Batched lookup: best user-uploaded photo URL per venue id.
- * MVP: pick the OLDEST active photo so the cover is stable and matches what
- * the venue detail page shows.
+ * Batched lookup: latest user-uploaded photo URL per venue id.
+ * Matches what the venue detail page shows as cover.
  */
 export function useVenuePhotos(venueIds: string[]) {
   const ids = [...new Set(venueIds.filter(Boolean))].sort();
   const key = ids.join(",");
   return useQuery<VenuePhotoMap>({
-    queryKey: ["venue-photos-batch", "oldest", key],
+    queryKey: ["venue-photos-batch", "latest", key],
     enabled: ids.length > 0,
     staleTime: 5 * 60_000,
     queryFn: async () => {
@@ -24,7 +23,7 @@ export function useVenuePhotos(venueIds: string[]) {
         .in("venue_id", ids)
         .eq("type", "photo")
         .eq("status", "active")
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: false }); // newest first
       if (error) return {};
 
       const map: VenuePhotoMap = {};
