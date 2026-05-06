@@ -87,9 +87,37 @@ interface VenueMapProps {
   selectedId: string | null;
   onSelect: (id: string) => void;
   fallbackCenter: [number, number];
+  userLocation?: { lat: number; lng: number } | null;
 }
 
-export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: VenueMapProps) {
+function FlyToUser({ location }: { location: { lat: number; lng: number } | null | undefined }) {
+  const map = useMap();
+  const lastKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!location) return;
+    const key = `${location.lat},${location.lng}`;
+    if (lastKey.current === key) return;
+    lastKey.current = key;
+    const t = setTimeout(() => {
+      map.invalidateSize();
+      map.flyTo([location.lat, location.lng], 16, { animate: true, duration: 0.9 });
+    }, 100);
+    return () => clearTimeout(t);
+  }, [map, location]);
+  return null;
+}
+
+const userLocationIcon = L.divIcon({
+  html: `<div style="position:relative;width:18px;height:18px;">
+    <div style="position:absolute;inset:-8px;border-radius:9999px;background:hsl(var(--primary)/0.25);animation:pulse 2s ease-out infinite"></div>
+    <div style="position:absolute;inset:0;border-radius:9999px;background:hsl(var(--primary));border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25)"></div>
+  </div>`,
+  className: "user-location-marker",
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+});
+
+export function VenueMap({ venues, selectedId, onSelect, fallbackCenter, userLocation }: VenueMapProps) {
   const validVenues = useMemo(
     () => venues.filter((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng)),
     [venues],
@@ -97,8 +125,6 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
   const center: [number, number] = validVenues.length
     ? [validVenues[0].lat, validVenues[0].lng]
     : fallbackCenter;
-
-
 
   return (
     <MapContainer
@@ -109,7 +135,6 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
       className="h-full w-full venue-map"
       style={{ background: "hsl(var(--secondary))" }}
     >
-      {/* Calmer, premium tile style */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
@@ -118,6 +143,11 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
       />
       <FitBounds venues={validVenues} />
       <PanToSelected venues={validVenues} selectedId={selectedId} />
+      <FlyToUser location={userLocation} />
+      {userLocation && (
+        <Marker position={[userLocation.lat, userLocation.lng]} icon={userLocationIcon} />
+      )}
+
       <MarkerClusterGroup
         chunkedLoading
         showCoverageOnHover={false}
