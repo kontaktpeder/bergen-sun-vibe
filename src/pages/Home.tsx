@@ -96,8 +96,8 @@ const Home = () => {
               <img
                 src={logoPng}
                 alt="Utefolket"
-                className="h-11 w-11 object-contain"
-                style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.25))" }}
+                className="object-contain"
+                style={{ height: 44, width: 44, filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.25))" }}
               />
               <div
                 className="leading-tight"
