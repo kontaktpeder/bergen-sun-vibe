@@ -801,18 +801,42 @@ function VenueForm({
         onClick={() => {
           const la = Number(lat);
           const ln = Number(lng);
-          if (!name.trim()) return toast.error("Navn er påkrevd.");
+          const finalName = (selectedPlace?.name ?? name).trim();
+          if (!finalName) return toast.error("Navn er påkrevd.");
           if (!Number.isFinite(la) || la < -90 || la > 90) return toast.error("Ugyldig lat.");
           if (!Number.isFinite(ln) || ln < -180 || ln > 180) return toast.error("Ugyldig lng.");
-          // Derive city from actual coordinates, not the selected city filter.
           const inferredCity = inferLegacyCity(la, ln);
           if (!inferredCity) {
             return toast.error("Posisjonen er utenfor Bergen og Oslo. Juster plassering på kartet.");
           }
-          onDone({ name: name.trim(), lat: la, lng: ln, category, city: inferredCity });
+          const payload: VenueAddPayload = selectedPlace
+            ? {
+                name: finalName,
+                lat: la,
+                lng: ln,
+                category,
+                city: inferredCity,
+                google_place_id: selectedPlace.google_place_id,
+                google_maps_url: selectedPlace.google_maps_uri ?? undefined,
+                address: selectedPlace.formatted_address ?? undefined,
+                google_rating: selectedPlace.rating ?? undefined,
+                google_user_rating_count: selectedPlace.user_rating_count ?? undefined,
+                source: "google",
+              }
+            : {
+                name: finalName,
+                lat: la,
+                lng: ln,
+                category,
+                city: inferredCity,
+                source: "manual",
+              };
+          // Suppress unused warning during MVP
+          void manualMode;
+          onDone(payload);
         }}
       >
-        Legg til 📍
+        {selectedPlace ? "Legg til fra Google ✨" : "Legg til 📍"}
       </Button>
     </div>
   );
