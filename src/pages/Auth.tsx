@@ -59,14 +59,12 @@ const Auth = () => {
       </div>
 
       <div className="mt-10">
-        <div className="text-xs font-semibold uppercase tracking-widest opacity-80">Uteliv Bergen</div>
+        <div className="text-xs font-semibold uppercase tracking-widest opacity-80">Utefolket</div>
         <h1 className="mt-2 font-display text-4xl font-semibold leading-tight">
-          {mode === "signin" ? "Velkommen tilbake" : "Bli med i Bergen"}
+          Bli en del av Utefolket
         </h1>
         <p className="mt-2 text-sm opacity-85">
-          {mode === "signin"
-            ? "Logg inn for å lagre steder og bidra til byen."
-            : "Opprett konto, samle poeng og hjelp andre å finne sola."}
+          Bidra til å vise hvor sola står lengst, ølen er billigst og stemningen er best.
         </p>
       </div>
 
