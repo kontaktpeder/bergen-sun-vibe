@@ -616,7 +616,7 @@ function VenueForm({
         <div className="rounded-xl border border-border bg-card p-3">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="text-sm font-medium">Fant vi riktig sted?</div>
+              <div className="text-sm font-medium">Er dette riktig sted?</div>
               <div className="text-xs text-muted-foreground">
                 Søk i Google for bedre kvalitet og færre duplikater.
               </div>
