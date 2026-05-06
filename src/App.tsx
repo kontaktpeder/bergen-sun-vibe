@@ -8,12 +8,16 @@ import Home from "./pages/Home";
 import Explore from "./pages/Explore";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
-import VenueDetail from "./pages/VenueDetail";
+
 import Auth from "./pages/Auth";
 import Leaderboard from "./pages/Leaderboard";
 import AdminReports from "./pages/AdminReports";
 import AdminVenues from "./pages/AdminVenues";
 import NotFound from "./pages/NotFound";
+import PlacePage from "./pages/seo/PlacePage";
+import CityPage from "./pages/seo/CityPage";
+import FacetPage from "./pages/seo/FacetPage";
+import LegacyVenueRedirect from "./pages/seo/LegacyVenueRedirect";
 
 const queryClient = new QueryClient();
 
@@ -29,10 +33,15 @@ const App = () => (
             <Route path="/explore" element={<Explore />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/venue/:id" element={<VenueDetail />} />
+            <Route path="/venue/:id" element={<LegacyVenueRedirect />} />
+            <Route path="/steder/:id" element={<PlacePage />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/admin/reports" element={<AdminReports />} />
             <Route path="/admin/venues" element={<AdminVenues />} />
+            <Route path="/oslo" element={<CityPage />} />
+            <Route path="/bergen" element={<CityPage />} />
+            <Route path="/oslo/:facetSlug" element={<FacetPage />} />
+            <Route path="/bergen/:facetSlug" element={<FacetPage />} />
           </Route>
           <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
