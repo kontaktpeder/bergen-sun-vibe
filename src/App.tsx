@@ -14,6 +14,10 @@ import Leaderboard from "./pages/Leaderboard";
 import AdminReports from "./pages/AdminReports";
 import AdminVenues from "./pages/AdminVenues";
 import NotFound from "./pages/NotFound";
+import PlacePage from "./pages/seo/PlacePage";
+import CityPage from "./pages/seo/CityPage";
+import FacetPage from "./pages/seo/FacetPage";
+import LegacyVenueRedirect from "./pages/seo/LegacyVenueRedirect";
 
 const queryClient = new QueryClient();
 
@@ -29,10 +33,13 @@ const App = () => (
             <Route path="/explore" element={<Explore />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/venue/:id" element={<VenueDetail />} />
+            <Route path="/venue/:id" element={<LegacyVenueRedirect />} />
+            <Route path="/steder/:slug" element={<PlacePage />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/admin/reports" element={<AdminReports />} />
             <Route path="/admin/venues" element={<AdminVenues />} />
+            <Route path="/:citySlug" element={<CityPage />} />
+            <Route path="/:citySlug/:facetSlug" element={<FacetPage />} />
           </Route>
           <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
