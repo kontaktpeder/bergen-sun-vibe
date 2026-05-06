@@ -47,7 +47,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
 
   if (variant === "feature") {
     return (
-      <Link to={`/venue/${venue.id}`} className="group block tap-scale animate-stagger" style={{ animationDelay: `${index * 60}ms` }}>
+      <Link to={`/steder/${venue.id}`} className="group block tap-scale animate-stagger" style={{ animationDelay: `${index * 60}ms` }}>
         <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-card">
           <VenueImage
             venue={venue}
@@ -90,7 +90,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
 
   if (variant === "compact") {
     return (
-      <Link to={`/venue/${venue.id}`} className="group block w-[180px] shrink-0 tap-scale animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
+      <Link to={`/steder/${venue.id}`} className="group block w-[180px] shrink-0 tap-scale animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
         <div className="relative aspect-square overflow-hidden rounded-2xl shadow-soft">
           <VenueImage
             venue={venue}
@@ -116,7 +116,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
 
   // default — wide card
   return (
-    <Link to={`/venue/${venue.id}`} className="group block w-[280px] shrink-0 tap-scale animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
+    <Link to={`/steder/${venue.id}`} className="group block w-[280px] shrink-0 tap-scale animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
       <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-card">
         <VenueImage
           venue={venue}
