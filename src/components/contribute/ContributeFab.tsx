@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin, Search, Star } from "lucide-react";
 import { MobileSheet } from "@/components/ui/mobile-sheet";
 import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
@@ -21,6 +21,9 @@ import { useCity } from "@/context/CityContext";
 import { inferLegacyCity } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { findPossibleDuplicate } from "@/lib/dedupe-venues";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import type { VenueAddPayload } from "@/lib/contribution-types";
 
 const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Bergen: { lat: 60.3913, lng: 5.3221 },
