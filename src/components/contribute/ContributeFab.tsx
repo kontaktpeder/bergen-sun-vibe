@@ -115,15 +115,15 @@ export function ContributeFab() {
               success={success}
               onSeeVenue={() => {
                 close();
-                if (success.venueSlug) navigate(`/venue/${success.venueSlug}`);
+                if (success.venueSlug) navigate(`/steder/${success.venueSlug}`);
               }}
               onAddPhoto={() => {
                 close();
-                if (success.venueSlug) navigate(`/venue/${success.venueSlug}?contribute=photo`);
+                if (success.venueSlug) navigate(`/steder/${success.venueSlug}?contribute=photo`);
               }}
               onAddBeer={() => {
                 close();
-                if (success.venueSlug) navigate(`/venue/${success.venueSlug}?contribute=beer`);
+                if (success.venueSlug) navigate(`/steder/${success.venueSlug}?contribute=beer`);
               }}
             />
           ) : mode === "menu" ? (
@@ -233,7 +233,7 @@ export function ContributeFab() {
                         label: "Åpne",
                         onClick: () => {
                           close();
-                          navigate(`/venue/${slug}`);
+                          navigate(`/steder/${slug}`);
                         },
                       },
                     });
@@ -249,7 +249,7 @@ export function ContributeFab() {
                         label: "Åpne",
                         onClick: () => {
                           close();
-                          navigate(`/venue/${slug}`);
+                          navigate(`/steder/${slug}`);
                         },
                       },
                     });
@@ -703,7 +703,7 @@ function VenueForm({
                         toast.error("Stedet finnes allerede", {
                           action: {
                             label: "Åpne",
-                            onClick: () => navigate(`/venue/${existing.slug}`),
+                            onClick: () => navigate(`/steder/${existing.slug}`),
                           },
                         });
                         return;
