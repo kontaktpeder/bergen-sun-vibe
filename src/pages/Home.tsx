@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Sparkles, Sun } from "lucide-react";
 import heroImg from "@/assets/hero-oslo-sunset.jpg";
-import logoImg from "@/assets/utefolket-logo.png";
+import logoPng from "@/assets/utefolket-logo.png";
+import logoSvg from "@/assets/utefolket-logo.svg";
 import { buildSectionConfig, belongsToCity, type SectionDef } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { VenueCard } from "@/components/VenueCard";
@@ -89,12 +90,18 @@ const Home = () => {
         <div className="relative z-10 flex min-h-[100svh] flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-8">
           {/* Top bar */}
           <div className="flex items-center justify-between text-white">
-            <div className="flex items-center gap-2">
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-sun shadow-glow">
-                <Sun className="h-5 w-5 text-night" strokeWidth={2.5} />
-              </div>
-              <div className="leading-tight [text-shadow:0_1px_8px_rgba(0,0,0,0.4)]">
-                <div className="font-display text-lg font-semibold">Uteliv</div>
+            <div className="flex items-center gap-3">
+              <img
+                src={logoPng}
+                alt="Utefolket"
+                className="h-10 w-10 object-contain"
+                style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.25))" }}
+              />
+              <div
+                className="leading-tight"
+                style={{ color: "#F7F5F2", textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}
+              >
+                <div className="font-display text-lg font-semibold">Utefolket</div>
                 <div className="text-[10px] uppercase tracking-widest opacity-80">{currentCity}</div>
               </div>
             </div>
@@ -106,12 +113,10 @@ const Home = () => {
           {/* Centered hero content – logo sits ~40% from top */}
           <div className="flex flex-1 flex-col items-center text-center pt-[18vh]">
             <img
-              src={logoImg}
+              src={logoSvg}
               alt="Utefolket"
-              width={180}
-              height={180}
-              className="h-[160px] w-auto max-w-[180px] object-contain"
-              style={{ filter: "drop-shadow(0 8px 30px rgba(0,0,0,0.25))" }}
+              className="w-[170px] max-w-[42vw] h-auto object-contain"
+              style={{ filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.18))" }}
             />
 
             <h1
