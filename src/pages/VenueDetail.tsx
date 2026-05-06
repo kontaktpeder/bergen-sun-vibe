@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
+import { DataSunBadge } from "@/components/DataSunBadge";
+import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { ReportButton } from "@/components/ReportButton";
 import { VenueStatusBadges } from "@/components/VenueStatusBadges";
 import { VenuePhotoGallery } from "@/components/VenuePhotoGallery";
@@ -19,6 +21,9 @@ const VenueDetail = () => {
   useFavorites();
   const { data: venue, isLoading, error } = useVenue(id);
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
+  const venueIds = venue?.dbId ? [venue.dbId] : [];
+  const { data: badgeMap = {} } = useVenueBadges(venueIds);
+  const badge = venue?.dbId ? badgeMap[venue.dbId] : undefined;
 
   const openContribute = (mode: "sun" | "beer" | "photo") => {
     setSearchParams({ contribute: mode }, { replace: false });
@@ -106,7 +111,9 @@ const VenueDetail = () => {
         </div>
 
         <div className="absolute bottom-16 left-5 right-5">
-          <SunBadge status={venue.sunStatus} until={venue.sunUntil} size="md" />
+          {badge && badge.sun
+            ? <DataSunBadge badge={badge} size="md" />
+            : <SunBadge status={venue.sunStatus} until={venue.sunUntil} size="md" />}
         </div>
       </div>
 
