@@ -12,6 +12,7 @@ import VenueDetail from "./pages/VenueDetail";
 import Auth from "./pages/Auth";
 import Leaderboard from "./pages/Leaderboard";
 import AdminReports from "./pages/AdminReports";
+import AdminVenues from "./pages/AdminVenues";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
