@@ -30,7 +30,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
   const { data: fetchedPhoto } = useLatestVenuePhoto(userPhotoProp === undefined ? venue.dbId : undefined);
   const userPhotoUrl = userPhotoProp !== undefined ? userPhotoProp : fetchedPhoto;
   const fav = isFavorite(venue.id);
-  const price = "kr".repeat(venue.priceLevel);
+  
 
   const loading = eager ? "eager" : "lazy";
   const fetchPriority = eager ? "high" : "auto";
@@ -79,7 +79,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
             <h3 className="font-display text-2xl font-semibold leading-tight">{venue.name}</h3>
             <div className="mt-2 flex items-center gap-3 text-sm">
               <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{venue.rating}</span>
-              <span className="opacity-70">{price}</span>
+              
               {venue.dealText && <span className="rounded-full bg-primary/90 px-2 py-0.5 text-xs font-medium">{venue.dealText}</span>}
             </div>
           </div>
@@ -107,7 +107,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
           <h4 className="truncate font-display text-base font-semibold">{venue.name}</h4>
           <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{venue.rating}</span>
-            <span>·</span><span>{price}</span>
+            
           </div>
         </div>
       </Link>
@@ -146,7 +146,6 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
       <div className="mt-3 px-1">
         <div className="flex items-baseline justify-between gap-2">
           <h4 className="truncate font-display text-lg font-semibold">{venue.name}</h4>
-          <span className="shrink-0 text-xs text-muted-foreground">{price}</span>
         </div>
         <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{venue.rating}</span>
