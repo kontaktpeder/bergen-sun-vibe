@@ -13,6 +13,7 @@ import { useCity } from "@/context/CityContext";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
+import { CityBanner } from "@/components/CityBanner";
 
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
