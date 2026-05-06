@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Plus, Search as SearchIcon, X } from "lucide-react";
 import { useVenues } from "@/hooks/useVenues";
+import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 import { openContributeFab } from "@/lib/contribute-bus";
 import { VenueImage } from "@/components/VenueImage";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,8 @@ export function SearchOverlay({ open, onClose }: Props) {
       })
       .slice(0, 30);
   }, [q, venues]);
+
+  const { data: photoMap = {} } = useVenuePhotos(results.map((v) => v.dbId));
 
   if (!open) return null;
 
@@ -97,7 +100,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                 )}
               >
                 <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl">
-                  <VenueImage venue={v} size={{ w: 400, h: 400 }} compactFallback showAttribution={false} />
+                  <VenueImage venue={v} userPhotoUrl={photoMap[v.dbId] ?? null} size={{ w: 400, h: 400 }} compactFallback showAttribution={false} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-display text-base font-semibold">{v.name}</div>
