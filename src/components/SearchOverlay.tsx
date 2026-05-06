@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Plus, Search as SearchIcon, X } from "lucide-react";
 import { useVenues } from "@/hooks/useVenues";
+import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 import { openContributeFab } from "@/lib/contribute-bus";
 import { VenueImage } from "@/components/VenueImage";
 import { cn } from "@/lib/utils";
