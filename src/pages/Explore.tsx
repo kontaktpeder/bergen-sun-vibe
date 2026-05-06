@@ -21,10 +21,6 @@ const filters = [
   { id: "cheap", label: "Billigst øl", emoji: "🍺" },
 ];
 
-const cityOptions = [
-  { id: "Bergen", label: "Bergen", emoji: "🏔️" },
-  { id: "Oslo", label: "Oslo", emoji: "🏙️" },
-];
 
 const CITY_CENTERS: Record<string, [number, number]> = {
   Bergen: [60.3913, 5.3221],
@@ -33,7 +29,7 @@ const CITY_CENTERS: Record<string, [number, number]> = {
 
 const Explore = () => {
   const [filter, setFilter] = useState("all");
-  const { currentCity: city, setCurrentCity } = useCity();
+  const { currentCity: city } = useCity();
   const { data: venues = [], isLoading, error } = useVenues();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
