@@ -11,7 +11,8 @@ import { DataSunBadge } from "@/components/DataSunBadge";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { VenueMap } from "@/components/VenueMap";
 import { VenueImage } from "@/components/VenueImage";
-import { useCity, type City } from "@/context/CityContext";
+import { useCity } from "@/context/CityContext";
+import { CityBanner } from "@/components/CityBanner";
 import { cn } from "@/lib/utils";
 
 const filters = [
