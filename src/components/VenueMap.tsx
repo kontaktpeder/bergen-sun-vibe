@@ -117,7 +117,7 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
         maxZoom={20}
       />
       <FitBounds venues={validVenues} />
-      <PanToSelected />
+      <PanToSelected venues={validVenues} selectedId={selectedId} />
       <MarkerClusterGroup
         chunkedLoading
         showCoverageOnHover={false}
