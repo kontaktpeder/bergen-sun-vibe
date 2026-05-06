@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { SearchOverlay } from "@/components/SearchOverlay";
 import { Search, Sparkles, Sun } from "lucide-react";
 import heroImg from "@/assets/hero-oslo-sunset.jpg";
 import logoPng from "@/assets/utefolket-logo.png";
@@ -21,6 +22,7 @@ const filterOptions = [
 
 const Home = () => {
   const [filter, setFilter] = useState("all");
+  const [searchOpen, setSearchOpen] = useState(false);
   const { currentCity } = useCity();
   const { data: allVenues = [], isLoading, error } = useVenues();
   const { user, profile } = useAuthProfile();
@@ -145,14 +147,15 @@ const Home = () => {
             <div className="flex-1" />
 
             {/* Search */}
-            <Link
-              to="/explore"
-              className="mt-8 flex w-full items-center gap-3 rounded-full border border-white/30 bg-white/95 px-5 py-3.5 shadow-[0_8px_28px_rgba(0,0,0,0.25)] backdrop-blur-xl tap-scale"
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="mt-8 flex w-full items-center gap-3 rounded-full border border-white/30 bg-white/95 px-5 py-3.5 shadow-[0_8px_28px_rgba(0,0,0,0.25)] backdrop-blur-xl tap-scale text-left"
             >
               <Search className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Søk barer, områder, stemning...</span>
               <Sparkles className="ml-auto h-4 w-4 text-primary" />
-            </Link>
+            </button>
 
             {/* Filter chips */}
             <div className="mt-4 w-full">
@@ -232,6 +235,8 @@ const Home = () => {
       <div className="mt-12 px-5 text-center">
         <p className="font-display text-sm italic text-muted-foreground">Laget med ☀️ i {currentCity}</p>
       </div>
+
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 };
