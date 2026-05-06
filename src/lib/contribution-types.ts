@@ -18,6 +18,14 @@ export type VenueAddPayload = {
   category: "bar" | "cafe" | "restaurant";
   city: "Bergen" | "Oslo";
   image_url?: string;
+
+  // Optional Google Places enrichment
+  google_place_id?: string;
+  google_maps_url?: string;
+  address?: string;
+  google_rating?: number;
+  google_user_rating_count?: number;
+  source?: "manual" | "google";
 };
 
 export type ContributionPayload =
