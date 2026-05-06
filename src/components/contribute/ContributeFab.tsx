@@ -218,6 +218,21 @@ export function ContributeFab() {
                     close();
                   }
                 } catch (e) {
+                  const raw = e instanceof Error ? e.message : String(e);
+                  const dupMatch = raw.match(/duplicate_google_place:([\w-]+)/);
+                  if (dupMatch) {
+                    const slug = dupMatch[1];
+                    toast.error("Stedet finnes allerede", {
+                      action: {
+                        label: "Åpne",
+                        onClick: () => {
+                          close();
+                          navigate(`/venue/${slug}`);
+                        },
+                      },
+                    });
+                    return;
+                  }
                   toast.error(toUserErrorMessage(e));
                 }
               }}
