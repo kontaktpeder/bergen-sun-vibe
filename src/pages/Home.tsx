@@ -13,6 +13,7 @@ import { useCity } from "@/context/CityContext";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
+import { CityBanner } from "@/components/CityBanner";
 
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
@@ -165,6 +166,9 @@ const Home = () => {
         </div>
       </header>
 
+      <div className="mt-4 px-5">
+        <CityBanner />
+      </div>
 
       {isLoading && (
         <div className="mt-10 px-5 text-sm text-muted-foreground">Laster steder…</div>

@@ -11,7 +11,8 @@ import { DataSunBadge } from "@/components/DataSunBadge";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { VenueMap } from "@/components/VenueMap";
 import { VenueImage } from "@/components/VenueImage";
-import { useCity, type City } from "@/context/CityContext";
+import { useCity } from "@/context/CityContext";
+import { CityBanner } from "@/components/CityBanner";
 import { cn } from "@/lib/utils";
 
 const filters = [
@@ -20,10 +21,6 @@ const filters = [
   { id: "cheap", label: "Billigst øl", emoji: "🍺" },
 ];
 
-const cityOptions = [
-  { id: "Bergen", label: "Bergen", emoji: "🏔️" },
-  { id: "Oslo", label: "Oslo", emoji: "🏙️" },
-];
 
 const CITY_CENTERS: Record<string, [number, number]> = {
   Bergen: [60.3913, 5.3221],
@@ -32,7 +29,7 @@ const CITY_CENTERS: Record<string, [number, number]> = {
 
 const Explore = () => {
   const [filter, setFilter] = useState("all");
-  const { currentCity: city, setCurrentCity } = useCity();
+  const { currentCity: city } = useCity();
   const { data: venues = [], isLoading, error } = useVenues();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -121,21 +118,8 @@ const Explore = () => {
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
-            <div className="flex shrink-0 items-center rounded-full glass p-0.5 shadow-soft">
-              {cityOptions.map(opt => (
-                <button
-                  key={opt.id}
-                  onClick={() => setCurrentCity(opt.id as City)}
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-                    city === opt.id ? "bg-foreground text-background" : "text-muted-foreground"
-                  )}
-                  aria-label={opt.label}
-                >
-                  {opt.emoji}
-                </button>
-              ))}
-            </div>
+            <CityBanner variant="dark" className="shrink-0" />
+
           </div>
           {/* Filter-chips horisontalt scrollbar — tar ikke ekstra rad-plass */}
           <div className="mt-2 -mx-3 overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
