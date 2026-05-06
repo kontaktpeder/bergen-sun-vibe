@@ -53,11 +53,13 @@ function clusterIcon(cluster: { getChildCount: () => number }) {
 
 function FitBounds({ venues }: { venues: Venue[] }) {
   const map = useMap();
+  const idsKey = venues.map((v) => v.id).sort().join(",");
   useEffect(() => {
     if (!venues.length) return;
     const bounds = L.latLngBounds(venues.map((v) => [v.lat, v.lng] as [number, number]));
     map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15, animate: true });
-  }, [map, venues]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, idsKey]);
   return null;
 }
 
