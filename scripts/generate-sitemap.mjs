@@ -9,7 +9,16 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const SITE = "https://utefolket.no";
-const FACETS = ["kveldssol", "afterwork", "date", "takterrasse"];
+// Holdes i synk med FACET_DEFS i src/lib/seo.ts
+const FACET_MATCHERS = {
+  kveldssol: (v) =>
+    v.sun_status === "evening-sun" ||
+    (v.tags || []).some((t) => /kveldssol|sunset|kveld/i.test(String(t))),
+  afterwork: (v) => (v.tags || []).some((t) => /afterwork|after-?work|happyhour/i.test(String(t))),
+  date: (v) => (v.tags || []).some((t) => /date|romantisk|intim/i.test(String(t))),
+  takterrasse: (v) => (v.tags || []).some((t) => /tak|terrasse|rooftop/i.test(String(t))),
+};
+const FACETS = Object.keys(FACET_MATCHERS);
 const CITIES = ["oslo", "bergen"];
 
 function readEnv() {
@@ -39,7 +48,7 @@ async function fetchVenues(env) {
   if (!url || !key) return [];
   try {
     const res = await fetch(
-      `${url}/rest/v1/venues?select=slug,city,area,tags&status=eq.published`,
+      `${url}/rest/v1/venues?select=slug,city,area,tags,sun_status&status=eq.published`,
       { headers: { apikey: key, Authorization: `Bearer ${key}` } }
     );
     if (!res.ok) {
@@ -67,12 +76,9 @@ async function main() {
   for (const c of CITIES) {
     entries.push(urlEntry(`${SITE}/${c}`, now));
     for (const f of FACETS) {
-      // Only include facets that actually have venues with a matching tag.
       const cityName = c === "oslo" ? "Oslo" : "Bergen";
       const matching = venues.filter(
-        (v) =>
-          (v.city === cityName) &&
-          (v.tags || []).some((t) => new RegExp(f, "i").test(String(t)))
+        (v) => v.city === cityName && FACET_MATCHERS[f](v)
       );
       if (matching.length >= 6) {
         entries.push(urlEntry(`${SITE}/${c}/${f}`, now));

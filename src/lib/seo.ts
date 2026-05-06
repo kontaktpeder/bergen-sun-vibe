@@ -97,12 +97,15 @@ export function shouldNoIndex(input: {
   resultCount?: number;
   hasIntro?: boolean;
   hasImage?: boolean;
+  hasName?: boolean;
+  hasCity?: boolean;
+  hasTags?: boolean;
 }): boolean {
   if (input.pageType === "place") {
-    // Konservativt: noindex hvis bilde mangler ELLER beskrivelse mangler
-    if (!input.hasImage) return true;
-    if (!input.hasIntro) return true;
-    return false;
+    // Konservativt: krev navn + by + minst én kvalitetsindikator.
+    if (!input.hasName || !input.hasCity) return true;
+    const qualityIndicators = [input.hasImage, input.hasIntro, input.hasTags].filter(Boolean).length;
+    return qualityIndicators === 0;
   }
   if (input.pageType === "city") {
     const count = input.resultCount ?? 0;
@@ -115,6 +118,8 @@ export function shouldNoIndex(input: {
   return false;
 }
 
+// NB: `Venue.id` (fra mapDbVenue) er allerede `slug`. `dbId` er uuid.
+// Alle SEO-URL-er bruker derfor venue.id (= slug).
 export function buildPlaceSchema(venue: Venue) {
   const schema: Record<string, unknown> = {
     "@context": "https://schema.org",

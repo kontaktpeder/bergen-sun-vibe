@@ -17,7 +17,7 @@ import {
 import VenueDetail from "@/pages/VenueDetail";
 
 export default function PlacePage() {
-  const { id: slug } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const { data: venue, isLoading } = useVenue(slug);
   const { data: allVenues = [] } = useVenues();
 
@@ -51,9 +51,12 @@ export default function PlacePage() {
 
   const hasIntro = !!venue?.description && venue.description.length >= 40;
   const hasImage = !!venue?.image;
+  const hasTags = !!venue?.tags && venue.tags.length > 0;
+  const hasName = !!venue?.name;
+  const hasCity = !!venue?.city;
   const noindex = !venue
     ? true
-    : shouldNoIndex({ pageType: "place", hasIntro, hasImage });
+    : shouldNoIndex({ pageType: "place", hasIntro, hasImage, hasTags, hasName, hasCity });
 
   return (
     <>
