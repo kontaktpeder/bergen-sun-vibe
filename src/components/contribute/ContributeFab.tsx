@@ -600,8 +600,124 @@ function VenueForm({
       <div className="mt-4 space-y-3">
         <div>
           <Label>Navn</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="F.eks. Pelikanen" />
+          <Input
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (selectedPlace && e.target.value.trim() !== selectedPlace.name) {
+                setSelectedPlace(null);
+              }
+            }}
+            placeholder="F.eks. Pelikanen"
+          />
         </div>
+
+        {/* Google Places lookup */}
+        <div className="rounded-xl border border-border bg-card p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-sm font-medium">Fant vi riktig sted?</div>
+              <div className="text-xs text-muted-foreground">
+                Søk i Google for bedre kvalitet og færre duplikater.
+              </div>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={searchGooglePlace}
+              disabled={searchingPlaces || !name.trim()}
+              className="shrink-0"
+            >
+              {searchingPlaces ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4" />
+              )}
+              <span className="ml-1.5">{searchingPlaces ? "Søker…" : "Søk"}</span>
+            </Button>
+          </div>
+
+          {searchedOnce && placeCandidates.length === 0 && !searchingPlaces && (
+            <div className="mt-3 text-xs text-muted-foreground">
+              Ingen treff i Google. Du kan legge inn manuelt under.
+            </div>
+          )}
+
+          {placeCandidates.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {placeCandidates.map((p) => {
+                const existing = existingByPlaceId.find(
+                  (e) => e.google_place_id === p.google_place_id,
+                );
+                const isSelected = selectedPlace?.google_place_id === p.google_place_id;
+                return (
+                  <button
+                    key={p.google_place_id}
+                    type="button"
+                    onClick={() => {
+                      if (existing) {
+                        toast.error("Stedet finnes allerede", {
+                          action: {
+                            label: "Åpne",
+                            onClick: () => navigate(`/venue/${existing.slug}`),
+                          },
+                        });
+                        return;
+                      }
+                      setSelectedPlace(p);
+                      setManualMode(false);
+                      if (typeof p.lat === "number" && typeof p.lng === "number") {
+                        setLat(p.lat.toFixed(6));
+                        setLng(p.lng.toFixed(6));
+                        setGeoState("ok");
+                      }
+                    }}
+                    className={cn(
+                      "w-full rounded-lg border p-3 text-left transition-colors",
+                      isSelected
+                        ? "border-primary bg-primary/5"
+                        : existing
+                        ? "border-amber-300/60 bg-amber-50/60 dark:bg-amber-950/30"
+                        : "border-border hover:bg-secondary/50",
+                    )}
+                  >
+                    <div className="text-sm font-medium">{p.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {p.formatted_address ?? "Ingen adresse"}
+                    </div>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                      {p.rating != null ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Star className="h-3 w-3 fill-current text-amber-500" />
+                          {p.rating} ({p.user_rating_count ?? 0})
+                        </span>
+                      ) : (
+                        <span>Ingen rating</span>
+                      )}
+                      {existing && (
+                        <span className="ml-auto text-amber-700 dark:text-amber-300">
+                          Finnes allerede – trykk for å åpne
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedPlace(null);
+                  setManualMode(true);
+                }}
+                className="text-xs font-medium text-muted-foreground underline-offset-2 hover:underline"
+              >
+                Legg inn manuelt i stedet
+              </button>
+            </div>
+          )}
+        </div>
+
         <div>
           <Label>Kategori</Label>
           <select
