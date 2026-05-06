@@ -69,8 +69,12 @@ export function buildCanonical(path: string): string {
 
 export function buildTitle(type: PageType, data: Record<string, string>): string {
   switch (type) {
-    case "place":
-      return `${data.name}${data.area ? ", " + data.area : ""}${data.city ? " — " + data.city : ""} | Utefolket`;
+    case "place": {
+      const showArea = data.area && data.area.toLowerCase() !== (data.city || "").toLowerCase();
+      const cityPart = data.city ? ` — ${data.city}` : "";
+      const areaPart = showArea ? `, ${data.area}` : "";
+      return `${data.name}${areaPart}${cityPart} | Utefolket`;
+    }
     case "city":
       return `Steder å være ute i ${data.city} akkurat nå | Utefolket`;
     case "facet":
@@ -100,11 +104,18 @@ export function shouldNoIndex(input: {
   hasName?: boolean;
   hasCity?: boolean;
   hasTags?: boolean;
+  hasRating?: boolean;
+  hasReviews?: boolean;
 }): boolean {
   if (input.pageType === "place") {
-    // Konservativt: krev navn + by + minst én kvalitetsindikator.
     if (!input.hasName || !input.hasCity) return true;
-    const qualityIndicators = [input.hasImage, input.hasIntro, input.hasTags].filter(Boolean).length;
+    const qualityIndicators = [
+      input.hasImage,
+      input.hasIntro,
+      input.hasTags,
+      input.hasRating,
+      input.hasReviews,
+    ].filter(Boolean).length;
     return qualityIndicators === 0;
   }
   if (input.pageType === "city") {

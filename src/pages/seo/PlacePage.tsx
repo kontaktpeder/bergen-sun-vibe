@@ -54,9 +54,20 @@ export default function PlacePage() {
   const hasTags = !!venue?.tags && venue.tags.length > 0;
   const hasName = !!venue?.name;
   const hasCity = !!venue?.city;
+  const hasRating = !!venue && venue.rating > 0;
+  const hasReviews = !!venue && venue.reviews > 0;
   const noindex = !venue
     ? true
-    : shouldNoIndex({ pageType: "place", hasIntro, hasImage, hasTags, hasName, hasCity });
+    : shouldNoIndex({
+        pageType: "place",
+        hasIntro,
+        hasImage,
+        hasTags,
+        hasName,
+        hasCity,
+        hasRating,
+        hasReviews,
+      });
 
   return (
     <>
