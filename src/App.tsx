@@ -34,7 +34,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/venue/:id" element={<LegacyVenueRedirect />} />
-            <Route path="/steder/:slug" element={<PlacePage />} />
+            <Route path="/steder/:id" element={<PlacePage />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/admin/reports" element={<AdminReports />} />
             <Route path="/admin/venues" element={<AdminVenues />} />

@@ -17,7 +17,7 @@ import {
 import VenueDetail from "@/pages/VenueDetail";
 
 export default function PlacePage() {
-  const { slug } = useParams<{ slug: string }>();
+  const { id: slug } = useParams<{ id: string }>();
   const { data: venue, isLoading } = useVenue(slug);
   const { data: allVenues = [] } = useVenues();
 
