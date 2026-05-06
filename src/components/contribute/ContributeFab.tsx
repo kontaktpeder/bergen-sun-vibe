@@ -454,11 +454,12 @@ function PhotoForm({ venueId, onDone }: { venueId?: string; onDone: (f: File) =>
 function VenueForm({
   onDone,
 }: {
-  onDone: (d: { name: string; lat: number; lng: number; category: "bar" | "cafe" | "restaurant"; city: "Bergen" | "Oslo" }) => void;
+  onDone: (d: VenueAddPayload) => void;
 }) {
   const { currentCity } = useCity();
   const { data: allVenues = [] } = useVenues();
   const cityCenter = CITY_CENTERS[currentCity] ?? CITY_CENTERS.Bergen;
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
   const [lat, setLat] = useState<string>("");
@@ -467,6 +468,61 @@ function VenueForm({
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [geoState, setGeoState] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [geoErr, setGeoErr] = useState<string | null>(null);
+
+  type PlaceCandidate = {
+    name: string;
+    formatted_address: string | null;
+    google_place_id: string;
+    google_maps_uri: string | null;
+    rating: number | null;
+    user_rating_count: number | null;
+    lat: number | null;
+    lng: number | null;
+  };
+  type ExistingPlace = { google_place_id: string; venue_id: string; slug: string; name: string };
+  const [searchingPlaces, setSearchingPlaces] = useState(false);
+  const [placeCandidates, setPlaceCandidates] = useState<PlaceCandidate[]>([]);
+  const [existingByPlaceId, setExistingByPlaceId] = useState<ExistingPlace[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceCandidate | null>(null);
+  const [manualMode, setManualMode] = useState(false);
+  const [searchedOnce, setSearchedOnce] = useState(false);
+
+  const searchGooglePlace = async () => {
+    if (!name.trim()) {
+      toast.error("Skriv inn navn først.");
+      return;
+    }
+    setSearchingPlaces(true);
+    try {
+      const la = Number(lat);
+      const ln = Number(lng);
+      const { data, error } = await supabase.functions.invoke("search-google-place", {
+        body: {
+          name: name.trim(),
+          city: currentCity,
+          lat: Number.isFinite(la) ? la : undefined,
+          lng: Number.isFinite(ln) ? ln : undefined,
+        },
+      });
+      if (error) throw error;
+      const candidates = (data?.matches ?? []) as PlaceCandidate[];
+      const existing = (data?.existingByPlaceId ?? []) as ExistingPlace[];
+      setPlaceCandidates(candidates);
+      setExistingByPlaceId(existing);
+      setSearchedOnce(true);
+      if (selectedPlace) {
+        const stillExists = candidates.find(
+          (c) => c.google_place_id === selectedPlace.google_place_id,
+        );
+        if (!stillExists) setSelectedPlace(null);
+      }
+    } catch {
+      toast.error("Kunne ikke søke i Google akkurat nå.");
+    } finally {
+      setSearchingPlaces(false);
+    }
+  };
+
 
   const possibleDup = useMemo(() => {
     const la = Number(lat);
