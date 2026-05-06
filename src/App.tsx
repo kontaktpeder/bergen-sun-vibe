@@ -38,8 +38,10 @@ const App = () => (
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/admin/reports" element={<AdminReports />} />
             <Route path="/admin/venues" element={<AdminVenues />} />
-            <Route path="/:citySlug" element={<CityPage />} />
-            <Route path="/:citySlug/:facetSlug" element={<FacetPage />} />
+            <Route path="/oslo" element={<CityPage />} />
+            <Route path="/bergen" element={<CityPage />} />
+            <Route path="/oslo/:facetSlug" element={<FacetPage />} />
+            <Route path="/bergen/:facetSlug" element={<FacetPage />} />
           </Route>
           <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
