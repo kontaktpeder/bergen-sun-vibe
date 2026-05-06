@@ -46,6 +46,8 @@ export function SearchOverlay({ open, onClose }: Props) {
       .slice(0, 30);
   }, [q, venues]);
 
+  const { data: photoMap = {} } = useVenuePhotos(results.map((v) => v.dbId));
+
   if (!open) return null;
 
   return (
