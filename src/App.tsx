@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import Explore from "./pages/Explore";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
-import VenueDetail from "./pages/VenueDetail";
+
 import Auth from "./pages/Auth";
 import Leaderboard from "./pages/Leaderboard";
 import AdminReports from "./pages/AdminReports";
