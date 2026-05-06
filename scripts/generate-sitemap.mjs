@@ -76,12 +76,9 @@ async function main() {
   for (const c of CITIES) {
     entries.push(urlEntry(`${SITE}/${c}`, now));
     for (const f of FACETS) {
-      // Only include facets that actually have venues with a matching tag.
       const cityName = c === "oslo" ? "Oslo" : "Bergen";
       const matching = venues.filter(
-        (v) =>
-          (v.city === cityName) &&
-          (v.tags || []).some((t) => new RegExp(f, "i").test(String(t)))
+        (v) => v.city === cityName && FACET_MATCHERS[f](v)
       );
       if (matching.length >= 6) {
         entries.push(urlEntry(`${SITE}/${c}/${f}`, now));
