@@ -46,9 +46,9 @@ const Profile = () => {
           <div className="grid h-12 w-12 place-items-center rounded-full bg-sun shadow-glow">
             <Sun className="h-6 w-6 text-night" strokeWidth={2.5} />
           </div>
-          <h1 className="mt-5 font-display text-2xl font-semibold">Bli en del av Bergen</h1>
+          <h1 className="mt-5 font-display text-2xl font-semibold">Bli en del av Utefolket</h1>
           <p className="mt-2 text-sm opacity-85">
-            Logg inn for å lagre steder, samle poeng og hjelpe andre å finne sola.
+            Bidra til å vise hvor sola står lengst, ølen er billigst og stemningen er best.
           </p>
           <button
             onClick={() => navigate("/auth")}
