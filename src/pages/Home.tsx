@@ -74,7 +74,7 @@ const Home = () => {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.4) 100%)",
+              "linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0.38) 100%)",
           }}
         />
         {/* Subtle film grain */}
@@ -90,11 +90,11 @@ const Home = () => {
         <div className="relative z-10 flex min-h-[100svh] flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-8">
           {/* Top bar */}
           <div className="flex items-center justify-between text-white">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 ml-1">
               <img
                 src={logoPng}
                 alt="Utefolket"
-                className="h-10 w-10 object-contain"
+                className="h-11 w-11 object-contain"
                 style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.25))" }}
               />
               <div
@@ -116,7 +116,7 @@ const Home = () => {
               src={logoSvg}
               alt="Utefolket"
               className="w-[170px] max-w-[42vw] h-auto object-contain"
-              style={{ filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.18))" }}
+              style={{ opacity: 0.96, filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.18))" }}
             />
 
             <h1
@@ -132,12 +132,14 @@ const Home = () => {
               Akkurat nå i {currentCity}
             </p>
 
-            <div className="mt-8 inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-sun" />
               </span>
-              {sunCount} steder med sol akkurat nå
+              {sunCount > 0
+                ? `${sunCount} steder med sol akkurat nå`
+                : "Sola er på vei ned 🌇"}
             </div>
 
             <div className="flex-1" />
