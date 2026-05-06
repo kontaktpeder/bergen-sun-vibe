@@ -53,11 +53,13 @@ function clusterIcon(cluster: { getChildCount: () => number }) {
 
 function FitBounds({ venues }: { venues: Venue[] }) {
   const map = useMap();
+  const idsKey = venues.map((v) => v.id).sort().join(",");
   useEffect(() => {
     if (!venues.length) return;
     const bounds = L.latLngBounds(venues.map((v) => [v.lat, v.lng] as [number, number]));
     map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15, animate: true });
-  }, [map, venues]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, idsKey]);
   return null;
 }
 
@@ -84,11 +86,15 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
       const v = validVenues.find((x) => x.id === selectedId);
       if (!v) return;
       if (isFirst.current) {
-        // Don't override initial FitBounds on first mount
         isFirst.current = false;
         return;
       }
-      map.flyTo([v.lat, v.lng], 17, { animate: true, duration: 0.8 });
+      // Defer so the page scroll-to-top finishes first; then animate zoom in.
+      const t = setTimeout(() => {
+        map.invalidateSize();
+        map.flyTo([v.lat, v.lng], 17, { animate: true, duration: 0.9 });
+      }, 350);
+      return () => clearTimeout(t);
     }, [map, selectedId, validVenues]);
     return null;
   }
