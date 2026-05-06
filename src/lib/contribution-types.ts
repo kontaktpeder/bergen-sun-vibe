@@ -26,6 +26,9 @@ export type VenueAddPayload = {
   google_rating?: number;
   google_user_rating_count?: number;
   source?: "manual" | "google";
+
+  // Set true after the user confirms a similar-named venue elsewhere in the city is a different place
+  confirm_distinct?: boolean;
 };
 
 export type ContributionPayload =
