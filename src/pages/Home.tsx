@@ -166,6 +166,9 @@ const Home = () => {
         </div>
       </header>
 
+      <div className="mt-4 px-5">
+        <CityBanner />
+      </div>
 
       {isLoading && (
         <div className="mt-10 px-5 text-sm text-muted-foreground">Laster steder…</div>
