@@ -91,6 +91,7 @@ const Explore = () => {
             selectedId={selectedId}
             onSelect={setSelectedId}
             fallbackCenter={CITY_CENTERS[city]}
+            userLocation={userLoc}
           />
         </div>
 
