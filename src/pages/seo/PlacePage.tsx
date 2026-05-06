@@ -49,12 +49,12 @@ export default function PlacePage() {
     );
   }
 
-  const hasIntro = !!venue?.description && venue.description.length >= 40;
+  const hasIntro = !!venue?.description && venue.description.length >= 20;
   const hasImage = !!venue?.image;
   const hasTags = !!venue?.tags && venue.tags.length > 0;
   const hasName = !!venue?.name;
   const hasCity = !!venue?.city;
-  const hasRating = !!venue && venue.rating > 0;
+  const hasRating = !!venue && venue.rating >= 0;
   const hasReviews = !!venue && venue.reviews > 0;
   const noindex = !venue
     ? true
