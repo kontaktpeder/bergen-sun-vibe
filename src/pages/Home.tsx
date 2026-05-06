@@ -150,7 +150,7 @@ const Home = () => {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="mt-8 flex w-full items-center gap-3 rounded-full border border-white/30 bg-white/95 px-5 py-3.5 shadow-[0_8px_28px_rgba(0,0,0,0.25)] backdrop-blur-xl tap-scale text-left"
+              className="mt-12 flex w-full items-center gap-3 rounded-full border border-white/30 bg-white/95 px-5 py-3.5 shadow-[0_8px_28px_rgba(0,0,0,0.25)] backdrop-blur-xl tap-scale text-left"
             >
               <Search className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Søk barer, områder, stemning...</span>
