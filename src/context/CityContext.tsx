@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 export type City = "Bergen" | "Oslo";
 
 const STORAGE_KEY = "uteliv:currentCity";
+const CHOSEN_STORAGE_KEY = "uteliv:hasChosenCity";
 const DEFAULT_CITY: City = "Bergen";
 
 type CityContextValue = {
@@ -25,6 +26,15 @@ function readStoredCity(): City | null {
   return null;
 }
 
+function readHasChosenCity(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(CHOSEN_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
 // Approximate city centers for nearest-city detection
 const CITY_CENTERS: Record<City, { lat: number; lng: number }> = {
   Bergen: { lat: 60.3913, lng: 5.3221 },
@@ -44,14 +54,16 @@ function nearestCity(lat: number, lng: number): City {
 
 export function CityProvider({ children }: { children: ReactNode }) {
   const initial = readStoredCity();
+  const initiallyChosen = readHasChosenCity();
   const [currentCity, setCurrentCityState] = useState<City>(initial ?? DEFAULT_CITY);
-  const [hasChosenCity, setHasChosenCity] = useState<boolean>(initial !== null);
+  const [hasChosenCity, setHasChosenCity] = useState<boolean>(initiallyChosen);
 
   const setCurrentCity = (city: City) => {
     setCurrentCityState(city);
     setHasChosenCity(true);
     try {
       window.localStorage.setItem(STORAGE_KEY, city);
+      window.localStorage.setItem(CHOSEN_STORAGE_KEY, "true");
     } catch {
       // ignore
     }
@@ -81,6 +93,7 @@ export function CityProvider({ children }: { children: ReactNode }) {
     if (!hasChosenCity) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, currentCity);
+      window.localStorage.setItem(CHOSEN_STORAGE_KEY, "true");
     } catch {
       // ignore
     }
