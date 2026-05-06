@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type VenuePhotoMap = Record<string, string | undefined>;
 
-const MIN_AGE_MS = 10 * 60 * 1000; // 10 minutes anti-troll window
+
 
 /**
  * Batched lookup: best user-uploaded photo URL per venue id.
