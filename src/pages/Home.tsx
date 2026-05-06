@@ -235,6 +235,8 @@ const Home = () => {
       <div className="mt-12 px-5 text-center">
         <p className="font-display text-sm italic text-muted-foreground">Laget med ☀️ i {currentCity}</p>
       </div>
+
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 };
