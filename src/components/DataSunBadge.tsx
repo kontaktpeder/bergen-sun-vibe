@@ -12,7 +12,7 @@ const map = {
   sunny: { label: "Sol nå", Icon: Sun, bg: "bg-gradient-to-r from-sun to-primary text-white", pulse: true },
   partial: { label: "Delvis sol", Icon: CloudSun, bg: "bg-gradient-to-r from-sun/80 to-sunset-pink text-white", pulse: false },
   shade: { label: "Skygge", Icon: Moon, bg: "bg-night/90 text-white", pulse: false },
-  unknown: { label: "Ukjent", Icon: HelpCircle, bg: "bg-secondary text-foreground", pulse: false },
+  unknown: { label: "Trenger rapport", Icon: HelpCircle, bg: "bg-secondary text-foreground", pulse: false },
 } as const;
 
 export function DataSunBadge({ badge, className, size = "sm" }: Props) {

@@ -8,6 +8,7 @@ export function toUserErrorMessage(input: unknown): string {
 
   if (msg.includes("cooldown")) return "Du bidro nettopp her. Prøv igjen om noen minutter.";
   if (msg.includes("duplicate_price")) return "Denne prisen er allerede sendt inn i dag.";
+  if (msg.includes("duplicate_google_place")) return "Dette stedet finnes allerede i appen.";
   if (msg.includes("duplicate_venue")) return "Et lignende sted finnes allerede i nærheten.";
   if (msg.includes("photo_limit")) return "Maks 3 bilder per sted per døgn.";
   if (msg.includes("invalid beer price")) return "Ugyldig pris. Skriv inn mellom 1 og 1000 kr.";

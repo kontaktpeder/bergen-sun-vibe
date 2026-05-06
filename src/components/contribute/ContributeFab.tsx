@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin, Search, Star } from "lucide-react";
 import { MobileSheet } from "@/components/ui/mobile-sheet";
 import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
@@ -21,6 +21,9 @@ import { useCity } from "@/context/CityContext";
 import { inferLegacyCity } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { findPossibleDuplicate } from "@/lib/dedupe-venues";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import type { VenueAddPayload } from "@/lib/contribution-types";
 
 const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Bergen: { lat: 60.3913, lng: 5.3221 },
@@ -215,6 +218,21 @@ export function ContributeFab() {
                     close();
                   }
                 } catch (e) {
+                  const raw = e instanceof Error ? e.message : String(e);
+                  const dupMatch = raw.match(/duplicate_google_place:([\w-]+)/);
+                  if (dupMatch) {
+                    const slug = dupMatch[1];
+                    toast.error("Stedet finnes allerede", {
+                      action: {
+                        label: "Åpne",
+                        onClick: () => {
+                          close();
+                          navigate(`/venue/${slug}`);
+                        },
+                      },
+                    });
+                    return;
+                  }
                   toast.error(toUserErrorMessage(e));
                 }
               }}
@@ -436,11 +454,12 @@ function PhotoForm({ venueId, onDone }: { venueId?: string; onDone: (f: File) =>
 function VenueForm({
   onDone,
 }: {
-  onDone: (d: { name: string; lat: number; lng: number; category: "bar" | "cafe" | "restaurant"; city: "Bergen" | "Oslo" }) => void;
+  onDone: (d: VenueAddPayload) => void;
 }) {
   const { currentCity } = useCity();
   const { data: allVenues = [] } = useVenues();
   const cityCenter = CITY_CENTERS[currentCity] ?? CITY_CENTERS.Bergen;
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
   const [lat, setLat] = useState<string>("");
@@ -449,6 +468,61 @@ function VenueForm({
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [geoState, setGeoState] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [geoErr, setGeoErr] = useState<string | null>(null);
+
+  type PlaceCandidate = {
+    name: string;
+    formatted_address: string | null;
+    google_place_id: string;
+    google_maps_uri: string | null;
+    rating: number | null;
+    user_rating_count: number | null;
+    lat: number | null;
+    lng: number | null;
+  };
+  type ExistingPlace = { google_place_id: string; venue_id: string; slug: string; name: string };
+  const [searchingPlaces, setSearchingPlaces] = useState(false);
+  const [placeCandidates, setPlaceCandidates] = useState<PlaceCandidate[]>([]);
+  const [existingByPlaceId, setExistingByPlaceId] = useState<ExistingPlace[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceCandidate | null>(null);
+  const [manualMode, setManualMode] = useState(false);
+  const [searchedOnce, setSearchedOnce] = useState(false);
+
+  const searchGooglePlace = async () => {
+    if (!name.trim()) {
+      toast.error("Skriv inn navn først.");
+      return;
+    }
+    setSearchingPlaces(true);
+    try {
+      const la = Number(lat);
+      const ln = Number(lng);
+      const { data, error } = await supabase.functions.invoke("search-google-place", {
+        body: {
+          name: name.trim(),
+          city: currentCity,
+          lat: Number.isFinite(la) ? la : undefined,
+          lng: Number.isFinite(ln) ? ln : undefined,
+        },
+      });
+      if (error) throw error;
+      const candidates = (data?.matches ?? []) as PlaceCandidate[];
+      const existing = (data?.existingByPlaceId ?? []) as ExistingPlace[];
+      setPlaceCandidates(candidates);
+      setExistingByPlaceId(existing);
+      setSearchedOnce(true);
+      if (selectedPlace) {
+        const stillExists = candidates.find(
+          (c) => c.google_place_id === selectedPlace.google_place_id,
+        );
+        if (!stillExists) setSelectedPlace(null);
+      }
+    } catch {
+      toast.error("Kunne ikke søke i Google akkurat nå.");
+    } finally {
+      setSearchingPlaces(false);
+    }
+  };
+
 
   const possibleDup = useMemo(() => {
     const la = Number(lat);
@@ -526,8 +600,124 @@ function VenueForm({
       <div className="mt-4 space-y-3">
         <div>
           <Label>Navn</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="F.eks. Pelikanen" />
+          <Input
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (selectedPlace && e.target.value.trim() !== selectedPlace.name) {
+                setSelectedPlace(null);
+              }
+            }}
+            placeholder="F.eks. Pelikanen"
+          />
         </div>
+
+        {/* Google Places lookup */}
+        <div className="rounded-xl border border-border bg-card p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-sm font-medium">Fant vi riktig sted?</div>
+              <div className="text-xs text-muted-foreground">
+                Søk i Google for bedre kvalitet og færre duplikater.
+              </div>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={searchGooglePlace}
+              disabled={searchingPlaces || !name.trim()}
+              className="shrink-0"
+            >
+              {searchingPlaces ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4" />
+              )}
+              <span className="ml-1.5">{searchingPlaces ? "Søker…" : "Søk"}</span>
+            </Button>
+          </div>
+
+          {searchedOnce && placeCandidates.length === 0 && !searchingPlaces && (
+            <div className="mt-3 text-xs text-muted-foreground">
+              Ingen treff i Google. Du kan legge inn manuelt under.
+            </div>
+          )}
+
+          {placeCandidates.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {placeCandidates.map((p) => {
+                const existing = existingByPlaceId.find(
+                  (e) => e.google_place_id === p.google_place_id,
+                );
+                const isSelected = selectedPlace?.google_place_id === p.google_place_id;
+                return (
+                  <button
+                    key={p.google_place_id}
+                    type="button"
+                    onClick={() => {
+                      if (existing) {
+                        toast.error("Stedet finnes allerede", {
+                          action: {
+                            label: "Åpne",
+                            onClick: () => navigate(`/venue/${existing.slug}`),
+                          },
+                        });
+                        return;
+                      }
+                      setSelectedPlace(p);
+                      setManualMode(false);
+                      if (typeof p.lat === "number" && typeof p.lng === "number") {
+                        setLat(p.lat.toFixed(6));
+                        setLng(p.lng.toFixed(6));
+                        setGeoState("ok");
+                      }
+                    }}
+                    className={cn(
+                      "w-full rounded-lg border p-3 text-left transition-colors",
+                      isSelected
+                        ? "border-primary bg-primary/5"
+                        : existing
+                        ? "border-amber-300/60 bg-amber-50/60 dark:bg-amber-950/30"
+                        : "border-border hover:bg-secondary/50",
+                    )}
+                  >
+                    <div className="text-sm font-medium">{p.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {p.formatted_address ?? "Ingen adresse"}
+                    </div>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                      {p.rating != null ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Star className="h-3 w-3 fill-current text-amber-500" />
+                          {p.rating} ({p.user_rating_count ?? 0})
+                        </span>
+                      ) : (
+                        <span>Ingen rating</span>
+                      )}
+                      {existing && (
+                        <span className="ml-auto text-amber-700 dark:text-amber-300">
+                          Finnes allerede – trykk for å åpne
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedPlace(null);
+                  setManualMode(true);
+                }}
+                className="text-xs font-medium text-muted-foreground underline-offset-2 hover:underline"
+              >
+                Legg inn manuelt i stedet
+              </button>
+            </div>
+          )}
+        </div>
+
         <div>
           <Label>Kategori</Label>
           <select
@@ -611,18 +801,42 @@ function VenueForm({
         onClick={() => {
           const la = Number(lat);
           const ln = Number(lng);
-          if (!name.trim()) return toast.error("Navn er påkrevd.");
+          const finalName = (selectedPlace?.name ?? name).trim();
+          if (!finalName) return toast.error("Navn er påkrevd.");
           if (!Number.isFinite(la) || la < -90 || la > 90) return toast.error("Ugyldig lat.");
           if (!Number.isFinite(ln) || ln < -180 || ln > 180) return toast.error("Ugyldig lng.");
-          // Derive city from actual coordinates, not the selected city filter.
           const inferredCity = inferLegacyCity(la, ln);
           if (!inferredCity) {
             return toast.error("Posisjonen er utenfor Bergen og Oslo. Juster plassering på kartet.");
           }
-          onDone({ name: name.trim(), lat: la, lng: ln, category, city: inferredCity });
+          const payload: VenueAddPayload = selectedPlace
+            ? {
+                name: finalName,
+                lat: la,
+                lng: ln,
+                category,
+                city: inferredCity,
+                google_place_id: selectedPlace.google_place_id,
+                google_maps_url: selectedPlace.google_maps_uri ?? undefined,
+                address: selectedPlace.formatted_address ?? undefined,
+                google_rating: selectedPlace.rating ?? undefined,
+                google_user_rating_count: selectedPlace.user_rating_count ?? undefined,
+                source: "google",
+              }
+            : {
+                name: finalName,
+                lat: la,
+                lng: ln,
+                category,
+                city: inferredCity,
+                source: "manual",
+              };
+          // Suppress unused warning during MVP
+          void manualMode;
+          onDone(payload);
         }}
       >
-        Legg til 📍
+        {selectedPlace ? "Legg til fra Google ✨" : "Legg til 📍"}
       </Button>
     </div>
   );
