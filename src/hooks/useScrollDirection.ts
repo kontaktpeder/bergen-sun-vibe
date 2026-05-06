@@ -5,15 +5,28 @@ import { useEffect, useState } from "react";
  * Returns false at the top of the page or while scrolling up.
  */
 export function useHideOnScroll(threshold = 32) {
-  const [hidden, setHidden] = useState(false);
+  // Start hidden so the nav doesn't compete with Safari's address bar on first paint.
+  const [hidden, setHidden] = useState(true);
 
   useEffect(() => {
     let lastY = window.scrollY;
     let ticking = false;
+    let interacted = false;
 
     const update = () => {
       const y = window.scrollY;
       const dy = y - lastY;
+
+      if (!interacted) {
+        // Wait for the first real scroll gesture before revealing the nav.
+        if (Math.abs(dy) > 2) {
+          interacted = true;
+        } else {
+          lastY = y;
+          ticking = false;
+          return;
+        }
+      }
 
       if (y < threshold) {
         setHidden(false);
