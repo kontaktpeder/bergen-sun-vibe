@@ -42,8 +42,9 @@ export function ContributeFab() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isOnVenue = location.pathname.startsWith("/venue/");
-  const slug = isOnVenue ? params.id : undefined;
+  const isOnVenue =
+    location.pathname.startsWith("/venue/") || location.pathname.startsWith("/steder/");
+  const slug = isOnVenue ? (params.slug ?? params.id) : undefined;
   const { data: currentVenue } = useVenue(slug);
 
   const venueDbId = currentVenue?.dbId;
