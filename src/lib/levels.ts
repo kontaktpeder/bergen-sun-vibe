@@ -9,7 +9,7 @@ const LEVELS = [
 ];
 
 export function getLevel(points: number): LevelName {
-  return LEVELS.find((l) => points >= l.min && points <= l.max)?.name ?? "Livsnyter";
+  return LEVELS.find((l) => points >= l.min && points <= l.max)?.name ?? "Nyter";
 }
 
 export function getNextLevelThreshold(points: number): number | null {
