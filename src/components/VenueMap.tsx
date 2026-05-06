@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
@@ -79,9 +79,16 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
 
   function PanToSelected() {
     const map = useMap();
+    const isFirst = useRef(true);
     useEffect(() => {
       const v = validVenues.find((x) => x.id === selectedId);
-      if (v) map.panTo([v.lat, v.lng], { animate: true });
+      if (!v) return;
+      if (isFirst.current) {
+        // Don't override initial FitBounds on first mount
+        isFirst.current = false;
+        return;
+      }
+      map.flyTo([v.lat, v.lng], 17, { animate: true, duration: 0.8 });
     }, [map, selectedId, validVenues]);
     return null;
   }
