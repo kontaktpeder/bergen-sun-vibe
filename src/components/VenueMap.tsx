@@ -63,6 +63,25 @@ function FitBounds({ venues }: { venues: Venue[] }) {
   return null;
 }
 
+function PanToSelected({ venues, selectedId }: { venues: Venue[]; selectedId: string | null }) {
+  const map = useMap();
+  const isFirst = useRef(true);
+  useEffect(() => {
+    const v = venues.find((x) => x.id === selectedId);
+    if (!v) return;
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
+    const t = setTimeout(() => {
+      map.invalidateSize();
+      map.flyTo([v.lat, v.lng], 17, { animate: true, duration: 0.9 });
+    }, 350);
+    return () => clearTimeout(t);
+  }, [map, selectedId, venues]);
+  return null;
+}
+
 interface VenueMapProps {
   venues: Venue[];
   selectedId: string | null;
@@ -79,25 +98,7 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
     ? [validVenues[0].lat, validVenues[0].lng]
     : fallbackCenter;
 
-  function PanToSelected() {
-    const map = useMap();
-    const isFirst = useRef(true);
-    useEffect(() => {
-      const v = validVenues.find((x) => x.id === selectedId);
-      if (!v) return;
-      if (isFirst.current) {
-        isFirst.current = false;
-        return;
-      }
-      // Defer so the page scroll-to-top finishes first; then animate zoom in.
-      const t = setTimeout(() => {
-        map.invalidateSize();
-        map.flyTo([v.lat, v.lng], 17, { animate: true, duration: 0.9 });
-      }, 350);
-      return () => clearTimeout(t);
-    }, [map, selectedId, validVenues]);
-    return null;
-  }
+
 
   return (
     <MapContainer
@@ -116,7 +117,7 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter }: Venue
         maxZoom={20}
       />
       <FitBounds venues={validVenues} />
-      <PanToSelected />
+      <PanToSelected venues={validVenues} selectedId={selectedId} />
       <MarkerClusterGroup
         chunkedLoading
         showCoverageOnHover={false}
