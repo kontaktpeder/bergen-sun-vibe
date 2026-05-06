@@ -15,11 +15,12 @@ import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
 const VenueDetail = () => {
-  const { id } = useParams();
+  const params = useParams<{ id?: string; slug?: string }>();
+  const slug = params.slug ?? params.id;
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   useFavorites();
-  const { data: venue, isLoading, error } = useVenue(id);
+  const { data: venue, isLoading, error } = useVenue(slug);
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
   const venueIds = venue?.dbId ? [venue.dbId] : [];
   const { data: badgeMap = {} } = useVenueBadges(venueIds);
