@@ -117,13 +117,13 @@ const Home = () => {
             <img
               src={logoSvg}
               alt="Utefolket"
-              className="w-[170px] max-w-[42vw] h-auto object-contain"
+              className="w-[186px] max-w-[46vw] h-auto object-contain"
               style={{ opacity: 0.96, filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.18))" }}
             />
 
             <h1
               className="mt-5 font-display text-[2.75rem] font-semibold leading-[1] tracking-[0.5px]"
-              style={{ color: "#F7F5F2", textShadow: "0 2px 18px rgba(0,0,0,0.45)" }}
+              style={{ color: "#F7F5F2", textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}
             >
               Utefolket
             </h1>
@@ -134,7 +134,7 @@ const Home = () => {
               Akkurat nå i {currentCity}
             </p>
 
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
+            <div className="mt-2 inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-medium text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-sun" />
