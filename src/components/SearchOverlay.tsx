@@ -100,7 +100,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                 )}
               >
                 <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl">
-                  <VenueImage venue={v} size={{ w: 400, h: 400 }} compactFallback showAttribution={false} />
+                  <VenueImage venue={v} userPhotoUrl={photoMap[v.dbId] ?? null} size={{ w: 400, h: 400 }} compactFallback showAttribution={false} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-display text-base font-semibold">{v.name}</div>
