@@ -180,12 +180,20 @@ const Profile = () => {
         )}
 
         {isAdmin && (
-          <Link
-            to="/admin/reports"
-            className="tap-scale mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-card py-3.5 text-sm font-medium shadow-soft"
-          >
-            <Shield className="h-4 w-4" /> Adminpanel
-          </Link>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <Link
+              to="/admin/reports"
+              className="tap-scale inline-flex items-center justify-center gap-2 rounded-full bg-card py-3.5 text-sm font-medium shadow-soft"
+            >
+              <Shield className="h-4 w-4" /> Rapporter
+            </Link>
+            <Link
+              to="/admin/venues"
+              className="tap-scale inline-flex items-center justify-center gap-2 rounded-full bg-card py-3.5 text-sm font-medium shadow-soft"
+            >
+              <Shield className="h-4 w-4" /> Steder
+            </Link>
+          </div>
         )}
 
         <button
