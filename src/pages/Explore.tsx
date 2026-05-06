@@ -121,21 +121,8 @@ const Explore = () => {
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
-            <div className="flex shrink-0 items-center rounded-full glass p-0.5 shadow-soft">
-              {cityOptions.map(opt => (
-                <button
-                  key={opt.id}
-                  onClick={() => setCurrentCity(opt.id as City)}
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-                    city === opt.id ? "bg-foreground text-background" : "text-muted-foreground"
-                  )}
-                  aria-label={opt.label}
-                >
-                  {opt.emoji}
-                </button>
-              ))}
-            </div>
+            <CityBanner variant="dark" className="shrink-0" />
+
           </div>
           {/* Filter-chips horisontalt scrollbar — tar ikke ekstra rad-plass */}
           <div className="mt-2 -mx-3 overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
