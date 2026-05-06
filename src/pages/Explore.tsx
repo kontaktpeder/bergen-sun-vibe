@@ -211,7 +211,12 @@ const Explore = () => {
           {filtered.map((v) => (
             <button
               key={v.id}
-              onClick={() => setSelectedId(v.id)}
+              onClick={() => {
+                setSelectedId(v.id);
+                if (typeof window !== "undefined") {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
               className={cn(
                 "tap-scale flex w-full items-center gap-3 rounded-2xl bg-card p-2.5 text-left shadow-soft transition-all",
                 selectedId === v.id && "ring-2 ring-primary",
