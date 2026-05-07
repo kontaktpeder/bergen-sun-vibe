@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { showRewardFeedback } from "@/lib/reward-feedback";
+import { showReward } from "@/components/RewardOverlay";
 import { toUserErrorMessage } from "@/lib/error-messages";
 import { FLAGS } from "@/lib/flags";
 import { subscribeContributeFab } from "@/lib/contribute-bus";
@@ -147,6 +148,17 @@ export function ContributeFab() {
                   });
                   close();
                 } catch (e) {
+                  const raw = e instanceof Error ? e.message : String(e);
+                  if (raw.toLowerCase().includes("cooldown")) {
+                    showReward({
+                      emoji: "👌",
+                      title: "Sola er allerede oppdatert",
+                      subtitle: "Du kan rapportere igjen om noen minutter.",
+                      variant: "points",
+                    });
+                    close();
+                    return;
+                  }
                   toast.error(toUserErrorMessage(e));
                 }
               }}
@@ -170,6 +182,17 @@ export function ContributeFab() {
                   });
                   close();
                 } catch (e) {
+                  const raw = e instanceof Error ? e.message : String(e);
+                  if (raw.toLowerCase().includes("cooldown")) {
+                    showReward({
+                      emoji: "👌",
+                      title: "Stemningen er allerede oppdatert",
+                      subtitle: "Du kan rapportere igjen om noen minutter.",
+                      variant: "points",
+                    });
+                    close();
+                    return;
+                  }
                   toast.error(toUserErrorMessage(e));
                 }
               }}
