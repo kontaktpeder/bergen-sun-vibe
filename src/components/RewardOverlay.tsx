@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 
 export type RewardEvent = {
   emoji: string;
@@ -26,44 +25,86 @@ export function RewardOverlayHost() {
     return () => { listeners.delete(l); };
   }, []);
 
-  // Auto-advance level-up after a small dwell so it doesn't block forever
   useEffect(() => {
     if (!current) return;
-    const t = setTimeout(() => setQueue((q) => q.slice(1)), current.variant === "levelup" ? 2800 : 1900);
+    // Light haptic on supported devices
+    try { (navigator as Navigator & { vibrate?: (p: number | number[]) => boolean }).vibrate?.(12); } catch { /* noop */ }
+    const dwell = current.variant === "levelup" ? 2600 : 1700;
+    const t = setTimeout(() => setQueue((q) => q.slice(1)), dwell);
     return () => clearTimeout(t);
   }, [current]);
 
   if (!current) return null;
 
   const dismiss = () => setQueue((q) => q.slice(1));
+  const isLevel = current.variant === "levelup";
 
   return (
     <div
-      role="dialog"
+      role="status"
       aria-live="polite"
       onClick={dismiss}
-      className="fixed inset-0 z-[80] grid place-items-center bg-night/40 px-6 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-x-0 top-0 z-[80] flex justify-center px-4 pt-[max(env(safe-area-inset-top),0.75rem)] pointer-events-none"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xs rounded-3xl bg-card p-6 text-center shadow-float animate-scale-in"
+        className="pointer-events-auto w-full max-w-sm animate-float-up"
       >
-        <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br from-primary/15 to-sunset-pink/15 text-5xl">
-          {current.emoji}
-        </div>
-        {current.points != null && current.variant !== "levelup" && (
-          <div className="mt-4 font-display text-4xl font-semibold text-primary">
-            +{current.points} poeng
+        <div
+          className="relative overflow-hidden rounded-3xl border border-white/40 bg-card/95 px-4 py-3 shadow-float backdrop-blur-xl"
+        >
+          {/* Subtle brand glow */}
+          <div className="pointer-events-none absolute -left-10 -top-12 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
+          <div className="pointer-events-none absolute -right-12 -bottom-14 h-32 w-32 rounded-full bg-sunset-pink/20 blur-3xl" />
+
+          <div className="relative flex items-center gap-3">
+            <div
+              className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl shadow-soft ${
+                isLevel
+                  ? "bg-gradient-to-br from-accent to-primary text-white"
+                  : "bg-gradient-to-br from-primary/15 via-sunset-pink/15 to-accent/15"
+              }`}
+            >
+              <span className="drop-shadow-sm">{current.emoji}</span>
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <div className="font-display text-[15px] font-semibold leading-tight text-foreground">
+                {current.title}
+              </div>
+              {current.subtitle && (
+                <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {current.subtitle}
+                </div>
+              )}
+            </div>
+
+            {current.points != null && !isLevel && (
+              <div className="shrink-0 rounded-full bg-gradient-to-r from-primary to-sunset-pink px-3 py-1.5 font-display text-sm font-semibold text-white shadow-soft">
+                +{current.points}
+              </div>
+            )}
           </div>
-        )}
-        <div className={`mt-2 font-display ${current.variant === "levelup" ? "text-2xl" : "text-base"} font-semibold leading-tight`}>
-          {current.title}
+
+          {/* Progress bar that drains during dwell */}
+          <div className="relative mt-3 h-0.5 overflow-hidden rounded-full bg-foreground/5">
+            <div
+              key={current.title + current.emoji}
+              className="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-primary to-sunset-pink"
+              style={{
+                animation: `reward-drain ${isLevel ? 2600 : 1700}ms linear forwards`,
+              }}
+            />
+          </div>
         </div>
-        {current.subtitle && (
-          <p className="mt-1 text-sm text-muted-foreground">{current.subtitle}</p>
-        )}
-        <Button onClick={dismiss} className="mt-5 w-full">Ferdig</Button>
       </div>
+
+      <style>{`
+        @keyframes reward-drain {
+          from { transform: scaleX(1); }
+          to { transform: scaleX(0); }
+        }
+      `}</style>
     </div>
   );
 }
