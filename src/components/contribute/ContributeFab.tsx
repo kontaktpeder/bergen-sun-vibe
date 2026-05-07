@@ -410,32 +410,44 @@ function ActionCard({
 }
 
 function SunForm({ venueId, onDone }: { venueId?: string; onDone: (s: SunStatus) => void }) {
+  const [selected, setSelected] = useState<SunStatus | null>(null);
+  const handle = (s: SunStatus) => {
+    if (!venueId) return;
+    setSelected(s);
+    setTimeout(() => onDone(s), 350);
+  };
   return (
     <div className="pb-4">
       <div className="text-center">
         <h2 className="font-display text-lg font-semibold">Hvordan er sola akkurat nå?</h2>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="☀️" label="Sol nå" disabled={!venueId} onClick={() => onDone("sun")} />
-        <ActionCard emoji="⛅" label="Delvis sol" disabled={!venueId} onClick={() => onDone("partial")} />
-        <ActionCard emoji="🌇" label="Sol på vei ned" disabled={!venueId} onClick={() => onDone("going_down")} />
-        <ActionCard emoji="🌥️" label="Skygge" disabled={!venueId} onClick={() => onDone("shade")} />
+        <ActionCard emoji="☀️" label="Sol nå" disabled={!venueId} selected={selected === "sun"} onClick={() => handle("sun")} />
+        <ActionCard emoji="⛅" label="Delvis sol" disabled={!venueId} selected={selected === "partial"} onClick={() => handle("partial")} />
+        <ActionCard emoji="🌇" label="Sol på vei ned" disabled={!venueId} selected={selected === "going_down"} onClick={() => handle("going_down")} />
+        <ActionCard emoji="🌥️" label="Skygge" disabled={!venueId} selected={selected === "shade"} onClick={() => handle("shade")} />
       </div>
     </div>
   );
 }
 
 function CrowdForm({ venueId, onDone }: { venueId?: string; onDone: (l: CrowdLevel) => void }) {
+  const [selected, setSelected] = useState<CrowdLevel | null>(null);
+  const handle = (l: CrowdLevel) => {
+    if (!venueId) return;
+    setSelected(l);
+    setTimeout(() => onDone(l), 350);
+  };
   return (
     <div className="pb-4">
       <div className="text-center">
         <h2 className="font-display text-lg font-semibold">Hvordan er stemningen?</h2>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="🌿" label="Rolig nå" disabled={!venueId} onClick={() => onDone("quiet")} />
-        <ActionCard emoji="👥" label="Litt folk" disabled={!venueId} onClick={() => onDone("some")} />
-        <ActionCard emoji="🔥" label="Fullt" disabled={!venueId} onClick={() => onDone("full")} />
-        <ActionCard emoji="🚷" label="Kø ute" disabled={!venueId} onClick={() => onDone("queue")} />
+        <ActionCard emoji="🌿" label="Rolig nå" disabled={!venueId} selected={selected === "quiet"} onClick={() => handle("quiet")} />
+        <ActionCard emoji="👥" label="Litt folk" disabled={!venueId} selected={selected === "some"} onClick={() => handle("some")} />
+        <ActionCard emoji="🔥" label="Fullt" disabled={!venueId} selected={selected === "full"} onClick={() => handle("full")} />
+        <ActionCard emoji="🚶" label="Kø ute" disabled={!venueId} selected={selected === "queue"} onClick={() => handle("queue")} />
       </div>
     </div>
   );
