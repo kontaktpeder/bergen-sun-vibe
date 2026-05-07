@@ -94,6 +94,7 @@ const AdminReports = () => {
                 <div className="mt-3 rounded-lg bg-secondary/50 p-3 text-xs">
                   {c.type === "beer_price" && <>Pris: kr {String(d.price ?? "?")}</>}
                   {c.type === "sun_report" && <>Status: {String(d.status ?? "?")}</>}
+                  {c.type === "crowd_report" && <>Stemning: {String(d.level ?? "?")}</>}
                   {c.type === "photo" && d.image_url ? (
                     <img
                       src={String(d.image_url)}
