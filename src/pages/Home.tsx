@@ -72,12 +72,20 @@ const Home = () => {
           fetchpriority="high"
           className="absolute inset-0 h-full w-full object-cover object-[center_40%] [filter:saturate(1.05)_contrast(1.05)]"
         />
-        {/* Stronger gradient: vignette top, deep wash bottom for CTA legibility */}
+        {/* Warm vignette + readable wash, keeps sunset glow */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.05) 28%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.7) 100%)",
+              "linear-gradient(to bottom, rgba(20,10,30,0.45) 0%, rgba(0,0,0,0.05) 22%, rgba(0,0,0,0.0) 45%, rgba(30,10,40,0.35) 70%, rgba(10,5,20,0.78) 100%)",
+          }}
+        />
+        {/* Subtle warm glow behind text block */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-[28%] h-[42%]"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 50%, rgba(255,150,90,0.18) 0%, rgba(255,120,140,0.08) 40%, transparent 70%)",
           }}
         />
         {/* Subtle film grain */}
@@ -115,51 +123,51 @@ const Home = () => {
             )}
           </div>
 
-          {/* Hero content – pulled up; CTA cluster sits in lower thumb zone */}
-          <div className="flex flex-1 flex-col items-center text-center pt-[10vh]">
+          {/* Hero content */}
+          <div className="flex flex-1 flex-col items-center text-center pt-[6vh]">
             <img
               src={logoSvg}
               alt="Utefolket"
-              className="w-[160px] max-w-[40vw] h-auto object-contain"
-              style={{ opacity: 0.96, filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.25))" }}
+              className="w-[120px] max-w-[30vw] h-auto object-contain"
+              style={{ opacity: 0.92, filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.3))" }}
             />
 
             <h1
-              className="mt-4 font-display text-[2.5rem] font-semibold leading-[1] tracking-[0.5px]"
-              style={{ color: "#F7F5F2", textShadow: "0 2px 12px rgba(0,0,0,0.45)" }}
+              className="mt-3 font-display text-[2.6rem] font-semibold leading-[1] tracking-[0.3px]"
+              style={{ color: "#FBF7F2", textShadow: "0 2px 14px rgba(0,0,0,0.5)" }}
             >
               Vil du ut?
             </h1>
             <p
-              className="mt-2 max-w-[18rem] text-[15px] font-medium leading-snug"
-              style={{ color: "#F7F5F2", opacity: 0.92, textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}
+              className="mt-2 max-w-[15rem] font-display text-[16px] font-medium italic leading-snug"
+              style={{ color: "#FBF7F2", opacity: 0.94, textShadow: "0 1px 10px rgba(0,0,0,0.55)" }}
             >
-              Sol, billig øl og stemning i {currentCity} — akkurat nå.
+              Finn steder med sol og stemning akkurat nå
             </p>
             <p
-              className="mt-1 text-[11px] uppercase tracking-[0.18em]"
-              style={{ color: "#F7F5F2", opacity: 0.65, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}
+              className="mt-1.5 text-[10px] uppercase tracking-[0.22em]"
+              style={{ color: "#FBF7F2", opacity: 0.45, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}
             >
               Oppdatert av Utefolket
             </p>
 
-            {/* Search – secondary, moved up */}
+            {/* Search – glassmorphism */}
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="mt-5 flex w-full items-center gap-3 rounded-full border border-white/20 bg-white/10 px-5 py-3 backdrop-blur-xl tap-scale text-left text-white"
+              className="mt-5 flex w-full items-center gap-3 rounded-full border border-white/25 bg-white/[0.14] px-5 py-3.5 backdrop-blur-2xl shadow-[0_10px_30px_rgba(0,0,0,0.25)] tap-scale text-left text-white"
             >
-              <Search className="h-4 w-4 text-white/80" />
-              <span className="text-sm text-white/80">Søk barer, områder, stemning…</span>
+              <Search className="h-4 w-4 text-white/85" />
+              <span className="text-sm text-white/85">Søk barer, områder, stemning…</span>
               <Sparkles className="ml-auto h-4 w-4 text-sun" />
             </button>
 
             {/* Filter chips */}
             <div className="mt-3 w-full">
-              <FilterChips options={filterOptions} active={filter} onChange={setFilter} />
+              <FilterChips options={filterOptions} active={filter} onChange={setFilter} variant="onDark" />
             </div>
 
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 backdrop-blur-xl px-3 py-1.5 text-xs font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-sun" />

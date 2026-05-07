@@ -27,7 +27,7 @@ export function BottomNav() {
       aria-hidden={hidden}
     >
       <div className="mx-auto max-w-md px-4">
-        <div className="pointer-events-auto flex items-center justify-around rounded-full glass shadow-float py-2">
+        <div className="pointer-events-auto flex items-center justify-around rounded-full border border-white/40 bg-white/55 backdrop-blur-2xl shadow-[0_10px_30px_rgba(20,10,30,0.15)] py-2">
           {items.slice(0, 2).map(({ to, icon: Icon, label }) => (
             <NavItem key={to} to={to} Icon={Icon} label={label} />
           ))}
