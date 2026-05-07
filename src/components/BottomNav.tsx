@@ -53,16 +53,16 @@ function NavItem({ to, Icon, label }: { to: string; Icon: typeof Home; label: st
     <NavLink
       to={to}
       end={to === "/"}
+      aria-label={label}
       className={({ isActive }) => cn(
-        "tap-scale relative flex flex-col items-center gap-0.5 rounded-full px-3 py-2 transition-colors",
+        "tap-scale relative flex items-center justify-center rounded-full p-3 transition-colors",
         isActive ? "text-primary" : "text-muted-foreground",
       )}
     >
       {({ isActive }) => (
         <>
           {isActive && <span className="absolute inset-0 -z-10 rounded-full bg-primary/10" />}
-          <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
-          <span className="text-[10px] font-medium leading-none">{label}</span>
+          <Icon className="h-7 w-7" strokeWidth={isActive ? 2.5 : 2} />
         </>
       )}
     </NavLink>
