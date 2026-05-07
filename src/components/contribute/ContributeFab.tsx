@@ -391,17 +391,24 @@ function ActionCard({
   label,
   onClick,
   disabled,
+  selected,
 }: {
   emoji: string;
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  selected?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className="tap-scale flex h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card shadow-soft disabled:opacity-50"
+      className={cn(
+        "tap-scale flex h-28 flex-col items-center justify-center gap-2 rounded-2xl shadow-soft transition-all duration-200 disabled:opacity-50",
+        selected
+          ? "scale-95 border-2 border-primary bg-gradient-to-br from-primary/15 to-sunset-pink/15"
+          : "bg-card"
+      )}
     >
       <span className="text-3xl">{emoji}</span>
       <span className="text-sm font-medium">{label}</span>
