@@ -128,7 +128,7 @@ const Home = () => {
               className="mt-4 font-display text-[2.5rem] font-semibold leading-[1] tracking-[0.5px]"
               style={{ color: "#F7F5F2", textShadow: "0 2px 12px rgba(0,0,0,0.45)" }}
             >
-              Ut nå.
+              Vil du ut?
             </h1>
             <p
               className="mt-2 max-w-[18rem] text-[15px] font-medium leading-snug"
@@ -136,6 +136,28 @@ const Home = () => {
             >
               Sol, billig øl og stemning i {currentCity} — akkurat nå.
             </p>
+            <p
+              className="mt-1 text-[11px] uppercase tracking-[0.18em]"
+              style={{ color: "#F7F5F2", opacity: 0.65, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}
+            >
+              Oppdatert av Utefolket
+            </p>
+
+            {/* Search – secondary, moved up */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="mt-5 flex w-full items-center gap-3 rounded-full border border-white/20 bg-white/10 px-5 py-3 backdrop-blur-xl tap-scale text-left text-white"
+            >
+              <Search className="h-4 w-4 text-white/80" />
+              <span className="text-sm text-white/80">Søk barer, områder, stemning…</span>
+              <Sparkles className="ml-auto h-4 w-4 text-sun" />
+            </button>
+
+            {/* Filter chips */}
+            <div className="mt-3 w-full">
+              <FilterChips options={filterOptions} active={filter} onChange={setFilter} />
+            </div>
 
             <div className="mt-3 inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
               <span className="relative flex h-2 w-2">
@@ -148,31 +170,6 @@ const Home = () => {
             </div>
 
             <div className="flex-1" />
-
-            {/* Primary CTA – thumb-zone */}
-            <Link
-              to="/explore"
-              className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sun via-sunset-pink to-primary px-6 py-4 text-base font-bold text-white shadow-[0_12px_32px_rgba(0,0,0,0.35)] tap-scale"
-            >
-              <Sun className="h-5 w-5" strokeWidth={2.5} />
-              Ta meg ut nå
-            </Link>
-
-            {/* Search – secondary */}
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              className="mt-3 flex w-full items-center gap-3 rounded-full border border-white/25 bg-white/15 px-5 py-3 backdrop-blur-xl tap-scale text-left text-white"
-            >
-              <Search className="h-4 w-4 text-white/90" />
-              <span className="text-sm text-white/90">Søk barer, områder, stemning…</span>
-              <Sparkles className="ml-auto h-4 w-4 text-sun" />
-            </button>
-
-            {/* Filter chips */}
-            <div className="mt-3 w-full">
-              <FilterChips options={filterOptions} active={filter} onChange={setFilter} />
-            </div>
           </div>
         </div>
       </header>
