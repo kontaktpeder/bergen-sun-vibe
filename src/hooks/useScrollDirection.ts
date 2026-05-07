@@ -6,13 +6,13 @@ import { useLocation } from "react-router-dom";
  * Returns false at the top of the page or while scrolling up.
  * Resets to hidden on every route change so the nav reveals only after the user scrolls.
  */
-export function useHideOnScroll(threshold = 32) {
-  const [hidden, setHidden] = useState(true);
+export function useHideOnScroll(threshold = 32, resetOnRoute = false) {
+  const [hidden, setHidden] = useState(resetOnRoute);
   const location = useLocation();
 
   useEffect(() => {
-    setHidden(true);
-  }, [location.pathname]);
+    if (resetOnRoute) setHidden(true);
+  }, [location.pathname, resetOnRoute]);
 
   useEffect(() => {
     let lastY = window.scrollY;
