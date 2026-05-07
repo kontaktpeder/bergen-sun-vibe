@@ -23,14 +23,14 @@ import { useVenues } from "@/hooks/useVenues";
 import { findPossibleDuplicate } from "@/lib/dedupe-venues";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import type { VenueAddPayload } from "@/lib/contribution-types";
+import type { VenueAddPayload, SunStatus, CrowdLevel } from "@/lib/contribution-types";
 
 const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Bergen: { lat: 60.3913, lng: 5.3221 },
   Oslo: { lat: 59.9139, lng: 10.7522 },
 };
 
-type Mode = "menu" | "sun" | "beer" | "photo" | "venue";
+type Mode = "menu" | "sun" | "beer" | "photo" | "venue" | "crowd";
 type SuccessState = { venueId: string; venueSlug?: string } | null;
 
 export function ContributeFab() {
@@ -82,11 +82,11 @@ export function ContributeFab() {
     });
   }, []);
 
-  // Deep-link: ?contribute=sun|beer|photo opens sheet in mode (only when on a venue)
+  // Deep-link: ?contribute=sun|beer|photo|crowd opens sheet in mode (only when on a venue)
   useEffect(() => {
     const c = searchParams.get("contribute");
     if (!c) return;
-    if (!["sun", "beer", "photo", "venue"].includes(c)) return;
+    if (!["sun", "beer", "photo", "venue", "crowd"].includes(c)) return;
     setOpen(true);
     setMode(c as Mode);
   }, [searchParams]);
