@@ -11,6 +11,9 @@ type CityContextValue = {
   setCurrentCity: (city: City) => void;
   hasChosenCity: boolean;
   chooseCityByLocation: () => Promise<City | null>;
+  pickerOpen: boolean;
+  openPicker: () => void;
+  closePicker: () => void;
 };
 
 const CityContext = createContext<CityContextValue | undefined>(undefined);
@@ -57,10 +60,12 @@ export function CityProvider({ children }: { children: ReactNode }) {
   const initiallyChosen = readHasChosenCity();
   const [currentCity, setCurrentCityState] = useState<City>(initial ?? DEFAULT_CITY);
   const [hasChosenCity, setHasChosenCity] = useState<boolean>(initiallyChosen);
+  const [pickerOpen, setPickerOpen] = useState<boolean>(false);
 
   const setCurrentCity = (city: City) => {
     setCurrentCityState(city);
     setHasChosenCity(true);
+    setPickerOpen(false);
     try {
       window.localStorage.setItem(STORAGE_KEY, city);
       window.localStorage.setItem(CHOSEN_STORAGE_KEY, "true");
@@ -100,7 +105,7 @@ export function CityProvider({ children }: { children: ReactNode }) {
   }, [currentCity, hasChosenCity]);
 
   return (
-    <CityContext.Provider value={{ currentCity, setCurrentCity, hasChosenCity, chooseCityByLocation }}>
+    <CityContext.Provider value={{ currentCity, setCurrentCity, hasChosenCity, chooseCityByLocation, pickerOpen, openPicker: () => setPickerOpen(true), closePicker: () => setPickerOpen(false) }}>
       {children}
     </CityContext.Provider>
   );

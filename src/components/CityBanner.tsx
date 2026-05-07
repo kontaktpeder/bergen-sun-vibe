@@ -11,7 +11,7 @@ type Props = {
 };
 
 export function CityBanner({ className, variant = "light" }: Props) {
-  const { currentCity, setCurrentCity, chooseCityByLocation } = useCity();
+  const { currentCity, setCurrentCity, chooseCityByLocation, openPicker } = useCity();
   const [open, setOpen] = useState(false);
 
   const chooseCity = (city: City) => {
@@ -22,6 +22,11 @@ export function CityBanner({ className, variant = "light" }: Props) {
   const chooseLocation = () => {
     setOpen(false);
     void chooseCityByLocation();
+  };
+
+  const openModal = () => {
+    setOpen(false);
+    openPicker();
   };
 
   return (
@@ -68,6 +73,14 @@ export function CityBanner({ className, variant = "light" }: Props) {
           className="flex w-full items-center rounded-sm border-t px-2 py-2 text-left text-sm outline-none transition-colors hover:bg-accent"
         >
           📍 Bruk min posisjon
+        </button>
+        <button
+          type="button"
+          role="menuitem"
+          onClick={openModal}
+          className="flex w-full items-center rounded-sm border-t px-2 py-2 text-left text-sm outline-none transition-colors hover:bg-accent"
+        >
+          🔁 Velg by på nytt
         </button>
         </div>
       )}

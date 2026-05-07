@@ -11,8 +11,10 @@ const CITIES: { id: City; label: string; emoji: string }[] = [
 ];
 
 export function CityPickerModal() {
-  const { hasChosenCity, setCurrentCity, chooseCityByLocation } = useCity();
+  const { hasChosenCity, setCurrentCity, chooseCityByLocation, pickerOpen, closePicker } = useCity();
   const [busy, setBusy] = useState(false);
+  const open = !hasChosenCity || pickerOpen;
+  const dismissable = hasChosenCity;
 
   const handleLocate = async () => {
     setBusy(true);
@@ -26,12 +28,12 @@ export function CityPickerModal() {
   };
 
   return (
-    <Dialog open={!hasChosenCity} onOpenChange={() => { /* controlled */ }}>
+    <Dialog open={open} onOpenChange={(o) => { if (!o && dismissable) closePicker(); }}>
       <DialogContent
         className="max-w-sm rounded-3xl"
-        onInteractOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
-        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => { if (!dismissable) e.preventDefault(); }}
+        onEscapeKeyDown={(e) => { if (!dismissable) e.preventDefault(); }}
+        onPointerDownOutside={(e) => { if (!dismissable) e.preventDefault(); }}
       >
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">Velg din by</DialogTitle>
