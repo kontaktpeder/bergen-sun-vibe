@@ -72,12 +72,20 @@ const Home = () => {
           fetchpriority="high"
           className="absolute inset-0 h-full w-full object-cover object-[center_40%] [filter:saturate(1.05)_contrast(1.05)]"
         />
-        {/* Stronger gradient: vignette top, deep wash bottom for CTA legibility */}
+        {/* Warm vignette + readable wash, keeps sunset glow */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.05) 28%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.7) 100%)",
+              "linear-gradient(to bottom, rgba(20,10,30,0.45) 0%, rgba(0,0,0,0.05) 22%, rgba(0,0,0,0.0) 45%, rgba(30,10,40,0.35) 70%, rgba(10,5,20,0.78) 100%)",
+          }}
+        />
+        {/* Subtle warm glow behind text block */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-[28%] h-[42%]"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 50%, rgba(255,150,90,0.18) 0%, rgba(255,120,140,0.08) 40%, transparent 70%)",
           }}
         />
         {/* Subtle film grain */}
