@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { SearchOverlay } from "@/components/SearchOverlay";
 import { Search, Sparkles, Sun } from "lucide-react";
@@ -24,6 +24,15 @@ const filterOptions = [
 const Home = () => {
   const [filter, setFilter] = useState("all");
   const [searchOpen, setSearchOpen] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const handleFilterChange = (id: string) => {
+    setFilter(id);
+    if (id !== "all") {
+      requestAnimationFrame(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
   const { currentCity } = useCity();
   const { data: allVenues = [], isLoading, error } = useVenues();
   const { user, profile } = useAuthProfile();
@@ -72,20 +81,20 @@ const Home = () => {
           fetchpriority="high"
           className="absolute inset-0 h-full w-full object-cover object-[center_40%] [filter:saturate(1.05)_contrast(1.05)]"
         />
-        {/* Warm vignette + readable wash, keeps sunset glow */}
+        {/* Stronger readable overlay – keeps warm sunset glow */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(20,10,30,0.45) 0%, rgba(0,0,0,0.05) 22%, rgba(0,0,0,0.0) 45%, rgba(30,10,40,0.35) 70%, rgba(10,5,20,0.78) 100%)",
+              "linear-gradient(to bottom, rgba(20,10,30,0.55) 0%, rgba(0,0,0,0.25) 25%, rgba(0,0,0,0.3) 55%, rgba(10,5,20,0.85) 100%)",
           }}
         />
-        {/* Subtle warm glow behind text block */}
+        {/* Warm glow behind text */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-[28%] h-[42%]"
+          className="pointer-events-none absolute inset-x-0 top-[24%] h-[46%]"
           style={{
             background:
-              "radial-gradient(ellipse at 50% 50%, rgba(255,150,90,0.18) 0%, rgba(255,120,140,0.08) 40%, transparent 70%)",
+              "radial-gradient(ellipse at 50% 50%, rgba(255,150,90,0.22) 0%, rgba(255,120,140,0.10) 40%, transparent 70%)",
           }}
         />
         {/* Subtle film grain */}
@@ -145,8 +154,8 @@ const Home = () => {
               Finn steder med sol og stemning akkurat nå
             </p>
             <p
-              className="mt-1.5 text-[10px] uppercase tracking-[0.22em]"
-              style={{ color: "#FBF7F2", opacity: 0.45, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}
+              className="mt-2 text-[11px] uppercase tracking-[0.22em]"
+              style={{ color: "#FBF7F2", opacity: 0.75, textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
             >
               Oppdatert av Utefolket
             </p>
@@ -164,7 +173,7 @@ const Home = () => {
 
             {/* Filter chips */}
             <div className="mt-3 w-full">
-              <FilterChips options={filterOptions} active={filter} onChange={setFilter} variant="onDark" />
+              <FilterChips options={filterOptions} active={filter} onChange={handleFilterChange} variant="onDark" />
             </div>
 
             <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 backdrop-blur-xl px-3 py-1.5 text-xs font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
@@ -182,7 +191,7 @@ const Home = () => {
         </div>
       </header>
 
-      <div className="mt-4 px-5">
+      <div ref={resultsRef} className="mt-4 px-5 scroll-mt-4">
         <CityBanner />
       </div>
 
