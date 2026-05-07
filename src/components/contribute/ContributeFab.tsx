@@ -148,6 +148,17 @@ export function ContributeFab() {
                   });
                   close();
                 } catch (e) {
+                  const raw = e instanceof Error ? e.message : String(e);
+                  if (raw.toLowerCase().includes("cooldown")) {
+                    showReward({
+                      emoji: "👌",
+                      title: "Sola er allerede oppdatert",
+                      subtitle: "Du kan rapportere igjen om noen minutter.",
+                      variant: "points",
+                    });
+                    close();
+                    return;
+                  }
                   toast.error(toUserErrorMessage(e));
                 }
               }}
