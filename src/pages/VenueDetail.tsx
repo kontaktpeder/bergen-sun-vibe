@@ -26,7 +26,7 @@ const VenueDetail = () => {
   const { data: badgeMap = {} } = useVenueBadges(venueIds);
   const badge = venue?.dbId ? badgeMap[venue.dbId] : undefined;
 
-  const openContribute = (mode: "sun" | "beer" | "photo") => {
+  const openContribute = (mode: "sun" | "beer" | "photo" | "crowd") => {
     setSearchParams({ contribute: mode }, { replace: false });
   };
 
@@ -136,6 +136,7 @@ const VenueDetail = () => {
         <VenueStatusBadges
           contributions={contributions}
           onSun={() => openContribute("sun")}
+          onCrowd={() => openContribute("crowd")}
           onBeer={() => openContribute("beer")}
           onPhoto={() => openContribute("photo")}
         />
@@ -199,8 +200,25 @@ const VenueDetail = () => {
                 let label = "Bidrag";
                 let emoji = "✨";
                 if (c.type === "sun_report") {
-                  emoji = d?.status === "sun" ? "☀️" : "🌥️";
-                  label = d?.status === "sun" ? "Rapporterte sol" : "Rapporterte skygge";
+                  const s = String(d?.status ?? "");
+                  const meta: Record<string, { e: string; l: string }> = {
+                    sun: { e: "☀️", l: "Rapporterte sol" },
+                    partial: { e: "⛅", l: "Rapporterte delvis sol" },
+                    going_down: { e: "🌇", l: "Sol på vei ned" },
+                    shade: { e: "🌥️", l: "Rapporterte skygge" },
+                  };
+                  emoji = meta[s]?.e ?? "☀️";
+                  label = meta[s]?.l ?? "Solrapport";
+                } else if (c.type === "crowd_report") {
+                  const lvl = String(d?.level ?? "");
+                  const meta: Record<string, { e: string; l: string }> = {
+                    quiet: { e: "🌿", l: "Rolig nå" },
+                    some: { e: "👥", l: "Litt folk" },
+                    full: { e: "🔥", l: "Fullt" },
+                    queue: { e: "🚷", l: "Kø ute" },
+                  };
+                  emoji = meta[lvl]?.e ?? "👥";
+                  label = meta[lvl]?.l ?? "Stemning";
                 } else if (c.type === "beer_price") {
                   emoji = "🍺";
                   label = `Oppdaterte ølpris til kr ${d?.price}`;

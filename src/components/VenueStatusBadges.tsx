@@ -5,12 +5,28 @@ import { cn } from "@/lib/utils";
 type Props = {
   contributions: VenueContribution[];
   onSun?: () => void;
+  onCrowd?: () => void;
   onBeer?: () => void;
   onPhoto?: () => void;
 };
 
-export function VenueStatusBadges({ contributions, onSun, onBeer, onPhoto }: Props) {
+const SUN_LABELS: Record<string, { emoji: string; label: string }> = {
+  sun: { emoji: "☀️", label: "Sol" },
+  partial: { emoji: "⛅", label: "Delvis" },
+  going_down: { emoji: "🌇", label: "På vei ned" },
+  shade: { emoji: "🌥️", label: "Skygge" },
+};
+
+const CROWD_LABELS: Record<string, { emoji: string; label: string }> = {
+  quiet: { emoji: "🌿", label: "Rolig" },
+  some: { emoji: "👥", label: "Litt folk" },
+  full: { emoji: "🔥", label: "Fullt" },
+  queue: { emoji: "🚷", label: "Kø ute" },
+};
+
+export function VenueStatusBadges({ contributions, onSun, onCrowd, onBeer, onPhoto }: Props) {
   const sun = contributions.find((c) => c.type === "sun_report");
+  const crowd = contributions.find((c) => c.type === "crowd_report");
   const beer = contributions
     .filter((c) => c.type === "beer_price")
     .map((c) => ({ price: Number((c.data as Record<string, unknown>)?.price), at: c.created_at }))
@@ -21,18 +37,29 @@ export function VenueStatusBadges({ contributions, onSun, onBeer, onPhoto }: Pro
     ? beer.reduce((acc, b) => (b.price < acc.price ? b : acc), beer[0])
     : null;
 
-  const sunStatus = sun?.data as { status?: string } | undefined;
-  const sunIsSun = sunStatus?.status === "sun";
+  const sunStatus = (sun?.data as { status?: string } | undefined)?.status ?? "";
+  const sunMeta = SUN_LABELS[sunStatus];
+
+  const crowdLevel = (crowd?.data as { level?: string } | undefined)?.level ?? "";
+  const crowdMeta = CROWD_LABELS[crowdLevel];
 
   return (
-    <div className="mt-5 grid grid-cols-3 gap-2">
+    <div className="mt-5 grid grid-cols-2 gap-2">
       <BadgeButton
-        emoji={sunIsSun ? "☀️" : sun ? "🌥️" : "☀️"}
-        label={sun ? (sunIsSun ? "Sol" : "Skygge") : "Ingen rapport"}
+        emoji={sunMeta?.emoji ?? "☀️"}
+        label={sunMeta?.label ?? "Ingen rapport"}
         sub={sun ? timeAgo(sun.created_at) : "Rapportér sol"}
         active={!!sun}
         onClick={onSun}
         ariaLabel="Rapportér sol-status"
+      />
+      <BadgeButton
+        emoji={crowdMeta?.emoji ?? "👥"}
+        label={crowdMeta?.label ?? "Ingen rapport"}
+        sub={crowd ? timeAgo(crowd.created_at) : "Hvor fullt?"}
+        active={!!crowd}
+        onClick={onCrowd}
+        ariaLabel="Rapportér stemning"
       />
       <BadgeButton
         emoji="🍺"
