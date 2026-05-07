@@ -29,7 +29,7 @@ export function RewardOverlayHost() {
     if (!current) return;
     // Light haptic on supported devices
     try { (navigator as Navigator & { vibrate?: (p: number | number[]) => boolean }).vibrate?.(12); } catch { /* noop */ }
-    const dwell = current.variant === "levelup" ? 2600 : 1700;
+    const dwell = current.variant === "levelup" ? 4000 : 2800;
     const t = setTimeout(() => setQueue((q) => q.slice(1)), dwell);
     return () => clearTimeout(t);
   }, [current]);
@@ -92,7 +92,7 @@ export function RewardOverlayHost() {
               key={current.title + current.emoji}
               className="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-primary to-sunset-pink"
               style={{
-                animation: `reward-drain ${isLevel ? 2600 : 1700}ms linear forwards`,
+                animation: `reward-drain ${isLevel ? 4000 : 2800}ms linear forwards`,
               }}
             />
           </div>
