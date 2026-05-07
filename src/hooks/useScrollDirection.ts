@@ -24,7 +24,6 @@ export function useHideOnScroll(threshold = 32) {
       const dy = y - lastY;
 
       if (!interacted) {
-        // Wait for the first real scroll gesture before revealing the nav.
         if (Math.abs(dy) > 2) {
           interacted = true;
         } else {
@@ -34,11 +33,9 @@ export function useHideOnScroll(threshold = 32) {
         }
       }
 
-      if (y < threshold) {
-        setHidden(false);
-      } else if (dy > 4) {
+      if (dy > 4) {
         setHidden(true);
-      } else if (dy < -4) {
+      } else if (dy < -4 || y < threshold) {
         setHidden(false);
       }
 
