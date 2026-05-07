@@ -18,7 +18,7 @@ import { CityBanner } from "@/components/CityBanner";
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
   { id: "sun", label: "Sol nå", emoji: "☀️" },
-  { id: "cheap", label: "Billigst øl", emoji: "🍺" },
+  { id: "vibe", label: "Stemning", emoji: "👥" },
 ];
 
 const Home = () => {
@@ -54,7 +54,7 @@ const Home = () => {
     if (filter === "all") return sectionConfig;
     const map: Record<string, SectionDef["id"][]> = {
       sun: ["sun-now"],
-      cheap: ["cheap-beer"],
+      vibe: ["trending"],
     };
     const ids = map[filter] || [];
     return sectionConfig.filter(s => ids.includes(s.id));

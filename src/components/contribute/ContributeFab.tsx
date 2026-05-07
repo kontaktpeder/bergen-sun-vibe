@@ -23,14 +23,14 @@ import { useVenues } from "@/hooks/useVenues";
 import { findPossibleDuplicate } from "@/lib/dedupe-venues";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import type { VenueAddPayload } from "@/lib/contribution-types";
+import type { VenueAddPayload, SunStatus, CrowdLevel } from "@/lib/contribution-types";
 
 const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Bergen: { lat: 60.3913, lng: 5.3221 },
   Oslo: { lat: 59.9139, lng: 10.7522 },
 };
 
-type Mode = "menu" | "sun" | "beer" | "photo" | "venue";
+type Mode = "menu" | "sun" | "beer" | "photo" | "venue" | "crowd";
 type SuccessState = { venueId: string; venueSlug?: string } | null;
 
 export function ContributeFab() {
@@ -82,11 +82,11 @@ export function ContributeFab() {
     });
   }, []);
 
-  // Deep-link: ?contribute=sun|beer|photo opens sheet in mode (only when on a venue)
+  // Deep-link: ?contribute=sun|beer|photo|crowd opens sheet in mode (only when on a venue)
   useEffect(() => {
     const c = searchParams.get("contribute");
     if (!c) return;
-    if (!["sun", "beer", "photo", "venue"].includes(c)) return;
+    if (!["sun", "beer", "photo", "venue", "crowd"].includes(c)) return;
     setOpen(true);
     setMode(c as Mode);
   }, [searchParams]);
@@ -141,6 +141,29 @@ export function ContributeFab() {
                   });
                   showRewardFeedback({
                     type: "sun_report",
+                    awardedPoints: r.awardedPoints,
+                    beforePoints,
+                    afterPoints: r.newPoints,
+                  });
+                  close();
+                } catch (e) {
+                  toast.error(toUserErrorMessage(e));
+                }
+              }}
+            />
+          ) : mode === "crowd" ? (
+            <CrowdForm
+              venueId={venueDbId}
+              onDone={async (level) => {
+                if (!venueDbId) return toast.error("Velg et sted først.");
+                try {
+                  const r = await addContribution.mutateAsync({
+                    type: "crowd_report",
+                    venueId: venueDbId,
+                    data: { level },
+                  });
+                  showRewardFeedback({
+                    type: "crowd_report",
                     awardedPoints: r.awardedPoints,
                     beforePoints,
                     afterPoints: r.newPoints,
@@ -353,7 +376,8 @@ function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boo
         <h2 className="font-display text-lg font-semibold">Hva vil du dele?</h2>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="☀️" label="Er det sol?" onClick={() => onPick("sun")} />
+        <ActionCard emoji="☀️" label="Sol & stemning" onClick={() => onPick("sun")} />
+        <ActionCard emoji="👥" label="Hvor fullt?" onClick={() => onPick("crowd")} />
         <ActionCard emoji="🍺" label="Ølpris" onClick={() => onPick("beer")} />
         <ActionCard emoji="📸" label="Bilde" onClick={() => onPick("photo")} />
         <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
@@ -385,15 +409,33 @@ function ActionCard({
   );
 }
 
-function SunForm({ venueId, onDone }: { venueId?: string; onDone: (s: "sun" | "shade") => void }) {
+function SunForm({ venueId, onDone }: { venueId?: string; onDone: (s: SunStatus) => void }) {
   return (
     <div className="pb-4">
       <div className="text-center">
-        <h2 className="font-display text-lg font-semibold">Hvordan er det akkurat nå?</h2>
+        <h2 className="font-display text-lg font-semibold">Hvordan er sola akkurat nå?</h2>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="☀️" label="Sol" disabled={!venueId} onClick={() => onDone("sun")} />
+        <ActionCard emoji="☀️" label="Sol nå" disabled={!venueId} onClick={() => onDone("sun")} />
+        <ActionCard emoji="⛅" label="Delvis sol" disabled={!venueId} onClick={() => onDone("partial")} />
+        <ActionCard emoji="🌇" label="Sol på vei ned" disabled={!venueId} onClick={() => onDone("going_down")} />
         <ActionCard emoji="🌥️" label="Skygge" disabled={!venueId} onClick={() => onDone("shade")} />
+      </div>
+    </div>
+  );
+}
+
+function CrowdForm({ venueId, onDone }: { venueId?: string; onDone: (l: CrowdLevel) => void }) {
+  return (
+    <div className="pb-4">
+      <div className="text-center">
+        <h2 className="font-display text-lg font-semibold">Hvordan er stemningen?</h2>
+      </div>
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <ActionCard emoji="🌿" label="Rolig nå" disabled={!venueId} onClick={() => onDone("quiet")} />
+        <ActionCard emoji="👥" label="Litt folk" disabled={!venueId} onClick={() => onDone("some")} />
+        <ActionCard emoji="🔥" label="Fullt" disabled={!venueId} onClick={() => onDone("full")} />
+        <ActionCard emoji="🚷" label="Kø ute" disabled={!venueId} onClick={() => onDone("queue")} />
       </div>
     </div>
   );

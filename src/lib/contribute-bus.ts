@@ -1,4 +1,4 @@
-type Mode = "menu" | "sun" | "beer" | "photo" | "venue";
+type Mode = "menu" | "sun" | "beer" | "photo" | "venue" | "crowd";
 type Listener = (mode: Mode) => void;
 const listeners = new Set<Listener>();
 

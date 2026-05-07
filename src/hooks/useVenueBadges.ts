@@ -28,6 +28,7 @@ function mapSun(status: unknown): VenueBadgeSun | null {
   if (status === "sun") return "sunny";
   if (status === "partial") return "partial";
   if (status === "shade") return "shade";
+  if (status === "going_down") return "shade";
   return null;
 }
 
