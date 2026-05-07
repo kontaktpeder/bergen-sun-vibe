@@ -62,7 +62,7 @@ function NavItem({ to, Icon, label }: { to: string; Icon: typeof Home; label: st
       {({ isActive }) => (
         <>
           {isActive && <span className="absolute inset-0 -z-10 rounded-full bg-primary/10" />}
-          <Icon className="h-7 w-7" strokeWidth={isActive ? 2.5 : 2} />
+          <Icon className="h-6 w-6" strokeWidth={isActive ? 2.5 : 2} />
         </>
       )}
     </NavLink>

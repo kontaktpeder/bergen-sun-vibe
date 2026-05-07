@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Trophy } from "lucide-react";
 import { useLeaderboard } from "@/hooks/useLeaderboard";
 
@@ -6,13 +6,14 @@ const medal = (rank: number) => (rank === 1 ? "🥇" : rank === 2 ? "🥈" : ran
 
 const Leaderboard = () => {
   const { data: entries = [], isLoading, error } = useLeaderboard(10);
+  const navigate = useNavigate();
 
   return (
     <div className="px-5 pt-[max(env(safe-area-inset-top),1.5rem)] pb-12">
       <div className="flex items-center gap-3">
-        <Link to="/profile" className="grid h-10 w-10 place-items-center rounded-full bg-card shadow-soft">
+        <button onClick={() => navigate(-1)} aria-label="Tilbake" className="grid h-10 w-10 place-items-center rounded-full bg-card shadow-soft tap-scale">
           <ArrowLeft className="h-4 w-4" />
-        </Link>
+        </button>
         <div>
           <h1 className="font-display text-2xl font-semibold">Topplisten</h1>
           <p className="text-sm text-muted-foreground">Bergens mest aktive sol-bidragsytere</p>
