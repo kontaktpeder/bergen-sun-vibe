@@ -191,7 +191,7 @@ const Home = () => {
         </div>
       </header>
 
-      <div className="mt-4 px-5">
+      <div ref={resultsRef} className="mt-4 px-5 scroll-mt-4">
         <CityBanner />
       </div>
 
