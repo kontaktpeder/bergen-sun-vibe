@@ -26,11 +26,12 @@ export function CityPickerModal() {
   };
 
   return (
-    <Dialog open={!hasChosenCity}>
+    <Dialog open={!hasChosenCity} onOpenChange={() => { /* controlled */ }}>
       <DialogContent
         className="max-w-sm rounded-3xl"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">Velg din by</DialogTitle>
