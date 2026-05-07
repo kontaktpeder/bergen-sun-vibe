@@ -15,7 +15,8 @@ const items = [
 export function BottomNav() {
   const location = useLocation();
   const onAuth = location.pathname.startsWith("/auth");
-  const hidden = useHideOnScroll(48);
+  const isPlace = /^\/(steder|venue)\//.test(location.pathname);
+  const hidden = useHideOnScroll(48, isPlace);
 
   return (
     <nav
