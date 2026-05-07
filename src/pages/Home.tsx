@@ -156,7 +156,7 @@ const Home = () => {
 
             {/* Filter chips */}
             <div className="mt-3 w-full">
-              <FilterChips options={filterOptions} active={filter} onChange={setFilter} />
+              <FilterChips options={filterOptions} active={filter} onChange={setFilter} variant="onDark" />
             </div>
 
             <div className="mt-3 inline-flex items-center gap-2 rounded-full glass-dark px-3 py-1.5 text-xs font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
