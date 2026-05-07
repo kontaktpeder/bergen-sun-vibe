@@ -92,7 +92,7 @@ export function RewardOverlayHost() {
               key={current.title + current.emoji}
               className="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-primary to-sunset-pink"
               style={{
-                animation: `reward-drain ${isLevel ? 2600 : 1700}ms linear forwards`,
+                animation: `reward-drain ${isLevel ? 4000 : 2800}ms linear forwards`,
               }}
             />
           </div>
