@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { SearchOverlay } from "@/components/SearchOverlay";
 import { Search, Sparkles, Sun } from "lucide-react";
@@ -24,6 +24,15 @@ const filterOptions = [
 const Home = () => {
   const [filter, setFilter] = useState("all");
   const [searchOpen, setSearchOpen] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const handleFilterChange = (id: string) => {
+    setFilter(id);
+    if (id !== "all") {
+      requestAnimationFrame(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
   const { currentCity } = useCity();
   const { data: allVenues = [], isLoading, error } = useVenues();
   const { user, profile } = useAuthProfile();
