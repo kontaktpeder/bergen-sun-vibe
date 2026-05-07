@@ -22,6 +22,7 @@ const AdminVenues = () => {
   const { user, isAuthed, loading } = useAuthProfile();
   const { data: isAdmin, isLoading: roleLoading } = useIsAdmin(user?.id);
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
 
