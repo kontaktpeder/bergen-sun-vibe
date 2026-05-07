@@ -151,6 +151,29 @@ export function ContributeFab() {
                 }
               }}
             />
+          ) : mode === "crowd" ? (
+            <CrowdForm
+              venueId={venueDbId}
+              onDone={async (level) => {
+                if (!venueDbId) return toast.error("Velg et sted først.");
+                try {
+                  const r = await addContribution.mutateAsync({
+                    type: "crowd_report",
+                    venueId: venueDbId,
+                    data: { level },
+                  });
+                  showRewardFeedback({
+                    type: "crowd_report",
+                    awardedPoints: r.awardedPoints,
+                    beforePoints,
+                    afterPoints: r.newPoints,
+                  });
+                  close();
+                } catch (e) {
+                  toast.error(toUserErrorMessage(e));
+                }
+              }}
+            />
           ) : mode === "beer" ? (
             <BeerForm
               venueId={venueDbId}
@@ -353,7 +376,8 @@ function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boo
         <h2 className="font-display text-lg font-semibold">Hva vil du dele?</h2>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="☀️" label="Er det sol?" onClick={() => onPick("sun")} />
+        <ActionCard emoji="☀️" label="Sol & stemning" onClick={() => onPick("sun")} />
+        <ActionCard emoji="👥" label="Hvor fullt?" onClick={() => onPick("crowd")} />
         <ActionCard emoji="🍺" label="Ølpris" onClick={() => onPick("beer")} />
         <ActionCard emoji="📸" label="Bilde" onClick={() => onPick("photo")} />
         <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
