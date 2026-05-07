@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 /**
  * Returns true while the user is actively scrolling DOWN past the threshold.
  * Returns false at the top of the page or while scrolling up.
+ * Resets to hidden on every route change so the nav reveals only after the user scrolls.
  */
 export function useHideOnScroll(threshold = 32) {
-  // Start hidden so the nav doesn't compete with Safari's address bar on first paint.
   const [hidden, setHidden] = useState(true);
+  const location = useLocation();
+
+  useEffect(() => {
+    setHidden(true);
+  }, [location.pathname]);
 
   useEffect(() => {
     let lastY = window.scrollY;
@@ -18,7 +24,6 @@ export function useHideOnScroll(threshold = 32) {
       const dy = y - lastY;
 
       if (!interacted) {
-        // Wait for the first real scroll gesture before revealing the nav.
         if (Math.abs(dy) > 2) {
           interacted = true;
         } else {
@@ -28,11 +33,9 @@ export function useHideOnScroll(threshold = 32) {
         }
       }
 
-      if (y < threshold) {
-        setHidden(false);
-      } else if (dy > 4) {
+      if (dy > 4) {
         setHidden(true);
-      } else if (dy < -4) {
+      } else if (dy < -4 || y < threshold) {
         setHidden(false);
       }
 
