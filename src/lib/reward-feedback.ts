@@ -2,7 +2,7 @@ import { getLevel } from "@/lib/levels";
 import { showReward } from "@/components/RewardOverlay";
 
 type RewardArgs = {
-  type: "sun_report" | "beer_price" | "photo" | "venue_add";
+  type: "sun_report" | "beer_price" | "photo" | "venue_add" | "crowd_report";
   awardedPoints: number;
   beforePoints: number;
   afterPoints: number;
@@ -18,6 +18,7 @@ export function showRewardFeedback(args: RewardArgs) {
     beer_price_confirm: { emoji: "✅", title: "Takk for bekreftelsen" },
     photo: { emoji: "📸", title: "Takk! Bildet er publisert" },
     venue_add: { emoji: "📍", title: "Stedet er lagt til" },
+    crowd_report: { emoji: "👥", title: "Takk! Stemningen er oppdatert" },
   };
 
   const key =

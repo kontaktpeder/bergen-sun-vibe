@@ -1,4 +1,4 @@
-export type ContributionType = "sun_report" | "beer_price" | "photo" | "venue_add";
+export type ContributionType = "sun_report" | "beer_price" | "photo" | "venue_add" | "crowd_report";
 
 export const POINTS = {
   sun_report: 5,
@@ -6,9 +6,14 @@ export const POINTS = {
   beer_price_confirm: 3,
   photo: 15,
   venue_add: 25,
+  crowd_report: 5,
 } as const;
 
-export type SunPayload = { status: "sun" | "shade" };
+export type SunStatus = "sun" | "partial" | "shade" | "going_down";
+export type CrowdLevel = "quiet" | "some" | "full" | "queue";
+
+export type SunPayload = { status: SunStatus };
+export type CrowdPayload = { level: CrowdLevel };
 export type BeerPayload = { price: number; label: "cheapest" };
 export type PhotoPayload = { image_url: string };
 export type VenueAddPayload = {
@@ -33,6 +38,7 @@ export type VenueAddPayload = {
 
 export type ContributionPayload =
   | { type: "sun_report"; data: SunPayload; venueId: string }
+  | { type: "crowd_report"; data: CrowdPayload; venueId: string }
   | { type: "beer_price"; data: BeerPayload; venueId: string; isConfirm?: boolean }
   | { type: "photo"; data: PhotoPayload; venueId: string }
   | { type: "venue_add"; data: VenueAddPayload };

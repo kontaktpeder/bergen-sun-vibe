@@ -16,6 +16,7 @@ type Profile = { id: string; points: number; username?: string | null; avatar_ur
 
 function estimatePoints(p: ContributionPayload): number {
   if (p.type === "beer_price") return p.isConfirm ? POINTS.beer_price_confirm : POINTS.beer_price;
+  if (p.type === "crowd_report") return POINTS.crowd_report;
   return POINTS[p.type];
 }
 
