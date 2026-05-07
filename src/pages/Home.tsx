@@ -154,8 +154,8 @@ const Home = () => {
               Finn steder med sol og stemning akkurat nå
             </p>
             <p
-              className="mt-1.5 text-[10px] uppercase tracking-[0.22em]"
-              style={{ color: "#FBF7F2", opacity: 0.45, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}
+              className="mt-2 text-[11px] uppercase tracking-[0.22em]"
+              style={{ color: "#FBF7F2", opacity: 0.75, textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
             >
               Oppdatert av Utefolket
             </p>
@@ -173,7 +173,7 @@ const Home = () => {
 
             {/* Filter chips */}
             <div className="mt-3 w-full">
-              <FilterChips options={filterOptions} active={filter} onChange={setFilter} variant="onDark" />
+              <FilterChips options={filterOptions} active={filter} onChange={handleFilterChange} variant="onDark" />
             </div>
 
             <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 backdrop-blur-xl px-3 py-1.5 text-xs font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]">
