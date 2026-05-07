@@ -29,7 +29,7 @@ export function RewardOverlayHost() {
     if (!current) return;
     // Light haptic on supported devices
     try { (navigator as Navigator & { vibrate?: (p: number | number[]) => boolean }).vibrate?.(12); } catch { /* noop */ }
-    const dwell = current.variant === "levelup" ? 2600 : 1700;
+    const dwell = current.variant === "levelup" ? 4000 : 2800;
     const t = setTimeout(() => setQueue((q) => q.slice(1)), dwell);
     return () => clearTimeout(t);
   }, [current]);
