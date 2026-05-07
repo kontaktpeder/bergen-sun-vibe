@@ -21,7 +21,7 @@ const CROWD_LABELS: Record<string, { emoji: string; label: string }> = {
   quiet: { emoji: "🌿", label: "Rolig" },
   some: { emoji: "👥", label: "Litt folk" },
   full: { emoji: "🔥", label: "Fullt" },
-  queue: { emoji: "🚷", label: "Kø ute" },
+  queue: { emoji: "🚶", label: "Kø ute" },
 };
 
 export function VenueStatusBadges({ contributions, onSun, onCrowd, onBeer, onPhoto }: Props) {
