@@ -71,7 +71,7 @@ const Home = () => {
   return (
     <div className="pb-8">
       {/* Hero */}
-      <header className="relative z-0 min-h-[100svh] overflow-hidden">
+      <header className="relative z-0 min-h-[78svh] overflow-hidden">
         <img
           src={heroImg}
           alt={`${currentCity} ved solnedgang`}
