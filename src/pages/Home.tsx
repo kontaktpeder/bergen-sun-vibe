@@ -108,9 +108,11 @@ const Home = () => {
                 <div className="text-[10px] uppercase tracking-widest opacity-80">{currentCity}</div>
               </div>
             </div>
-            <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-full glass-dark text-white tap-scale">
-              <span className="text-xs font-semibold">{userInitials}</span>
-            </Link>
+            {user && (
+              <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-full glass-dark text-white tap-scale">
+                <span className="text-xs font-semibold">{userInitials}</span>
+              </Link>
+            )}
           </div>
 
           {/* Centered hero content – logo sits ~40% from top */}
