@@ -473,11 +473,10 @@ function CrowdForm({ venueId, onDone }: { venueId?: string; onDone: (l: CrowdLev
       <div className="text-center">
         <h2 className="font-display text-lg font-semibold">Hvordan er stemningen?</h2>
       </div>
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="🌿" label="Rolig nå" disabled={!venueId} selected={selected === "quiet"} onClick={() => handle("quiet")} />
-        <ActionCard emoji="👥" label="Litt folk" disabled={!venueId} selected={selected === "some"} onClick={() => handle("some")} />
-        <ActionCard emoji="🔥" label="Fullt" disabled={!venueId} selected={selected === "full"} onClick={() => handle("full")} />
-        <ActionCard emoji="🚶" label="Kø ute" disabled={!venueId} selected={selected === "queue"} onClick={() => handle("queue")} />
+      <div className="mt-5 grid grid-cols-1 gap-3">
+        <ActionCard emoji="😌" label="Rolig" disabled={!venueId} selected={selected === "quiet"} onClick={() => handle("quiet")} />
+        <ActionCard emoji="🙂" label="Litt liv" disabled={!venueId} selected={selected === "some"} onClick={() => handle("some")} />
+        <ActionCard emoji="🔥" label="Fullt / livlig" disabled={!venueId} selected={selected === "full"} onClick={() => handle("full")} />
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ import { CityBanner } from "@/components/CityBanner";
 const filterOptions = [
   { id: "all", label: "Alt", emoji: "✨" },
   { id: "sun", label: "Sol nå", emoji: "☀️" },
-  { id: "vibe", label: "Stemning", emoji: "👥" },
+  { id: "vibe", label: "Stemning", emoji: "🙂" },
 ];
 
 const Home = () => {

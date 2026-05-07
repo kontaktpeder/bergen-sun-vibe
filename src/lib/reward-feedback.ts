@@ -18,7 +18,7 @@ export function showRewardFeedback(args: RewardArgs) {
     beer_price_confirm: { emoji: "✅", title: "Takk for bekreftelsen" },
     photo: { emoji: "📸", title: "Takk! Bildet er publisert" },
     venue_add: { emoji: "📍", title: "Stedet er lagt til" },
-    crowd_report: { emoji: "👥", title: "Takk! Stemningen er oppdatert" },
+    crowd_report: { emoji: "🙂", title: "Takk! Stemningen er oppdatert" },
   };
 
   const key =
