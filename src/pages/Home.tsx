@@ -107,7 +107,7 @@ const Home = () => {
           }}
         />
 
-        <div className="relative z-10 flex min-h-[100svh] flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-8">
+        <div className="relative z-10 flex min-h-[78svh] flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-6">
           {/* Top bar */}
           <div className="flex items-center justify-between text-white">
             <div className="flex items-center gap-3 ml-1">
