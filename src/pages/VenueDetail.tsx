@@ -212,10 +212,10 @@ const VenueDetail = () => {
                 } else if (c.type === "crowd_report") {
                   const lvl = String(d?.level ?? "");
                   const meta: Record<string, { e: string; l: string }> = {
-                    quiet: { e: "🌿", l: "Rolig nå" },
-                    some: { e: "👥", l: "Litt folk" },
-                    full: { e: "🔥", l: "Fullt" },
-                    queue: { e: "🚷", l: "Kø ute" },
+                    quiet: { e: "😌", l: "Rapporterte rolig stemning" },
+                    some: { e: "🙂", l: "Rapporterte litt liv" },
+                    full: { e: "🔥", l: "Rapporterte fullt / livlig" },
+                    queue: { e: "🔥", l: "Rapporterte fullt / livlig" },
                   };
                   emoji = meta[lvl]?.e ?? "👥";
                   label = meta[lvl]?.l ?? "Stemning";

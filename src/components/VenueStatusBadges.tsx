@@ -18,10 +18,10 @@ const SUN_LABELS: Record<string, { emoji: string; label: string }> = {
 };
 
 const CROWD_LABELS: Record<string, { emoji: string; label: string }> = {
-  quiet: { emoji: "🌿", label: "Rolig" },
-  some: { emoji: "👥", label: "Litt folk" },
-  full: { emoji: "🔥", label: "Fullt" },
-  queue: { emoji: "🚶", label: "Kø ute" },
+  quiet: { emoji: "😌", label: "Rolig" },
+  some: { emoji: "🙂", label: "Litt liv" },
+  full: { emoji: "🔥", label: "Fullt / livlig" },
+  queue: { emoji: "🔥", label: "Fullt / livlig" },
 };
 
 export function VenueStatusBadges({ contributions, onSun, onCrowd, onBeer, onPhoto }: Props) {
