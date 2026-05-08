@@ -9,6 +9,13 @@ import { useLatestVenuePhoto } from "@/hooks/useLatestVenuePhoto";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import type { VenueBadgeState } from "@/hooks/useVenueBadges";
 
+const CROWD_TAG: Record<string, { emoji: string; label: string; bg: string }> = {
+  quiet: { emoji: "😌", label: "Rolig", bg: "bg-emerald-500/90 text-white" },
+  some: { emoji: "🙂", label: "Litt liv", bg: "bg-amber-500/90 text-white" },
+  full: { emoji: "🔥", label: "Livlig", bg: "bg-rose-500/90 text-white" },
+  queue: { emoji: "🔥", label: "Livlig", bg: "bg-rose-500/90 text-white" },
+};
+
 interface Props {
   venue: Venue;
   variant?: "feature" | "default" | "compact";
@@ -23,6 +30,24 @@ interface Props {
 // Standardized thumbnail size for all card variants → one cache entry per venue
 const CARD_SIZE = { w: 600, h: 600 };
 const FEATURE_SIZE = { w: 800, h: 1000 };
+
+export function CrowdTag({ level, className }: { level: string | null | undefined; className?: string }) {
+  if (!level) return null;
+  const meta = CROWD_TAG[level];
+  if (!meta) return null;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur-sm",
+        meta.bg,
+        className,
+      )}
+    >
+      <span>{meta.emoji}</span>
+      <span>{meta.label}</span>
+    </span>
+  );
+}
 
 export function VenueCard({ venue, variant = "default", index = 0, badge, userPhotoUrl: userPhotoProp, eager }: Props) {
   useFavorites();
@@ -79,7 +104,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
             <h3 className="font-display text-2xl font-semibold leading-tight">{venue.name}</h3>
             <div className="mt-2 flex items-center gap-3 text-sm">
               <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{venue.rating}</span>
-              
+              <CrowdTag level={badge?.crowd} />
               {venue.dealText && <span className="rounded-full bg-primary/90 px-2 py-0.5 text-xs font-medium">{venue.dealText}</span>}
             </div>
           </div>
@@ -102,6 +127,9 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
           />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" />
           {renderSunBadge("absolute top-2 left-2")}
+          <div className="absolute bottom-2 right-2">
+            <CrowdTag level={badge?.crowd} />
+          </div>
         </div>
         <div className="mt-2.5 px-1">
           <h4 className="truncate font-display text-base font-semibold">{venue.name}</h4>
@@ -142,6 +170,9 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
             {venue.dealText}
           </div>
         )}
+        <div className="absolute bottom-3 right-3">
+          <CrowdTag level={badge?.crowd} />
+        </div>
       </div>
       <div className="mt-3 px-1">
         <div className="flex items-baseline justify-between gap-2">

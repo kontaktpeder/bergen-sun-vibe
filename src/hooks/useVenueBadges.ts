@@ -9,6 +9,8 @@ export interface VenueBadgeState {
   beerPrice: number | null;
   photoCount: number;
   latestPhotoUrl: string | null;
+  crowd: string | null;
+  crowdAt: string | null;
 }
 
 const FRESH_MS = 60 * 60 * 1000; // 60 min
@@ -21,7 +23,7 @@ interface ContribRow {
 }
 
 function emptyState(): VenueBadgeState {
-  return { sun: null, sunAt: null, beerPrice: null, photoCount: 0, latestPhotoUrl: null };
+  return { sun: null, sunAt: null, beerPrice: null, photoCount: 0, latestPhotoUrl: null, crowd: null, crowdAt: null };
 }
 
 function mapSun(status: unknown): VenueBadgeSun | null {
@@ -46,7 +48,7 @@ export function useVenueBadges(venueIds: string[]) {
         .select("venue_id,type,data,created_at")
         .in("venue_id", ids)
         .eq("status", "active")
-        .in("type", ["sun_report", "beer_price", "photo"])
+        .in("type", ["sun_report", "beer_price", "photo", "crowd_report"])
         .order("created_at", { ascending: false });
       if (error) throw error;
 
@@ -72,6 +74,12 @@ export function useVenueBadges(venueIds: string[]) {
           const raw = r.data?.price;
           const n = typeof raw === "number" ? raw : Number(raw);
           if (Number.isFinite(n) && n > 0) s.beerPrice = n;
+        } else if (r.type === "crowd_report" && s.crowd === null) {
+          const ageMs = Date.now() - new Date(r.created_at).getTime();
+          if (ageMs <= FRESH_MS) {
+            s.crowd = String((r.data as Record<string, unknown>)?.level ?? "");
+            s.crowdAt = r.created_at;
+          }
         } else if (r.type === "photo") {
           s.photoCount += 1;
           (photosByVenue[r.venue_id] ||= []).push(r);

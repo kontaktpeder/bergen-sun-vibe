@@ -14,6 +14,7 @@ import { VenueImage } from "@/components/VenueImage";
 import { useCity } from "@/context/CityContext";
 import { CityBanner } from "@/components/CityBanner";
 import { cn } from "@/lib/utils";
+import { CrowdTag } from "@/components/VenueCard";
 
 const filters = [
   { id: "all", label: "Alt", emoji: "✨" },
@@ -167,6 +168,7 @@ const Explore = () => {
                     {badgeMap[selected.dbId]?.sun && (
                       <div className="mt-1.5"><DataSunBadge badge={badgeMap[selected.dbId]} /></div>
                     )}
+                    <div className="mt-1"><CrowdTag level={badgeMap[selected.dbId]?.crowd} /></div>
                   </div>
                 </div>
               </div>
@@ -216,6 +218,7 @@ const Explore = () => {
                 {badgeMap[v.dbId]?.sun && (
                   <div className="mt-1"><DataSunBadge badge={badgeMap[v.dbId]} /></div>
                 )}
+                <div className="mt-0.5"><CrowdTag level={badgeMap[v.dbId]?.crowd} /></div>
               </div>
               {v.rating > 0 && (
                 <div className="shrink-0 text-right">
