@@ -74,6 +74,12 @@ export function useVenueBadges(venueIds: string[]) {
           const raw = r.data?.price;
           const n = typeof raw === "number" ? raw : Number(raw);
           if (Number.isFinite(n) && n > 0) s.beerPrice = n;
+        } else if (r.type === "crowd_report" && s.crowd === null) {
+          const ageMs = Date.now() - new Date(r.created_at).getTime();
+          if (ageMs <= FRESH_MS) {
+            s.crowd = String((r.data as Record<string, unknown>)?.level ?? "");
+            s.crowdAt = r.created_at;
+          }
         } else if (r.type === "photo") {
           s.photoCount += 1;
           (photosByVenue[r.venue_id] ||= []).push(r);
