@@ -9,6 +9,13 @@ import { useLatestVenuePhoto } from "@/hooks/useLatestVenuePhoto";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import type { VenueBadgeState } from "@/hooks/useVenueBadges";
 
+const CROWD_TAG: Record<string, { emoji: string; label: string; bg: string }> = {
+  quiet: { emoji: "😌", label: "Rolig", bg: "bg-emerald-500/90 text-white" },
+  some: { emoji: "🙂", label: "Litt liv", bg: "bg-amber-500/90 text-white" },
+  full: { emoji: "🔥", label: "Livlig", bg: "bg-rose-500/90 text-white" },
+  queue: { emoji: "🔥", label: "Livlig", bg: "bg-rose-500/90 text-white" },
+};
+
 interface Props {
   venue: Venue;
   variant?: "feature" | "default" | "compact";
