@@ -218,6 +218,7 @@ const Explore = () => {
                 {badgeMap[v.dbId]?.sun && (
                   <div className="mt-1"><DataSunBadge badge={badgeMap[v.dbId]} /></div>
                 )}
+                <div className="mt-0.5"><CrowdTag level={badgeMap[v.dbId]?.crowd} /></div>
               </div>
               {v.rating > 0 && (
                 <div className="shrink-0 text-right">
