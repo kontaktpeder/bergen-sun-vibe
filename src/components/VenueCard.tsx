@@ -31,7 +31,7 @@ interface Props {
 const CARD_SIZE = { w: 600, h: 600 };
 const FEATURE_SIZE = { w: 800, h: 1000 };
 
-function CrowdTag({ level, className }: { level: string | null | undefined; className?: string }) {
+export function CrowdTag({ level, className }: { level: string | null | undefined; className?: string }) {
   if (!level) return null;
   const meta = CROWD_TAG[level];
   if (!meta) return null;
