@@ -14,6 +14,7 @@ import { VenueImage } from "@/components/VenueImage";
 import { useCity } from "@/context/CityContext";
 import { CityBanner } from "@/components/CityBanner";
 import { cn } from "@/lib/utils";
+import { CrowdTag } from "@/components/VenueCard";
 
 const filters = [
   { id: "all", label: "Alt", emoji: "✨" },
