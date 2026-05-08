@@ -127,6 +127,9 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
           />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" />
           {renderSunBadge("absolute top-2 left-2")}
+          <div className="absolute bottom-2 right-2">
+            <CrowdTag level={badge?.crowd} />
+          </div>
         </div>
         <div className="mt-2.5 px-1">
           <h4 className="truncate font-display text-base font-semibold">{venue.name}</h4>
@@ -167,6 +170,9 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
             {venue.dealText}
           </div>
         )}
+        <div className="absolute bottom-3 right-3">
+          <CrowdTag level={badge?.crowd} />
+        </div>
       </div>
       <div className="mt-3 px-1">
         <div className="flex items-baseline justify-between gap-2">
