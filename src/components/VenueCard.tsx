@@ -104,7 +104,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
             <h3 className="font-display text-2xl font-semibold leading-tight">{venue.name}</h3>
             <div className="mt-2 flex items-center gap-3 text-sm">
               <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{venue.rating}</span>
-              
+              <CrowdTag level={badge?.crowd} />
               {venue.dealText && <span className="rounded-full bg-primary/90 px-2 py-0.5 text-xs font-medium">{venue.dealText}</span>}
             </div>
           </div>
