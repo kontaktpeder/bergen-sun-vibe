@@ -31,6 +31,24 @@ interface Props {
 const CARD_SIZE = { w: 600, h: 600 };
 const FEATURE_SIZE = { w: 800, h: 1000 };
 
+function CrowdTag({ level, className }: { level: string | null | undefined; className?: string }) {
+  if (!level) return null;
+  const meta = CROWD_TAG[level];
+  if (!meta) return null;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur-sm",
+        meta.bg,
+        className,
+      )}
+    >
+      <span>{meta.emoji}</span>
+      <span>{meta.label}</span>
+    </span>
+  );
+}
+
 export function VenueCard({ venue, variant = "default", index = 0, badge, userPhotoUrl: userPhotoProp, eager }: Props) {
   useFavorites();
   // Only run per-card query if no batched photo was passed (legacy callers / Favorites page)
