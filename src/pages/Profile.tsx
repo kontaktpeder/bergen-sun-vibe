@@ -74,6 +74,12 @@ const Profile = () => {
 
   return (
     <div className="pb-6">
+      <SeoHead
+        title={`Min profil — Utefolket ${currentCity}`}
+        description={`Følg sol, stemning og ølpriser i ${currentCity}.`}
+        canonical={buildCanonical(`/${citySlugFor(currentCity)}`)}
+        robots="noindex,follow"
+      />
       <div className="relative h-44 overflow-hidden bg-gradient-to-br from-primary via-sunset-pink to-sunset-purple">
         <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-sun blur-3xl opacity-60" />
       </div>
