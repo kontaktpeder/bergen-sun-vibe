@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -6,8 +6,9 @@ import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { ReportButton } from "@/components/ReportButton";
-import { VenueStatusBadges } from "@/components/VenueStatusBadges";
+import { VenueLiveStatus } from "@/components/venue/VenueLiveStatus";
 import { VenuePhotoGallery } from "@/components/VenuePhotoGallery";
+import { openContributeFab } from "@/lib/contribute-bus";
 import { VenueImage } from "@/components/VenueImage";
 import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
@@ -23,7 +24,6 @@ const VenueDetail = () => {
   const params = useParams<{ id?: string; slug?: string }>();
   const slug = params.slug ?? params.id;
   const navigate = useNavigate();
-  const [, setSearchParams] = useSearchParams();
   const { isAuthed } = useAuthProfile();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [authOpen, setAuthOpen] = useState(false);
@@ -31,10 +31,6 @@ const VenueDetail = () => {
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
   const venueIds = venue?.dbId ? [venue.dbId] : [];
   useVenueBadges(venueIds);
-
-  const openContribute = (mode: "sun" | "beer" | "photo" | "crowd") => {
-    setSearchParams({ contribute: mode }, { replace: false });
-  };
 
   if (isLoading) {
     return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Laster…</div>;
@@ -112,7 +108,7 @@ const VenueDetail = () => {
             return (
               <span className="inline-flex items-center gap-1.5 rounded-full glass px-3 py-2 text-xs font-medium shadow-soft">
                 <Clock className="h-3.5 w-3.5" />
-                {latest ? `Sist oppdatert ${timeAgo(latest)}` : "Trenger ditt bidrag"}
+                {latest ? `Sist oppdatert ${timeAgo(latest)}` : "Ingen oppdatering ennå"}
               </span>
             );
           })()}
@@ -135,15 +131,12 @@ const VenueDetail = () => {
 
         <VenueStickyActions onMap={openMap} onShare={handleShare} onSave={handleFav} saved={fav} />
 
-        <VenueSection id="akkurat-na" title="Akkurat nå">
-          <VenueStatusBadges
+        <VenueSection id="akkurat-na" title="Akkurat nå" subtitle="Oppdatert av folk ute nå">
+          <VenueLiveStatus
             contributions={contributions}
-            onSun={() => openContribute("sun")}
-            onCrowd={() => openContribute("crowd")}
-            onBeer={() => openContribute("beer")}
-            onPhoto={() => openContribute("photo")}
+            onContribute={(m) => openContributeFab(m)}
           />
-          <VenuePhotoGallery contributions={contributions} onAdd={() => openContribute("photo")} />
+          <VenuePhotoGallery contributions={contributions} />
         </VenueSection>
 
         {venue.dealText && (

@@ -1,9 +1,9 @@
 import type { VenueContribution } from "@/hooks/useVenueContributions";
 import { timeAgo } from "@/lib/time";
 
-type Props = { contributions: VenueContribution[]; onAdd: () => void };
+type Props = { contributions: VenueContribution[] };
 
-export function VenuePhotoGallery({ contributions, onAdd }: Props) {
+export function VenuePhotoGallery({ contributions }: Props) {
   const photos = contributions
     .filter((c) => c.type === "photo")
     .map((c) => ({
@@ -17,11 +17,8 @@ export function VenuePhotoGallery({ contributions, onAdd }: Props) {
 
   return (
     <section className="mt-5">
-      <div className="flex items-center justify-between">
-        <div className="text-xs font-semibold uppercase tracking-widest text-primary">
-          Bilder fra brukere
-        </div>
-        <button onClick={onAdd} className="text-xs font-medium text-primary">+ Legg til</button>
+      <div className="text-xs font-semibold uppercase tracking-widest text-primary">
+        Bilder fra brukere
       </div>
       <div className="-mx-5 mt-3 flex gap-3 overflow-x-auto px-5 pb-1 scroll-pl-5 snap-x snap-mandatory">
         {photos.map((p) => (

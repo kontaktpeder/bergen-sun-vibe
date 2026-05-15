@@ -620,7 +620,47 @@ function VenueAddSuccess({
   );
 }
 
+function MenuRow({
+  emoji,
+  label,
+  onClick,
+}: {
+  emoji: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="tap-scale flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left shadow-soft"
+    >
+      <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary text-xl">
+        {emoji}
+      </span>
+      <span className="flex-1 text-sm font-medium">{label}</span>
+    </button>
+  );
+}
+
 function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boolean }) {
+  if (isOnVenue) {
+    return (
+      <div className="pb-4">
+        <div className="text-center">
+          <h2 className="font-display text-lg font-semibold">Oppdater stedet</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Hva vil du rapportere?</p>
+        </div>
+        <div className="mt-5 space-y-2">
+          <MenuRow emoji="☀️" label="Rapporter sol" onClick={() => onPick("sun")} />
+          <MenuRow emoji="🙂" label="Rapporter stemning" onClick={() => onPick("crowd")} />
+          <MenuRow emoji="🍺" label="Oppdater ølpris" onClick={() => onPick("beer")} />
+          <MenuRow emoji="📸" label="Legg til bilde" onClick={() => onPick("photo")} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pb-4">
       <div className="text-center">
@@ -633,11 +673,9 @@ function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boo
         <ActionCard emoji="🙂" label="Stemning" onClick={() => onPick("crowd")} />
         <ActionCard emoji="🍺" label="Ølpris" onClick={() => onPick("beer")} />
       </div>
-      {!isOnVenue && (
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          Velg deretter hvilket sted oppdateringen gjelder.
-        </p>
-      )}
+      <p className="mt-4 text-center text-xs text-muted-foreground">
+        Velg deretter hvilket sted oppdateringen gjelder.
+      </p>
     </div>
   );
 }
