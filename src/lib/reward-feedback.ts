@@ -1,5 +1,6 @@
 import { getLevel } from "@/lib/levels";
 import { showReward } from "@/components/RewardOverlay";
+import { pendingActionLine, type PendingPayload } from "@/lib/contribute-pending";
 
 type RewardArgs = {
   type: "sun_report" | "beer_price" | "photo" | "venue_add" | "crowd_report";
@@ -34,6 +35,34 @@ export function showRewardFeedback(args: RewardArgs) {
 
   const oldLevel = getLevel(beforePoints);
   const newLevel = getLevel(afterPoints);
+  if (oldLevel !== newLevel) {
+    showReward({
+      emoji: "🎉",
+      title: `Nivå opp! Du er nå ${newLevel}`,
+      subtitle: "Fortsett å bidra for å låse opp mer.",
+      variant: "levelup",
+    });
+  }
+}
+
+export function showCombinedRewardFeedback(args: {
+  venueName: string;
+  pending: PendingPayload;
+  totalPoints: number;
+  beforePoints: number;
+  afterPoints: number;
+}) {
+  const action = pendingActionLine(args.pending);
+  showReward({
+    emoji: "✨",
+    title: `Du opprettet ${args.venueName}`,
+    subtitle: `${action.emoji} ${action.label}`,
+    points: args.totalPoints,
+    variant: "venue",
+  });
+
+  const oldLevel = getLevel(args.beforePoints);
+  const newLevel = getLevel(args.afterPoints);
   if (oldLevel !== newLevel) {
     showReward({
       emoji: "🎉",
