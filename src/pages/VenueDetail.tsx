@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, MapPin, Clock, Star } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useVenue } from "@/hooks/useVenue";
@@ -90,14 +90,21 @@ const VenueDetail = () => {
   };
 
   const openMap = () => {
-    if (venue.googleMapsUrl) {
-      window.open(venue.googleMapsUrl, "_blank");
-      return;
+    const label = venue.name ? `${venue.name}${cityLabel ? `, ${cityLabel}` : ""}` : `${venue.lat},${venue.lng}`;
+    const q = encodeURIComponent(label);
+    const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    let url: string;
+    if (isIOS) {
+      url = `maps://?q=${q}&ll=${venue.lat},${venue.lng}`;
+    } else if (isAndroid) {
+      url = `geo:${venue.lat},${venue.lng}?q=${venue.lat},${venue.lng}(${q})`;
+    } else if (venue.googleMapsUrl) {
+      url = venue.googleMapsUrl;
+    } else {
+      url = `https://www.google.com/maps/search/?api=1&query=${q}&center=${venue.lat},${venue.lng}`;
     }
-    const q = encodeURIComponent(
-      venue.name ? `${venue.name}${cityLabel ? `, ${cityLabel}` : ""}` : `${venue.lat},${venue.lng}`,
-    );
-    const url = `https://www.google.com/maps/search/?api=1&query=${q}&center=${venue.lat},${venue.lng}`;
     window.open(url, "_blank");
   };
 
@@ -141,17 +148,10 @@ const VenueDetail = () => {
         <h1 className="mt-1 font-display text-3xl font-semibold leading-tight">{venue.name}</h1>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          {venue.area && (
+          {(venue.address || venue.area) && (
             <span className="inline-flex items-center gap-1 text-muted-foreground">
               <MapPin className="h-3.5 w-3.5" />
-              {venue.area}{cityLabel ? `, ${cityLabel}` : ""}
-            </span>
-          )}
-          {venue.rating > 0 && (
-            <span className="inline-flex items-center gap-1.5">
-              <Star className="h-4 w-4 fill-sun text-sun" />
-              <span className="font-semibold">{venue.rating}</span>
-              <span className="text-muted-foreground">({venue.reviews})</span>
+              {venue.address || `${venue.area}${cityLabel ? `, ${cityLabel}` : ""}`}
             </span>
           )}
         </div>
