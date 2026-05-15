@@ -95,9 +95,7 @@ const VenueDetail = () => {
       {/* Hero */}
       <div className="relative h-[55vh] overflow-hidden">
         {(() => {
-          const userPhoto = contributions.find(c => c.type === "photo")?.data as Record<string, unknown> | undefined;
-          const userPhotoUrl = typeof userPhoto?.image_url === "string" ? userPhoto.image_url : undefined;
-          return <VenueImage venue={venue} userPhotoUrl={userPhotoUrl} size={{ w: 1200, h: 900 }} loading="eager" />;
+          return <VenueImage venue={venue} userPhotoUrl={latestPhotoUrl} size={{ w: 1200, h: 900 }} loading="eager" />;
         })()}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-night/30" />
 
