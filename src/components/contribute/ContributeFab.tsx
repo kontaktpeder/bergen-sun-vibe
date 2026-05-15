@@ -19,8 +19,9 @@ import { toUserErrorMessage } from "@/lib/error-messages";
 import { FLAGS } from "@/lib/flags";
 import { subscribeContributeFab } from "@/lib/contribute-bus";
 import { useCity } from "@/context/CityContext";
-import { inferLegacyCity } from "@/lib/domain";
+import { inferLegacyCity, belongsToCity } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
+import { useFavorites } from "@/lib/favorites";
 import { findPossibleDuplicate } from "@/lib/dedupe-venues";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ type SuccessState = { venueId: string; venueSlug?: string } | null;
 export function ContributeFab() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("menu");
+  const [pendingContrib, setPendingContrib] = useState<ContribMode | null>(null);
   const [success, setSuccess] = useState<SuccessState>(null);
   const { isAuthed, user, profile, loading } = useAuthProfile();
   const params = useParams();
@@ -64,6 +66,7 @@ export function ContributeFab() {
 
   const reset = () => {
     setMode("menu");
+    setPendingContrib(null);
     setSuccess(null);
   };
 
