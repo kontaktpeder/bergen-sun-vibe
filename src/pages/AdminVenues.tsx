@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useIsAdmin } from "@/hooks/useReports";
 import { AdminVenuePhotos } from "@/components/admin/AdminVenuePhotos";
+import { AdminVenueEditor } from "@/components/admin/AdminVenueEditor";
 import { cn } from "@/lib/utils";
 
 type VenueRow = {
@@ -17,6 +18,9 @@ type VenueRow = {
   category: string;
   city: string | null;
   area: string | null;
+  description: string | null;
+  tags: string[] | null;
+  hours: string | null;
   created_at: string;
 };
 
