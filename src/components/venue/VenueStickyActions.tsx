@@ -23,7 +23,7 @@ export function VenueStickyActions({ onMap, onShare, onSave, saved }: Props) {
         className="tap-scale flex items-center justify-center gap-2 rounded-full bg-card py-3 text-sm font-medium shadow-soft"
       >
         <Heart className={cn("h-4 w-4 transition-colors", saved && "fill-primary text-primary")} />
-        {saved ? "Lagret" : "Lagre"}
+        {saved ? "Følger" : "Følg"}
       </button>
       <button
         onClick={onShare}
