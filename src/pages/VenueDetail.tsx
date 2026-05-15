@@ -23,7 +23,9 @@ const VenueDetail = () => {
   const slug = params.slug ?? params.id;
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
-  useFavorites();
+  const { isAuthed } = useAuthProfile();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const [authOpen, setAuthOpen] = useState(false);
   const { data: venue, isLoading, error } = useVenue(slug);
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
   const venueIds = venue?.dbId ? [venue.dbId] : [];
@@ -77,7 +79,11 @@ const VenueDetail = () => {
   };
 
   const handleFav = () => {
-    toggleFavorite(venue.id);
+    if (!isAuthed) {
+      setAuthOpen(true);
+      return;
+    }
+    void toggleFavorite(venue.id);
     toast(fav ? "Fjernet fra dine steder" : "Lagt til dine steder ❤️");
   };
 
