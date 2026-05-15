@@ -6,15 +6,15 @@ import { useVenues } from "@/hooks/useVenues";
 import { belongsToCity } from "@/lib/domain";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { FilterChips } from "@/components/FilterChips";
-import { SunBadge } from "@/components/SunBadge";
-import { DataSunBadge } from "@/components/DataSunBadge";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { VenueMap } from "@/components/VenueMap";
 import { VenueImage } from "@/components/VenueImage";
+import { VenuePreviewBadges } from "@/components/VenuePreviewBadges";
+import { VenueCardFavoriteButton } from "@/components/VenueCardFavoriteButton";
+import { getVenuePreviewBadges } from "@/lib/venuePreviewBadges";
 import { useCity } from "@/context/CityContext";
 import { CityBanner } from "@/components/CityBanner";
 import { cn } from "@/lib/utils";
-import { CrowdTag } from "@/components/VenueCard";
 
 const filters = [
   { id: "all", label: "Alt", emoji: "✨" },
