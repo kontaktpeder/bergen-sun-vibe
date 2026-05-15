@@ -1,7 +1,7 @@
 import { timeAgo } from "@/lib/time";
 import type { VenueContribution } from "@/hooks/useVenueContributions";
 
-export type LiveContribMode = "sun" | "crowd" | "beer" | "photo";
+export type LiveContribMode = "sun" | "crowd" | "beer" | "photo" | "capture-photo";
 
 type Props = {
   contributions: VenueContribution[];
