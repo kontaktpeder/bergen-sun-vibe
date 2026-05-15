@@ -106,7 +106,14 @@ export function ContributeFab() {
     );
   }, [userLoc, cityVenues, favs, badgeMap]);
 
-  // Trigger geolocation when entering confirm step
+  // Warm up GPS as soon as menu opens (not on a venue page) — so confirm step is instant
+  useEffect(() => {
+    if (open && !isOnVenue && !userLoc && !geoLoading) {
+      locate();
+    }
+  }, [open, isOnVenue, userLoc, geoLoading, locate]);
+
+  // Fallback: trigger geolocation when entering confirm step
   useEffect(() => {
     if (mode === "confirm-venue" && !userLoc && !geoLoading) {
       locate();
