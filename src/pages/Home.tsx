@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { SearchOverlay } from "@/components/SearchOverlay";
 import { Search, Sparkles, Sun } from "lucide-react";
@@ -13,6 +13,7 @@ import { useCity } from "@/context/CityContext";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
+import { useUserLocation } from "@/hooks/useUserLocation";
 import { CityBanner } from "@/components/CityBanner";
 
 const filterOptions = [
@@ -46,6 +47,8 @@ const Home = () => {
   const venueIds = useMemo(() => venues.map(v => v.dbId), [venues]);
   const { data: badgeMap = {} } = useVenueBadges(venueIds);
   const { data: photoMap = {} } = useVenuePhotos(venueIds);
+  const { location: userLocation, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
   const sunCount = Object.values(badgeMap).filter(b => b.sun === "sunny").length;
 
   const sectionConfig = useMemo<SectionDef[]>(() => buildSectionConfig(currentCity), [currentCity]);
@@ -221,7 +224,7 @@ const Home = () => {
               <h2 className="mt-1 font-display text-2xl font-semibold">Kveldens utvalgte</h2>
             </div>
           </div>
-          <VenueCard venue={featured} variant="feature" badge={badgeMap[featured.dbId] ?? null} userPhotoUrl={photoMap[featured.dbId] ?? null} eager />
+          <VenueCard venue={featured} variant="feature" badge={badgeMap[featured.dbId] ?? null} userPhotoUrl={photoMap[featured.dbId] ?? null} userLocation={userLocation} eager />
         </section>
       )}
 
@@ -253,6 +256,7 @@ const Home = () => {
                   index={i}
                   badge={badgeMap[v.dbId] ?? null}
                   userPhotoUrl={photoMap[v.dbId] ?? null}
+                  userLocation={userLocation}
                   eager={i < 3}
                 />
               ))}

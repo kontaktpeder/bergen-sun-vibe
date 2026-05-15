@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -8,6 +9,7 @@ import { VenueCardFavoriteButton } from "./VenueCardFavoriteButton";
 import { useLatestVenuePhoto } from "@/hooks/useLatestVenuePhoto";
 import type { VenueBadgeState } from "@/hooks/useVenueBadges";
 import { getVenuePreviewBadges } from "@/lib/venuePreviewBadges";
+import { venueLocationLabel, type UserLatLng } from "@/lib/venueCardMeta";
 
 // Backwards-compat: noen sider importerer fortsatt CrowdTag herfra.
 const CROWD_TAG: Record<string, { emoji: string; label: string; bg: string }> = {
@@ -41,15 +43,21 @@ interface Props {
   index?: number;
   badge?: VenueBadgeState | null;
   userPhotoUrl?: string | null;
+  userLocation?: UserLatLng | null;
   eager?: boolean;
 }
 
 const CARD_SIZE = { w: 600, h: 600 };
 const FEATURE_SIZE = { w: 800, h: 1000 };
 
-export function VenueCard({ venue, variant = "default", index = 0, badge, userPhotoUrl: userPhotoProp, eager }: Props) {
+export function VenueCard({ venue, variant = "default", index = 0, badge, userPhotoUrl: userPhotoProp, userLocation, eager }: Props) {
   const { data: fetchedPhoto } = useLatestVenuePhoto(userPhotoProp === undefined ? venue.dbId : undefined);
   const userPhotoUrl = userPhotoProp !== undefined ? userPhotoProp : fetchedPhoto;
+
+  const locationLabel = useMemo(
+    () => venueLocationLabel(venue, userLocation ?? null),
+    [venue, userLocation],
+  );
 
   const loading = eager ? "eager" : "lazy";
   const fetchPriority = eager ? "high" : "auto";
@@ -79,7 +87,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
             <div className="mb-1 flex items-center gap-2 text-xs/none opacity-90">
               <span className="font-medium">{venue.category}</span>
               <span className="opacity-60">•</span>
-              <span>{venue.area}</span>
+              <span>{locationLabel}</span>
             </div>
             <h3 className="font-display text-2xl font-semibold leading-tight">{venue.name}</h3>
             <div className="mt-2 flex items-center gap-3 text-sm">
@@ -114,7 +122,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
           <h4 className="truncate font-display text-base font-semibold">{venue.name}</h4>
           <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{venue.rating}</span>
-            <span>·</span><span className="capitalize truncate">{venue.category}</span>
+            <span>·</span><span className="capitalize truncate">{venue.category}</span><span>·</span><span className="truncate">{locationLabel}</span>
           </div>
         </div>
       </Link>
@@ -149,7 +157,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
         </div>
         <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{venue.rating}</span>
-          <span>·</span><span>{venue.category}</span><span>·</span><span>{venue.area}</span>
+          <span>·</span><span>{venue.category}</span><span>·</span><span>{locationLabel}</span>
         </div>
       </div>
     </Link>

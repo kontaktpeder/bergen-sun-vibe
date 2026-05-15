@@ -17,6 +17,7 @@ import {
 } from "@/lib/seo";
 import { belongsToCity } from "@/lib/domain";
 import { useCity } from "@/context/CityContext";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 export default function FacetPage() {
   const { citySlug, facetSlug } = useParams<{ citySlug: string; facetSlug: string }>();
@@ -45,6 +46,8 @@ export default function FacetPage() {
   const ids = useMemo(() => items.map((v) => v.dbId), [items]);
   const { data: badgeMap = {} } = useVenueBadges(ids);
   const { data: photoMap = {} } = useVenuePhotos(ids);
+  const { location: userLocation, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
 
   if (!cityName || !facetSlug) {
     return (
@@ -113,6 +116,7 @@ export default function FacetPage() {
                 index={i}
                 badge={badgeMap[v.dbId] ?? null}
                 userPhotoUrl={photoMap[v.dbId] ?? null}
+                userLocation={userLocation}
               />
             ))}
           </div>

@@ -17,6 +17,7 @@ import {
 } from "@/lib/seo";
 import { belongsToCity } from "@/lib/domain";
 import { useCity } from "@/context/CityContext";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 export default function CityPage() {
   const { citySlug } = useParams<{ citySlug: string }>();
@@ -39,6 +40,8 @@ export default function CityPage() {
   const ids = useMemo(() => venues.map((v) => v.dbId), [venues]);
   const { data: badgeMap = {} } = useVenueBadges(ids);
   const { data: photoMap = {} } = useVenuePhotos(ids);
+  const { location: userLocation, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
 
   if (!cityName) {
     // Ukjent by-slug — la NotFound håndtere via redirect
@@ -104,6 +107,7 @@ export default function CityPage() {
                     index={i}
                     badge={badgeMap[v.dbId] ?? null}
                     userPhotoUrl={photoMap[v.dbId] ?? null}
+                    userLocation={userLocation}
                   />
                 ))}
               </div>
@@ -123,6 +127,7 @@ export default function CityPage() {
                   index={i}
                   badge={badgeMap[v.dbId] ?? null}
                   userPhotoUrl={photoMap[v.dbId] ?? null}
+                  userLocation={userLocation}
                 />
               ))}
             </div>

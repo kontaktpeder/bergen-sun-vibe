@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { SeoHead } from "@/components/seo/SeoHead";
 import { buildCanonical } from "@/lib/seo";
 import { citySlugFor } from "@/lib/city-copy";
+import { venueLocationLabel } from "@/lib/venueCardMeta";
 
 const filters = [
   { id: "all", label: "Alt", emoji: "✨" },
@@ -40,6 +41,7 @@ const Explore = () => {
   const [selectedId, setSelectedId] = useState<string | null>(venueParam);
   const [query, setQuery] = useState("");
   const { location: userLoc, loading: locLoading, error: locError, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
 
   const cityVenues = useMemo(
     () => venues.filter(v => belongsToCity(v, city as "Bergen" | "Oslo")),
@@ -183,7 +185,7 @@ const Explore = () => {
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <span>{selected.category}</span>
                       <span>·</span>
-                      <span className="truncate">{selected.area}</span>
+                      <span className="truncate">{venueLocationLabel(selected, userLoc)}</span>
                     </div>
                     <h3 className="mt-0.5 truncate font-display text-base font-semibold">{selected.name}</h3>
                     {selected.rating > 0 && (
@@ -241,7 +243,7 @@ const Explore = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-display text-base font-semibold">{v.name}</div>
-                <div className="truncate text-xs text-muted-foreground">{v.area} · {v.category}</div>
+                <div className="truncate text-xs text-muted-foreground">{venueLocationLabel(v, userLoc)} · {v.category}</div>
                 <div className="mt-1"><VenuePreviewBadges badges={getVenuePreviewBadges(badgeMap[v.dbId])} /></div>
               </div>
               <div className="shrink-0">

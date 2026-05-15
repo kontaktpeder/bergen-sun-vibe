@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenues } from "@/hooks/useVenues";
@@ -14,6 +14,7 @@ import {
   shouldNoIndex,
   slugifyNorwegian,
 } from "@/lib/seo";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 import VenueDetail from "@/pages/VenueDetail";
 
@@ -33,6 +34,8 @@ export default function PlacePage() {
   const ids = useMemo(() => related.map((v) => v.dbId), [related]);
   const { data: badgeMap = {} } = useVenueBadges(ids);
   const { data: photoMap = {} } = useVenuePhotos(ids);
+  const { location: userLocation, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
 
   const desc = venue?.description?.trim() ?? "";
   const hasIntro = desc.length >= 20;
@@ -105,6 +108,7 @@ export default function PlacePage() {
                 index={i}
                 badge={badgeMap[v.dbId] ?? null}
                 userPhotoUrl={photoMap[v.dbId] ?? null}
+                userLocation={userLocation}
               />
             ))}
           </div>
