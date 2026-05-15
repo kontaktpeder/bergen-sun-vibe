@@ -87,7 +87,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
             <div className="mb-1 flex items-center gap-2 text-xs/none opacity-90">
               <span className="font-medium">{venue.category}</span>
               <span className="opacity-60">•</span>
-              <span>{venue.area}</span>
+              <span>{locationLabel}</span>
             </div>
             <h3 className="font-display text-2xl font-semibold leading-tight">{venue.name}</h3>
             <div className="mt-2 flex items-center gap-3 text-sm">
