@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenues } from "@/hooks/useVenues";
