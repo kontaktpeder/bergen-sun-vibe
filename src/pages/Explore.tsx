@@ -185,7 +185,7 @@ const Explore = () => {
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <span>{selected.category}</span>
                       <span>·</span>
-                      <span className="truncate">{selected.area}</span>
+                      <span className="truncate">{venueLocationLabel(selected, userLoc)}</span>
                     </div>
                     <h3 className="mt-0.5 truncate font-display text-base font-semibold">{selected.name}</h3>
                     {selected.rating > 0 && (
