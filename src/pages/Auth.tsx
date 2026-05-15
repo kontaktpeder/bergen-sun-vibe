@@ -119,7 +119,7 @@ const Auth = () => {
         )}
       </div>
 
-      <p className="mt-10 text-center text-xs opacity-70">Laget med ☀️ i Bergen</p>
+      <p className="mt-10 text-center text-xs opacity-70">Laget med ☀️ av Utefolket</p>
     </div>
   );
 };
