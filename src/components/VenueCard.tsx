@@ -43,15 +43,21 @@ interface Props {
   index?: number;
   badge?: VenueBadgeState | null;
   userPhotoUrl?: string | null;
+  userLocation?: UserLatLng | null;
   eager?: boolean;
 }
 
 const CARD_SIZE = { w: 600, h: 600 };
 const FEATURE_SIZE = { w: 800, h: 1000 };
 
-export function VenueCard({ venue, variant = "default", index = 0, badge, userPhotoUrl: userPhotoProp, eager }: Props) {
+export function VenueCard({ venue, variant = "default", index = 0, badge, userPhotoUrl: userPhotoProp, userLocation, eager }: Props) {
   const { data: fetchedPhoto } = useLatestVenuePhoto(userPhotoProp === undefined ? venue.dbId : undefined);
   const userPhotoUrl = userPhotoProp !== undefined ? userPhotoProp : fetchedPhoto;
+
+  const locationLabel = useMemo(
+    () => venueLocationLabel(venue, userLocation ?? null),
+    [venue, userLocation],
+  );
 
   const loading = eager ? "eager" : "lazy";
   const fetchPriority = eager ? "high" : "auto";
