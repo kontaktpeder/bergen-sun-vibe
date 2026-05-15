@@ -47,6 +47,8 @@ const Home = () => {
   const venueIds = useMemo(() => venues.map(v => v.dbId), [venues]);
   const { data: badgeMap = {} } = useVenueBadges(venueIds);
   const { data: photoMap = {} } = useVenuePhotos(venueIds);
+  const { location: userLocation, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
   const sunCount = Object.values(badgeMap).filter(b => b.sun === "sunny").length;
 
   const sectionConfig = useMemo<SectionDef[]>(() => buildSectionConfig(currentCity), [currentCity]);
