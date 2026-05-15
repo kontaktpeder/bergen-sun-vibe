@@ -30,8 +30,7 @@ const VenueDetail = () => {
   const { data: venue, isLoading, error } = useVenue(slug);
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
   const venueIds = venue?.dbId ? [venue.dbId] : [];
-  const { data: badgeMap = {} } = useVenueBadges(venueIds);
-  const badge = venue?.dbId ? badgeMap[venue.dbId] : undefined;
+  useVenueBadges(venueIds);
 
   const openContribute = (mode: "sun" | "beer" | "photo" | "crowd") => {
     setSearchParams({ contribute: mode }, { replace: false });
