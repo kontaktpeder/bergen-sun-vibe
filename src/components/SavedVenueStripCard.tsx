@@ -15,16 +15,30 @@ function latestUpdateAt(venue: Venue, badge?: VenueBadgeState | null): string | 
   return times.reduce((a, b) => (new Date(a) > new Date(b) ? a : b));
 }
 
+function statusLine(badge?: VenueBadgeState | null): string | null {
+  if (!badge) return null;
+  const parts: string[] = [];
+  if (badge.sun === "sunny") parts.push("☀️ Sol nå");
+  else if (badge.sun === "partial") parts.push("⛅ Delvis sol");
+  if (badge.crowd === "full" || badge.crowd === "queue") parts.push("🔥 Livlig");
+  else if (badge.crowd === "some") parts.push("🙂 Litt liv");
+  else if (badge.crowd === "quiet") parts.push("😌 Rolig");
+  if (badge.beerPrice != null) parts.push(`🍺 ${badge.beerPrice} kr`);
+  return parts.length ? parts.slice(0, 2).join(" · ") : null;
+}
+
 interface Props {
   venue: Venue;
   badge?: VenueBadgeState | null;
   userPhotoUrl?: string | null;
   index?: number;
+  hasNewUpdate?: boolean;
 }
 
-export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0 }: Props) {
+export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0, hasNewUpdate = false }: Props) {
   const updatedAt = latestUpdateAt(venue, badge);
   const previewBadges = getVenuePreviewBadges(badge);
+  const status = statusLine(badge);
 
   return (
     <Link
@@ -47,13 +61,23 @@ export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0 }: P
           <VenueCardFavoriteButton venueId={venue.id} />
         </div>
 
+        {hasNewUpdate && (
+          <div className="absolute bottom-[68px] left-2">
+            <span className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground shadow-soft">
+              Ny oppdatering
+            </span>
+          </div>
+        )}
+
         <div className="absolute inset-x-0 bottom-0 p-3 text-white">
           <h4 className="truncate font-display text-base font-semibold">{venue.name}</h4>
-          {updatedAt && (
+          {status ? (
+            <p className="mt-0.5 truncate text-[11px] opacity-90">{status}</p>
+          ) : updatedAt ? (
             <p className="mt-0.5 text-[10px] uppercase tracking-wider opacity-85">
               Oppdatert {timeAgo(updatedAt)}
             </p>
-          )}
+          ) : null}
         </div>
       </div>
     </Link>

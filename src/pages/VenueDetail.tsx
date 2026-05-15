@@ -81,7 +81,11 @@ const VenueDetail = () => {
       return;
     }
     void toggleFavorite(venue.id);
-    toast(fav ? "Fjernet fra dine steder" : "Lagt til dine steder ❤️");
+    if (fav) {
+      toast(`Du følger ikke lenger ${venue.name}`);
+    } else {
+      toast(`Du følger nå ${venue.name}. Nye bilder, priser og solrapporter vises under Dine steder.`);
+    }
   };
 
   const openMap = () => {

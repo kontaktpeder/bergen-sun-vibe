@@ -24,10 +24,10 @@ export function SaveVenueAuthPrompt({ open, onOpenChange }: Props) {
             <Heart className="h-6 w-6 text-primary" />
           </div>
           <DialogTitle className="font-display text-xl">
-            Bli medlem av Utefolket for å lagre steder
+            Bli medlem for å følge steder
           </DialogTitle>
           <DialogDescription>
-            Lagre favorittstedene dine og følg sol, stemning og ølpriser live.
+            Følg favorittstedene dine og få nye bilder, ølpriser og solrapporter samlet ett sted.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-col">

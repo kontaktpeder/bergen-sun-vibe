@@ -31,7 +31,8 @@ export function VenueCardFavoriteButton({ venueId, className, size = "sm" }: Pro
           void toggleFavorite(venueId);
         }}
         className={cn("grid place-items-center rounded-full glass shadow-soft tap-scale", dim, className)}
-        aria-label={fav ? "Fjern fra Dine steder" : "Lagre"}
+        aria-label={fav ? "Slutt å følge sted" : "Følg sted"}
+        title={fav ? "Følger" : "Følg"}
       >
         <Heart className={cn(ic, "transition-colors", fav ? "fill-primary text-primary" : "text-foreground")} />
       </button>
