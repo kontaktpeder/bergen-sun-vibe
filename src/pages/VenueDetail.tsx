@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Clock, Star } from "lucide-react";
 import { toast } from "sonner";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
@@ -17,12 +17,8 @@ import { SaveVenueAuthPrompt } from "@/components/SaveVenueAuthPrompt";
 import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
 import { inferLegacyCity } from "@/lib/domain";
-import { buildVenueContentBlocks } from "@/lib/venueContent";
-import { VenueVibePills } from "@/components/venue/VenueVibePills";
 import { VenueStickyActions } from "@/components/venue/VenueStickyActions";
 import { VenueIntroBlock } from "@/components/venue/VenueIntroBlock";
-import { VenueWorthKnowing } from "@/components/venue/VenueWorthKnowing";
-import { VenueLocalTips } from "@/components/venue/VenueLocalTips";
 import { VenueSection } from "@/components/venue/VenueSection";
 
 const VenueDetail = () => {
@@ -38,11 +34,6 @@ const VenueDetail = () => {
   const venueIds = venue?.dbId ? [venue.dbId] : [];
   const { data: badgeMap = {} } = useVenueBadges(venueIds);
   const badge = venue?.dbId ? badgeMap[venue.dbId] : undefined;
-
-  const content = useMemo(
-    () => (venue ? buildVenueContentBlocks(venue, badge) : null),
-    [venue, badge],
-  );
 
   const openContribute = (mode: "sun" | "beer" | "photo" | "crowd") => {
     setSearchParams({ contribute: mode }, { replace: false });
@@ -63,7 +54,7 @@ const VenueDetail = () => {
     );
   }
 
-  if (!venue || !content) {
+  if (!venue) {
     return (
       <div className="grid min-h-screen place-items-center p-6 text-center">
         <div>
@@ -165,8 +156,6 @@ const VenueDetail = () => {
           )}
         </div>
 
-        <VenueVibePills labels={content.vibeLabels} />
-
         <VenueStickyActions onMap={openMap} onShare={handleShare} onSave={handleFav} saved={fav} />
 
         <VenueSection id="akkurat-na" title="Akkurat nå">
@@ -190,15 +179,17 @@ const VenueDetail = () => {
           </div>
         )}
 
-        <VenueIntroBlock
-          introShort={content.introShort}
-          introFull={content.introFull}
-          showReadMore={content.showReadMore}
-        />
+        {venue.tags.length > 0 && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {venue.tags.map((t) => (
+              <span key={t} className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-foreground">
+                #{t}
+              </span>
+            ))}
+          </div>
+        )}
 
-        <VenueWorthKnowing facts={content.facts} />
-
-        <VenueLocalTips tips={content.tips} />
+        <VenueIntroBlock description={venue.description ?? ""} />
 
         {/* Hours */}
         <div className="mt-6 flex items-center gap-3 rounded-2xl bg-card p-4 shadow-soft">
