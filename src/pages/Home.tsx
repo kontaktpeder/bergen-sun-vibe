@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { SearchOverlay } from "@/components/SearchOverlay";
 import { Search, Sparkles, Sun } from "lucide-react";
@@ -13,6 +13,7 @@ import { useCity } from "@/context/CityContext";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
+import { useUserLocation } from "@/hooks/useUserLocation";
 import { CityBanner } from "@/components/CityBanner";
 
 const filterOptions = [
