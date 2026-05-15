@@ -40,7 +40,7 @@ export function BottomNav() {
               className="tap-scale flex flex-col items-center gap-0.5 px-2"
             >
               <span className="-mt-5 grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-primary to-sunset-pink text-white shadow-float">
-                <Camera className="h-6 w-6" strokeWidth={2.5} />
+                <Plus className="h-7 w-7" strokeWidth={2.5} />
               </span>
               <span className="text-[10px] font-semibold text-foreground">Del nå</span>
             </button>
