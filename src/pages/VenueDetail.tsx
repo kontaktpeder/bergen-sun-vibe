@@ -1,11 +1,9 @@
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, MapPin, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
-import { SunBadge } from "@/components/SunBadge";
-import { DataSunBadge } from "@/components/DataSunBadge";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { ReportButton } from "@/components/ReportButton";
 import { VenueStatusBadges } from "@/components/VenueStatusBadges";
@@ -15,7 +13,7 @@ import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { SaveVenueAuthPrompt } from "@/components/SaveVenueAuthPrompt";
 import { timeAgo } from "@/lib/time";
-import { cn } from "@/lib/utils";
+
 import { inferLegacyCity } from "@/lib/domain";
 import { VenueStickyActions } from "@/components/venue/VenueStickyActions";
 import { VenueIntroBlock } from "@/components/venue/VenueIntroBlock";
@@ -32,8 +30,7 @@ const VenueDetail = () => {
   const { data: venue, isLoading, error } = useVenue(slug);
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
   const venueIds = venue?.dbId ? [venue.dbId] : [];
-  const { data: badgeMap = {} } = useVenueBadges(venueIds);
-  const badge = venue?.dbId ? badgeMap[venue.dbId] : undefined;
+  useVenueBadges(venueIds);
 
   const openContribute = (mode: "sun" | "beer" | "photo" | "crowd") => {
     setSearchParams({ contribute: mode }, { replace: false });
@@ -106,24 +103,19 @@ const VenueDetail = () => {
         })()}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-night/30" />
 
-        <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-5 pt-[max(env(safe-area-inset-top),1rem)]">
+        <div className="absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 px-5 pt-[max(env(safe-area-inset-top),1rem)]">
           <button onClick={() => navigate(-1)} className="grid h-10 w-10 place-items-center rounded-full glass shadow-soft tap-scale">
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <div className="flex gap-2">
-            <button onClick={handleShare} className="grid h-10 w-10 place-items-center rounded-full glass shadow-soft tap-scale">
-              <Share2 className="h-4 w-4" />
-            </button>
-            <button onClick={handleFav} className="grid h-10 w-10 place-items-center rounded-full glass shadow-soft tap-scale">
-              <Heart className={cn("h-4 w-4 transition-colors", fav && "fill-primary text-primary")} />
-            </button>
-          </div>
-        </div>
-
-        <div className="absolute bottom-16 left-5 right-5">
-          {badge && badge.sun
-            ? <DataSunBadge badge={badge} size="md" />
-            : <SunBadge status={venue.sunStatus} until={venue.sunUntil} size="md" />}
+          {(() => {
+            const latest = contributions[0]?.created_at;
+            return (
+              <span className="inline-flex items-center gap-1.5 rounded-full glass px-3 py-2 text-xs font-medium shadow-soft">
+                <Clock className="h-3.5 w-3.5" />
+                {latest ? `Sist oppdatert ${timeAgo(latest)}` : "Trenger ditt bidrag"}
+              </span>
+            );
+          })()}
         </div>
       </div>
 
@@ -194,10 +186,6 @@ const VenueDetail = () => {
           )}
         </div>
 
-        {/* Last updated */}
-        <div className="mt-4 text-xs text-muted-foreground">
-          Sist oppdatert {timeAgo(venue.lastActivityAt)}
-        </div>
 
         {/* Mini-feed */}
         {contributions.length > 0 && (
