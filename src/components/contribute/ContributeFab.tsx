@@ -561,7 +561,7 @@ function PickVenueStep({
   onBack,
 }: {
   contrib: ContribMode | null;
-  onPick: (slug: string) => void;
+  onPick: (venue: Venue) => void;
   onExplore: () => void;
   onBack: () => void;
 }) {
