@@ -350,6 +350,7 @@ export function ContributeFab() {
             <ConfirmVenueStep
               result={guessResult}
               loading={geoLoading || (!userLoc && !guessResult)}
+              title={confirmTitleFor(pendingPayload)}
               onConfirm={(venue) => {
                 if (!pendingPayload || submitting) return;
                 void submitForVenue(venue.dbId, pendingPayload);
