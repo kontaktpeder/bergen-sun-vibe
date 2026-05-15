@@ -53,7 +53,7 @@ export default function PlacePage() {
     );
   }
 
-  const hasImage_ = false; // placeholder removed below
+  
   const hasImage = !!venue?.image;
   const hasTags = !!venue?.tags && venue.tags.length > 0;
   const hasName = !!venue?.name;
