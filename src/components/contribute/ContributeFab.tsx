@@ -653,7 +653,7 @@ function PickVenueStep({
   onExplore: () => void;
   onBack: () => void;
 }) {
-  const favs = useFavorites();
+  const { favorites: favs } = useFavorites();
   const { currentCity } = useCity();
   const { data: allVenues = [] } = useVenues();
   const saved = allVenues.filter(

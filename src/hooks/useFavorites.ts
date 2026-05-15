@@ -22,8 +22,7 @@ export function useFavorites(): UseFavoritesResult {
     staleTime: 60_000,
     queryFn: async (): Promise<string[]> => {
       const { data, error } = await supabase
-        .from("user_favorites")
-        // @ts-expect-error types not regenerated
+        .from("user_favorites" as never)
         .select("venue_id, venues(slug)")
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -51,7 +50,7 @@ export function useFavorites(): UseFavoritesResult {
       const isFav = favorites.includes(slug);
       if (isFav) {
         const { error } = await supabase
-          .from("user_favorites")
+          .from("user_favorites" as never)
           .delete()
           .eq("user_id", userId)
           .eq("venue_id", venueId);
@@ -59,9 +58,8 @@ export function useFavorites(): UseFavoritesResult {
         return false;
       } else {
         const { error } = await supabase
-          .from("user_favorites")
-          // @ts-expect-error types not regenerated
-          .insert({ user_id: userId, venue_id: venueId });
+          .from("user_favorites" as never)
+          .insert({ user_id: userId, venue_id: venueId } as never);
         if (error) throw error;
         return true;
       }
