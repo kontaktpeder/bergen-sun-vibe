@@ -41,6 +41,7 @@ const Explore = () => {
   const [selectedId, setSelectedId] = useState<string | null>(venueParam);
   const [query, setQuery] = useState("");
   const { location: userLoc, loading: locLoading, error: locError, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
 
   const cityVenues = useMemo(
     () => venues.filter(v => belongsToCity(v, city as "Bergen" | "Oslo")),
