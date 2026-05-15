@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Heart, Map, User, Camera } from "lucide-react";
+import { Heart, Map, User, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { openContributeFab } from "@/lib/contribute-bus";
 import { FLAGS } from "@/lib/flags";
