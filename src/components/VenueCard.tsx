@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -8,6 +9,7 @@ import { VenueCardFavoriteButton } from "./VenueCardFavoriteButton";
 import { useLatestVenuePhoto } from "@/hooks/useLatestVenuePhoto";
 import type { VenueBadgeState } from "@/hooks/useVenueBadges";
 import { getVenuePreviewBadges } from "@/lib/venuePreviewBadges";
+import { venueLocationLabel, type UserLatLng } from "@/lib/venueCardMeta";
 
 // Backwards-compat: noen sider importerer fortsatt CrowdTag herfra.
 const CROWD_TAG: Record<string, { emoji: string; label: string; bg: string }> = {
