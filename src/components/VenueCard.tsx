@@ -157,7 +157,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
         </div>
         <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{venue.rating}</span>
-          <span>·</span><span>{venue.category}</span><span>·</span><span>{venue.area}</span>
+          <span>·</span><span>{venue.category}</span><span>·</span><span>{locationLabel}</span>
         </div>
       </div>
     </Link>
