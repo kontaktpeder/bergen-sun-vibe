@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -6,8 +6,9 @@ import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { ReportButton } from "@/components/ReportButton";
-import { VenueStatusBadges } from "@/components/VenueStatusBadges";
+import { VenueLiveStatus } from "@/components/venue/VenueLiveStatus";
 import { VenuePhotoGallery } from "@/components/VenuePhotoGallery";
+import { openContributeFab } from "@/lib/contribute-bus";
 import { VenueImage } from "@/components/VenueImage";
 import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
