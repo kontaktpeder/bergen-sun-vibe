@@ -34,6 +34,8 @@ export default function PlacePage() {
   const ids = useMemo(() => related.map((v) => v.dbId), [related]);
   const { data: badgeMap = {} } = useVenueBadges(ids);
   const { data: photoMap = {} } = useVenuePhotos(ids);
+  const { location: userLocation, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
 
   const desc = venue?.description?.trim() ?? "";
   const hasIntro = desc.length >= 20;
