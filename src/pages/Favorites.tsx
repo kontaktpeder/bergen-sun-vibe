@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { useFavorites } from "@/lib/favorites";
+import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useVenues } from "@/hooks/useVenues";
 import { useCity } from "@/context/CityContext";
 import { belongsToCity } from "@/lib/domain";
@@ -15,9 +16,11 @@ import { buildCanonical } from "@/lib/seo";
 import { citySlugFor } from "@/lib/city-copy";
 
 const Favorites = () => {
-  const favs = useFavorites();
+  const { favorites: favs, isLoading: favsLoading } = useFavorites();
+  const { isAuthed, loading: authLoading } = useAuthProfile();
   const { currentCity } = useCity();
-  const { data: allVenues = [], isLoading } = useVenues();
+  const { data: allVenues = [], isLoading: venuesLoading } = useVenues();
+  const isLoading = venuesLoading || authLoading || (isAuthed && favsLoading);
 
   const savedVenues = useMemo(
     () =>
@@ -60,7 +63,25 @@ const Favorites = () => {
         <div className="mt-10 text-sm text-muted-foreground">Laster…</div>
       )}
 
-      {!isLoading && !hasSaved && (
+      {!isLoading && !isAuthed && (
+        <div className="mt-10 overflow-hidden rounded-3xl bg-gradient-to-br from-night via-sunset-purple to-primary p-7 text-white shadow-card">
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-sun shadow-glow">
+            <Heart className="h-6 w-6 text-night" strokeWidth={2.5} />
+          </div>
+          <h2 className="mt-5 font-display text-2xl font-semibold">Bli medlem av Utefolket</h2>
+          <p className="mt-2 text-sm opacity-85">
+            Lagre favorittstedene dine og følg sol, stemning og ølpriser live.
+          </p>
+          <Link
+            to="/auth"
+            className="tap-scale mt-6 inline-flex w-full items-center justify-center rounded-full bg-sun py-3.5 font-semibold text-night"
+          >
+            Opprett konto eller logg inn
+          </Link>
+        </div>
+      )}
+
+      {!isLoading && isAuthed && !hasSaved && (
         <div className="mt-16 grid place-items-center text-center">
           <div className="grid h-20 w-20 place-items-center rounded-full bg-secondary">
             <Heart className="h-8 w-8 text-muted-foreground" />
