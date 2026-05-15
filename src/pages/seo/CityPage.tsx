@@ -107,6 +107,7 @@ export default function CityPage() {
                     index={i}
                     badge={badgeMap[v.dbId] ?? null}
                     userPhotoUrl={photoMap[v.dbId] ?? null}
+                    userLocation={userLocation}
                   />
                 ))}
               </div>
