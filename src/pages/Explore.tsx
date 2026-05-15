@@ -15,6 +15,9 @@ import { getVenuePreviewBadges } from "@/lib/venuePreviewBadges";
 import { useCity } from "@/context/CityContext";
 import { CityBanner } from "@/components/CityBanner";
 import { cn } from "@/lib/utils";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { buildCanonical } from "@/lib/seo";
+import { citySlugFor } from "@/lib/city-copy";
 
 const filters = [
   { id: "all", label: "Alt", emoji: "✨" },
