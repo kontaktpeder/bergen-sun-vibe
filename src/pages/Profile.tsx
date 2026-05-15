@@ -7,6 +7,9 @@ import { useIsAdmin } from "@/hooks/useReports";
 import { supabase } from "@/integrations/supabase/client";
 import { getLevel, getNextLevelThreshold, getLevelProgress } from "@/lib/levels";
 import { useCity, type City } from "@/context/CityContext";
+import { cityFooter, citySlugFor } from "@/lib/city-copy";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { buildCanonical } from "@/lib/seo";
 
 const Profile = () => {
   const favs = useFavorites();
