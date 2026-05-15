@@ -13,6 +13,7 @@ import { VenueImage } from "@/components/VenueImage";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
+import { inferLegacyCity } from "@/lib/domain";
 
 const VenueDetail = () => {
   const params = useParams<{ id?: string; slug?: string }>();
