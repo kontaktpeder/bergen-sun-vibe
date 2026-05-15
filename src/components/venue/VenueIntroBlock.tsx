@@ -1,34 +1,35 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { cn } from "@/lib/utils";
 import { VenueSection } from "./VenueSection";
 
 interface Props {
-  introShort: string;
-  introFull: string;
-  showReadMore: boolean;
+  description: string;
 }
 
-export function VenueIntroBlock({ introShort, introFull, showReadMore }: Props) {
-  const [open, setOpen] = useState(false);
+const PREVIEW_LEN = 280;
 
-  if (!introShort.trim()) return null;
+export function VenueIntroBlock({ description }: Props) {
+  const [open, setOpen] = useState(false);
+  const trimmed = description.trim();
+  if (!trimmed) return null;
+
+  const showReadMore = trimmed.length > PREVIEW_LEN + 20;
+  const preview = showReadMore
+    ? trimmed.slice(0, PREVIEW_LEN).replace(/\s+\S*$/, "") + "…"
+    : trimmed;
 
   return (
     <VenueSection id="om-stedet" title="Om stedet">
-      <p className="text-[15px] leading-relaxed text-foreground/85">{introShort}</p>
-
+      <p className="text-[15px] leading-relaxed text-foreground/85 whitespace-pre-line">
+        {open ? trimmed : preview}
+      </p>
       {showReadMore && (
-        <Collapsible open={open} onOpenChange={setOpen} className="mt-2">
-          <CollapsibleTrigger className="inline-flex items-center gap-1 text-sm font-medium text-primary tap-scale">
-            {open ? "Vis mindre" : "Les mer"}
-            <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {introFull}
-          </CollapsibleContent>
-        </Collapsible>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="mt-2 text-sm font-medium text-primary tap-scale"
+        >
+          {open ? "Vis mindre" : "Les mer"}
+        </button>
       )}
     </VenueSection>
   );

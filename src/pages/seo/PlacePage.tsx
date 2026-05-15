@@ -14,7 +14,7 @@ import {
   shouldNoIndex,
   slugifyNorwegian,
 } from "@/lib/seo";
-import { buildVenueContentBlocks } from "@/lib/venueContent";
+
 import VenueDetail from "@/pages/VenueDetail";
 
 export default function PlacePage() {
@@ -34,10 +34,8 @@ export default function PlacePage() {
   const { data: badgeMap = {} } = useVenueBadges(ids);
   const { data: photoMap = {} } = useVenuePhotos(ids);
 
-  const venueBadgeIds = useMemo(() => (venue?.dbId ? [venue.dbId] : []), [venue?.dbId]);
-  const { data: venueBadgeMap = {} } = useVenueBadges(venueBadgeIds);
-  const venueBadge = venue?.dbId ? venueBadgeMap[venue.dbId] : undefined;
-  const contentBlocks = venue ? buildVenueContentBlocks(venue, venueBadge) : null;
+  const desc = venue?.description?.trim() ?? "";
+  const hasIntro = desc.length >= 20;
 
   if (!isLoading && !venue) {
     return (
@@ -55,7 +53,7 @@ export default function PlacePage() {
     );
   }
 
-  const hasIntro = !!contentBlocks?.introShort && contentBlocks.introShort.length >= 20;
+  
   const hasImage = !!venue?.image;
   const hasTags = !!venue?.tags && venue.tags.length > 0;
   const hasName = !!venue?.name;
@@ -83,7 +81,7 @@ export default function PlacePage() {
           description={buildDescription("place", {
             name: venue.name,
             city: venue.city ?? "",
-            description: contentBlocks?.introShort ?? venue.description,
+            description: desc,
           })}
           canonical={buildCanonical(`/steder/${venue.id}`)}
           robots={noindex ? "noindex,follow" : "index,follow"}
