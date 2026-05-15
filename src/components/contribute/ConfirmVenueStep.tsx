@@ -7,6 +7,7 @@ import { VenueImage } from "@/components/VenueImage";
 interface Props {
   result: VenueGuessResult | null;
   loading?: boolean;
+  title?: string;
   onConfirm: (venue: Venue) => void;
   onChangeVenue: () => void;
   onExplore: () => void;
@@ -15,6 +16,7 @@ interface Props {
 export function ConfirmVenueStep({
   result,
   loading,
+  title,
   onConfirm,
   onChangeVenue,
   onExplore,
