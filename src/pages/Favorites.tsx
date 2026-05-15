@@ -74,7 +74,7 @@ const Favorites = () => {
         <>
           <section className="mt-6">
             <h2 className="px-1 font-display text-lg font-semibold">Stedene dine</h2>
-            <div className="-mx-5 mt-3 flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide">
+            <div className="mt-3 grid grid-cols-2 gap-3">
               {savedVenues.map((v, i) => (
                 <SavedVenueStripCard
                   key={v.id}
