@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
+import { useLatestVenuePhoto } from "@/hooks/useLatestVenuePhoto";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { ReportButton } from "@/components/ReportButton";
 import { VenueLiveStatus } from "@/components/venue/VenueLiveStatus";
