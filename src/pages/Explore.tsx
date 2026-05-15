@@ -113,7 +113,7 @@ const Explore = () => {
           <VenueMap
             venues={filtered}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={handleSelect}
             fallbackCenter={CITY_CENTERS[city]}
             userLocation={userLoc}
             flyToSelectedOnMount={!!venueParam}
