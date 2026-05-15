@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { ArrowLeft, Shield, Trash2, Search } from "lucide-react";
+import { ArrowLeft, Shield, Trash2, Search, Image as ImageIcon, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useIsAdmin } from "@/hooks/useReports";
+import { AdminVenuePhotos } from "@/components/admin/AdminVenuePhotos";
+import { cn } from "@/lib/utils";
 
 type VenueRow = {
   id: string;
