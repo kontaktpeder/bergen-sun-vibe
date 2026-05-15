@@ -605,7 +605,7 @@ function PickVenueStep({
             {saved.map((v) => (
               <li key={v.id}>
                 <button
-                  onClick={() => onPick(v.id)}
+                  onClick={() => onPick(v)}
                   className="tap-scale flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left shadow-soft"
                 >
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
