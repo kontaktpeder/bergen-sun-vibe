@@ -44,3 +44,31 @@ export function showRewardFeedback(args: RewardArgs) {
     });
   }
 }
+
+export function showCombinedRewardFeedback(args: {
+  venueName: string;
+  pending: PendingPayload;
+  totalPoints: number;
+  beforePoints: number;
+  afterPoints: number;
+}) {
+  const action = pendingActionLine(args.pending);
+  showReward({
+    emoji: "✨",
+    title: `Du opprettet ${args.venueName}`,
+    subtitle: `${action.emoji} ${action.label}`,
+    points: args.totalPoints,
+    variant: "venue",
+  });
+
+  const oldLevel = getLevel(args.beforePoints);
+  const newLevel = getLevel(args.afterPoints);
+  if (oldLevel !== newLevel) {
+    showReward({
+      emoji: "🎉",
+      title: `Nivå opp! Du er nå ${newLevel}`,
+      subtitle: "Fortsett å bidra for å låse opp mer.",
+      variant: "levelup",
+    });
+  }
+}
