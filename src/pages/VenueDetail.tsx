@@ -13,7 +13,7 @@ import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { SaveVenueAuthPrompt } from "@/components/SaveVenueAuthPrompt";
 import { timeAgo } from "@/lib/time";
-import { cn } from "@/lib/utils";
+
 import { inferLegacyCity } from "@/lib/domain";
 import { VenueStickyActions } from "@/components/venue/VenueStickyActions";
 import { VenueIntroBlock } from "@/components/venue/VenueIntroBlock";
