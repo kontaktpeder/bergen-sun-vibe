@@ -45,6 +45,12 @@ const Profile = () => {
   if (!isAuthed) {
     return (
       <div className="px-5 pt-[max(env(safe-area-inset-top),1.5rem)] pb-12">
+        <SeoHead
+          title={`Min profil — Utefolket ${currentCity}`}
+          description={`Bli en del av Utefolket i ${currentCity}. Bidra med sol, stemning og ølpriser.`}
+          canonical={buildCanonical(`/${citySlugFor(currentCity)}`)}
+          robots="noindex,follow"
+        />
         <div className="mt-10 overflow-hidden rounded-3xl bg-gradient-to-br from-night via-sunset-purple to-primary p-7 text-white shadow-card">
           <div className="grid h-12 w-12 place-items-center rounded-full bg-sun shadow-glow">
             <Sun className="h-6 w-6 text-night" strokeWidth={2.5} />
@@ -61,7 +67,7 @@ const Profile = () => {
           </button>
         </div>
 
-        <p className="mt-10 text-center text-xs text-muted-foreground">v1.0 · Laget med ☀️ i Bergen</p>
+        <p className="mt-10 text-center text-xs text-muted-foreground">v1.0 · {cityFooter(currentCity)}</p>
       </div>
     );
   }
