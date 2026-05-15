@@ -14,6 +14,7 @@ import {
   shouldNoIndex,
   slugifyNorwegian,
 } from "@/lib/seo";
+import { buildVenueContentBlocks } from "@/lib/venueContent";
 import VenueDetail from "@/pages/VenueDetail";
 
 export default function PlacePage() {
