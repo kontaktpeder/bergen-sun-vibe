@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Loader2, MapPin, Search, Star } from "lucide-react";
 import { MobileSheet } from "@/components/ui/mobile-sheet";
@@ -8,6 +8,8 @@ import { useVenue } from "@/hooks/useVenue";
 import { useAddContribution } from "@/hooks/useAddContribution";
 import { useUploadImage } from "@/hooks/useUploadImage";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
+import { useUserLocation } from "@/hooks/useUserLocation";
+import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,10 +21,12 @@ import { toUserErrorMessage } from "@/lib/error-messages";
 import { FLAGS } from "@/lib/flags";
 import { subscribeContributeFab } from "@/lib/contribute-bus";
 import { useCity } from "@/context/CityContext";
-import { inferLegacyCity, belongsToCity } from "@/lib/domain";
+import { inferLegacyCity, belongsToCity, type Venue } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
 import { useFavorites } from "@/lib/favorites";
 import { findPossibleDuplicate } from "@/lib/dedupe-venues";
+import { resolveVenueGuess, type VenueGuessResult } from "@/lib/resolveVenueGuess";
+import { ConfirmVenueStep } from "@/components/contribute/ConfirmVenueStep";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import type { VenueAddPayload, SunStatus, CrowdLevel } from "@/lib/contribution-types";
@@ -32,14 +36,32 @@ const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Oslo: { lat: 59.9139, lng: 10.7522 },
 };
 
-type Mode = "menu" | "pick-venue" | "sun" | "beer" | "photo" | "venue" | "crowd";
+type Mode =
+  | "menu"
+  | "pick-venue"
+  | "confirm-venue"
+  | "capture-photo"
+  | "sun"
+  | "beer"
+  | "photo"
+  | "venue"
+  | "crowd";
 type ContribMode = "sun" | "beer" | "photo" | "crowd";
+
+type PendingPayload =
+  | { type: "sun"; status: SunStatus }
+  | { type: "crowd"; level: CrowdLevel }
+  | { type: "beer"; price: number; isConfirm: boolean }
+  | { type: "photo"; file: File };
+
 type SuccessState = { venueId: string; venueSlug?: string } | null;
 
 export function ContributeFab() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("menu");
   const [pendingContrib, setPendingContrib] = useState<ContribMode | null>(null);
+  const [pendingPayload, setPendingPayload] = useState<PendingPayload | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<SuccessState>(null);
   const { isAuthed, user, profile, loading } = useAuthProfile();
   const params = useParams();
@@ -64,9 +86,41 @@ export function ContributeFab() {
   const addContribution = useAddContribution(user?.id);
   const { upload } = useUploadImage();
 
+  // Venue guess data
+  const { currentCity } = useCity();
+  const { data: allVenues = [] } = useVenues();
+  const favs = useFavorites();
+  const cityVenues = useMemo(
+    () => allVenues.filter((v) => belongsToCity(v, currentCity as "Bergen" | "Oslo")),
+    [allVenues, currentCity],
+  );
+  const cityVenueIds = useMemo(() => cityVenues.map((v) => v.dbId), [cityVenues]);
+  const { data: badgeMap = {} } = useVenueBadges(cityVenueIds);
+  const { location: userLoc, loading: geoLoading, locate } = useUserLocation();
+
+  const guessResult: VenueGuessResult | null = useMemo(() => {
+    if (!userLoc) return null;
+    return resolveVenueGuess(
+      userLoc.lat,
+      userLoc.lng,
+      cityVenues,
+      favs,
+      badgeMap,
+    );
+  }, [userLoc, cityVenues, favs, badgeMap]);
+
+  // Trigger geolocation when entering confirm step
+  useEffect(() => {
+    if (mode === "confirm-venue" && !userLoc && !geoLoading) {
+      locate();
+    }
+  }, [mode, userLoc, geoLoading, locate]);
+
   const reset = () => {
     setMode("menu");
     setPendingContrib(null);
+    setPendingPayload(null);
+    setSubmitting(false);
     setSuccess(null);
   };
 
@@ -78,6 +132,87 @@ export function ContributeFab() {
     }
     setTimeout(reset, 300);
   };
+
+  const beforePoints = profile?.points ?? 0;
+
+  const submitForVenue = useCallback(
+    async (venueId: string, payload: PendingPayload) => {
+      setSubmitting(true);
+      try {
+        if (payload.type === "sun") {
+          const r = await addContribution.mutateAsync({
+            type: "sun_report",
+            venueId,
+            data: { status: payload.status },
+          });
+          showRewardFeedback({
+            type: "sun_report",
+            awardedPoints: r.awardedPoints,
+            beforePoints,
+            afterPoints: r.newPoints,
+          });
+        } else if (payload.type === "crowd") {
+          const r = await addContribution.mutateAsync({
+            type: "crowd_report",
+            venueId,
+            data: { level: payload.level },
+          });
+          showRewardFeedback({
+            type: "crowd_report",
+            awardedPoints: r.awardedPoints,
+            beforePoints,
+            afterPoints: r.newPoints,
+          });
+        } else if (payload.type === "beer") {
+          const r = await addContribution.mutateAsync({
+            type: "beer_price",
+            venueId,
+            data: { price: payload.price, label: "cheapest" },
+            isConfirm: payload.isConfirm,
+          });
+          showRewardFeedback({
+            type: "beer_price",
+            awardedPoints: r.awardedPoints,
+            beforePoints,
+            afterPoints: r.newPoints,
+            isBeerConfirm: payload.isConfirm,
+          });
+        } else if (payload.type === "photo") {
+          if (!user?.id) return;
+          const url = await upload(payload.file, user.id);
+          const r = await addContribution.mutateAsync({
+            type: "photo",
+            venueId,
+            data: { image_url: url },
+          });
+          showRewardFeedback({
+            type: "photo",
+            awardedPoints: r.awardedPoints,
+            beforePoints,
+            afterPoints: r.newPoints,
+          });
+        }
+        close();
+      } catch (e) {
+        const raw = e instanceof Error ? e.message : String(e);
+        if (raw.toLowerCase().includes("cooldown")) {
+          showReward({
+            emoji: "👌",
+            title: "Allerede oppdatert",
+            subtitle: "Du kan rapportere igjen om noen minutter.",
+            variant: "points",
+          });
+          close();
+          return;
+        }
+        toast.error(toUserErrorMessage(e));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [addContribution, beforePoints, upload, user?.id],
+  );
 
   // Bus subscription: BottomNav + plus opens this sheet
   useEffect(() => {
@@ -96,9 +231,12 @@ export function ContributeFab() {
     setMode(c as Mode);
   }, [searchParams]);
 
-  const beforePoints = profile?.points ?? 0;
-
   if (loading) return null;
+
+  const stashAndConfirm = (p: PendingPayload) => {
+    setPendingPayload(p);
+    setMode("confirm-venue");
+  };
 
   return (
     <>
@@ -135,119 +273,89 @@ export function ContributeFab() {
             <Menu
               isOnVenue={isOnVenue}
               onPick={(m) => {
-                if (m === "venue" || isOnVenue) {
+                if (m === "venue") {
+                  setMode("venue");
+                  return;
+                }
+                if (isOnVenue) {
                   setMode(m);
                   return;
                 }
-                // Global contribute → need to pick a venue first
                 setPendingContrib(m as ContribMode);
-                setMode("pick-venue");
+                if (m === "photo") {
+                  setMode("capture-photo");
+                } else {
+                  setMode(m);
+                }
+              }}
+            />
+          ) : mode === "capture-photo" ? (
+            <CapturePhotoStep
+              onPicked={(file) => stashAndConfirm({ type: "photo", file })}
+              onBack={() => setMode("menu")}
+            />
+          ) : mode === "confirm-venue" ? (
+            <ConfirmVenueStep
+              result={guessResult}
+              loading={geoLoading || (!userLoc && !guessResult)}
+              onConfirm={(venue) => {
+                if (!pendingPayload || submitting) return;
+                void submitForVenue(venue.dbId, pendingPayload);
+              }}
+              onChangeVenue={() => setMode("pick-venue")}
+              onExplore={() => {
+                close();
+                navigate("/explore");
               }}
             />
           ) : mode === "pick-venue" ? (
             <PickVenueStep
               contrib={pendingContrib}
-              onPick={(slug) => {
-                close();
-                navigate(`/steder/${slug}?contribute=${pendingContrib}`);
+              onPick={(venue) => {
+                if (pendingPayload) {
+                  void submitForVenue(venue.dbId, pendingPayload);
+                } else {
+                  close();
+                  navigate(`/steder/${venue.id}?contribute=${pendingContrib}`);
+                }
               }}
               onExplore={() => {
                 close();
                 navigate("/explore");
               }}
-              onBack={() => setMode("menu")}
+              onBack={() => setMode(pendingPayload ? "confirm-venue" : "menu")}
             />
           ) : mode === "sun" ? (
             <SunForm
-              venueId={venueDbId}
+              venueId={venueDbId ?? "global"}
               onDone={async (status) => {
-                if (!venueDbId) return toast.error("Velg et sted først.");
-                try {
-                  const r = await addContribution.mutateAsync({
-                    type: "sun_report",
-                    venueId: venueDbId,
-                    data: { status },
-                  });
-                  showRewardFeedback({
-                    type: "sun_report",
-                    awardedPoints: r.awardedPoints,
-                    beforePoints,
-                    afterPoints: r.newPoints,
-                  });
-                  close();
-                } catch (e) {
-                  const raw = e instanceof Error ? e.message : String(e);
-                  if (raw.toLowerCase().includes("cooldown")) {
-                    showReward({
-                      emoji: "👌",
-                      title: "Sola er allerede oppdatert",
-                      subtitle: "Du kan rapportere igjen om noen minutter.",
-                      variant: "points",
-                    });
-                    close();
-                    return;
-                  }
-                  toast.error(toUserErrorMessage(e));
+                if (isOnVenue && venueDbId) {
+                  await submitForVenue(venueDbId, { type: "sun", status });
+                } else {
+                  stashAndConfirm({ type: "sun", status });
                 }
               }}
             />
           ) : mode === "crowd" ? (
             <CrowdForm
-              venueId={venueDbId}
+              venueId={venueDbId ?? "global"}
               onDone={async (level) => {
-                if (!venueDbId) return toast.error("Velg et sted først.");
-                try {
-                  const r = await addContribution.mutateAsync({
-                    type: "crowd_report",
-                    venueId: venueDbId,
-                    data: { level },
-                  });
-                  showRewardFeedback({
-                    type: "crowd_report",
-                    awardedPoints: r.awardedPoints,
-                    beforePoints,
-                    afterPoints: r.newPoints,
-                  });
-                  close();
-                } catch (e) {
-                  const raw = e instanceof Error ? e.message : String(e);
-                  if (raw.toLowerCase().includes("cooldown")) {
-                    showReward({
-                      emoji: "👌",
-                      title: "Stemningen er allerede oppdatert",
-                      subtitle: "Du kan rapportere igjen om noen minutter.",
-                      variant: "points",
-                    });
-                    close();
-                    return;
-                  }
-                  toast.error(toUserErrorMessage(e));
+                if (isOnVenue && venueDbId) {
+                  await submitForVenue(venueDbId, { type: "crowd", level });
+                } else {
+                  stashAndConfirm({ type: "crowd", level });
                 }
               }}
             />
           ) : mode === "beer" ? (
             <BeerForm
-              venueId={venueDbId}
-              lastPrice={FLAGS.beerConfirmFlowEnabled ? lastBeer : null}
+              venueId={venueDbId ?? "global"}
+              lastPrice={isOnVenue && FLAGS.beerConfirmFlowEnabled ? lastBeer : null}
               onDone={async (price, isConfirm) => {
-                if (!venueDbId) return toast.error("Velg et sted først.");
-                try {
-                  const r = await addContribution.mutateAsync({
-                    type: "beer_price",
-                    venueId: venueDbId,
-                    data: { price, label: "cheapest" },
-                    isConfirm,
-                  });
-                  showRewardFeedback({
-                    type: "beer_price",
-                    awardedPoints: r.awardedPoints,
-                    beforePoints,
-                    afterPoints: r.newPoints,
-                    isBeerConfirm: isConfirm,
-                  });
-                  close();
-                } catch (e) {
-                  toast.error(toUserErrorMessage(e));
+                if (isOnVenue && venueDbId) {
+                  await submitForVenue(venueDbId, { type: "beer", price, isConfirm });
+                } else {
+                  stashAndConfirm({ type: "beer", price, isConfirm });
                 }
               }}
             />
@@ -256,24 +364,7 @@ export function ContributeFab() {
               venueId={venueDbId}
               onDone={async (file) => {
                 if (!venueDbId) return toast.error("Velg et sted først.");
-                if (!user?.id) return;
-                try {
-                  const url = await upload(file, user.id);
-                  const r = await addContribution.mutateAsync({
-                    type: "photo",
-                    venueId: venueDbId,
-                    data: { image_url: url },
-                  });
-                  showRewardFeedback({
-                    type: "photo",
-                    awardedPoints: r.awardedPoints,
-                    beforePoints,
-                    afterPoints: r.newPoints,
-                  });
-                  close();
-                } catch (e) {
-                  toast.error(toUserErrorMessage(e));
-                }
+                await submitForVenue(venueDbId, { type: "photo", file });
               }}
             />
           ) : (
@@ -360,6 +451,47 @@ export function ContributeFab() {
   );
 }
 
+function CapturePhotoStep({
+  onPicked,
+  onBack,
+}: {
+  onPicked: (file: File) => void;
+  onBack: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const t = setTimeout(() => inputRef.current?.click(), 100);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div className="pb-4 text-center">
+      <h2 className="font-display text-lg font-semibold">Ta et bilde</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Vis hvordan det er der du er nå.
+      </p>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onPicked(f);
+        }}
+      />
+      <div className="mt-5 grid gap-2">
+        <Button className="w-full" onClick={() => inputRef.current?.click()}>
+          📸 Åpne kamera
+        </Button>
+        <Button variant="ghost" className="w-full" onClick={onBack}>
+          Tilbake
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function VenueAddSuccess({
   success,
   onSeeVenue,
@@ -429,7 +561,7 @@ function PickVenueStep({
   onBack,
 }: {
   contrib: ContribMode | null;
-  onPick: (slug: string) => void;
+  onPick: (venue: Venue) => void;
   onExplore: () => void;
   onBack: () => void;
 }) {
@@ -473,7 +605,7 @@ function PickVenueStep({
             {saved.map((v) => (
               <li key={v.id}>
                 <button
-                  onClick={() => onPick(v.id)}
+                  onClick={() => onPick(v)}
                   className="tap-scale flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left shadow-soft"
                 >
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
