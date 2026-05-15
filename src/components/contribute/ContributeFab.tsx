@@ -986,7 +986,8 @@ function VenueForm({
   };
 
   useEffect(() => {
-    requestLocation();
+    if (!initialCoords) requestLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const hasCoords = lat !== "" && lng !== "";
