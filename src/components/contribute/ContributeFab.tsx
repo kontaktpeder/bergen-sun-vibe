@@ -612,11 +612,10 @@ function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boo
         <p className="mt-1 text-sm text-muted-foreground">Hva vil du dele?</p>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="📸" label="Ta bilde" onClick={() => onPick("photo")} />
-        <ActionCard emoji="☀️" label="Rapporter sol" onClick={() => onPick("sun")} />
-        <ActionCard emoji="🙂" label="Rapporter folk" onClick={() => onPick("crowd")} />
-        <ActionCard emoji="🍺" label="Legg inn ølpris" onClick={() => onPick("beer")} />
-        <ActionCard emoji="📍" label="Legg til sted" onClick={() => onPick("venue")} />
+        <ActionCard emoji="📸" label="Del bilde" onClick={() => onPick("photo")} />
+        <ActionCard emoji="☀️" label="Solrapport" onClick={() => onPick("sun")} />
+        <ActionCard emoji="🙂" label="Stemning" onClick={() => onPick("crowd")} />
+        <ActionCard emoji="🍺" label="Ølpris" onClick={() => onPick("beer")} />
       </div>
       {!isOnVenue && (
         <p className="mt-4 text-center text-xs text-muted-foreground">
