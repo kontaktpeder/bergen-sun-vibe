@@ -4,8 +4,6 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
-import { SunBadge } from "@/components/SunBadge";
-import { DataSunBadge } from "@/components/DataSunBadge";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { ReportButton } from "@/components/ReportButton";
 import { VenueStatusBadges } from "@/components/VenueStatusBadges";
