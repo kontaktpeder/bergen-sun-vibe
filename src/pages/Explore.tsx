@@ -217,12 +217,9 @@ const Explore = () => {
                 <div className="truncate text-xs text-muted-foreground">{v.area} · {v.category}</div>
                 <div className="mt-1"><VenuePreviewBadges badges={getVenuePreviewBadges(badgeMap[v.dbId])} /></div>
               </div>
-              {v.rating > 0 && (
-                <div className="shrink-0 text-right">
-                  <div className="inline-flex items-center gap-1 text-sm"><Star className="h-3.5 w-3.5 fill-sun text-sun" />{v.rating}</div>
-                  {v.reviews > 0 && <div className="text-xs text-muted-foreground">({v.reviews})</div>}
-                </div>
-              )}
+              <div className="shrink-0">
+                <VenueCardFavoriteButton venueId={v.id} />
+              </div>
             </button>
           ))}
         </div>
