@@ -131,84 +131,136 @@ export function ContributeFab() {
   };
 
   const beforePoints = profile?.points ?? 0;
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const executePending = useCallback(
+    async (
+      venueId: string,
+      payload: PendingPayload,
+    ): Promise<{ awardedPoints: number; newPoints: number }> => {
+      if (payload.type === "sun") {
+        const r = await addContribution.mutateAsync({
+          type: "sun_report",
+          venueId,
+          data: { status: payload.status },
+        });
+        return { awardedPoints: r.awardedPoints, newPoints: r.newPoints };
+      }
+      if (payload.type === "crowd") {
+        const r = await addContribution.mutateAsync({
+          type: "crowd_report",
+          venueId,
+          data: { level: payload.level },
+        });
+        return { awardedPoints: r.awardedPoints, newPoints: r.newPoints };
+      }
+      if (payload.type === "beer") {
+        const r = await addContribution.mutateAsync({
+          type: "beer_price",
+          venueId,
+          data: { price: payload.price, label: "cheapest" },
+          isConfirm: payload.isConfirm,
+        });
+        return { awardedPoints: r.awardedPoints, newPoints: r.newPoints };
+      }
+      // photo
+      if (!user?.id) throw new Error("Du må være innlogget.");
+      const url = await upload(payload.file, user.id);
+      const r = await addContribution.mutateAsync({
+        type: "photo",
+        venueId,
+        data: { image_url: url },
+      });
+      return { awardedPoints: r.awardedPoints, newPoints: r.newPoints };
+    },
+    [addContribution, upload, user?.id],
+  );
+
+  const handleSubmitError = useCallback((e: unknown): boolean => {
+    const raw = e instanceof Error ? e.message : String(e);
+    if (raw.toLowerCase().includes("cooldown")) {
+      showReward({
+        emoji: "👌",
+        title: "Allerede oppdatert",
+        subtitle: "Du kan rapportere igjen om noen minutter.",
+        variant: "points",
+      });
+      return true;
+    }
+    toast.error(toUserErrorMessage(e));
+    return true;
+  }, []);
 
   const submitForVenue = useCallback(
     async (venueId: string, payload: PendingPayload) => {
       setSubmitting(true);
       try {
-        if (payload.type === "sun") {
-          const r = await addContribution.mutateAsync({
-            type: "sun_report",
-            venueId,
-            data: { status: payload.status },
-          });
-          showRewardFeedback({
-            type: "sun_report",
-            awardedPoints: r.awardedPoints,
-            beforePoints,
-            afterPoints: r.newPoints,
-          });
-        } else if (payload.type === "crowd") {
-          const r = await addContribution.mutateAsync({
-            type: "crowd_report",
-            venueId,
-            data: { level: payload.level },
-          });
-          showRewardFeedback({
-            type: "crowd_report",
-            awardedPoints: r.awardedPoints,
-            beforePoints,
-            afterPoints: r.newPoints,
-          });
-        } else if (payload.type === "beer") {
-          const r = await addContribution.mutateAsync({
-            type: "beer_price",
-            venueId,
-            data: { price: payload.price, label: "cheapest" },
-            isConfirm: payload.isConfirm,
-          });
-          showRewardFeedback({
-            type: "beer_price",
-            awardedPoints: r.awardedPoints,
-            beforePoints,
-            afterPoints: r.newPoints,
-            isBeerConfirm: payload.isConfirm,
-          });
-        } else if (payload.type === "photo") {
-          if (!user?.id) return;
-          const url = await upload(payload.file, user.id);
-          const r = await addContribution.mutateAsync({
-            type: "photo",
-            venueId,
-            data: { image_url: url },
-          });
-          showRewardFeedback({
-            type: "photo",
-            awardedPoints: r.awardedPoints,
-            beforePoints,
-            afterPoints: r.newPoints,
-          });
-        }
+        const r = await executePending(venueId, payload);
+        const rewardType =
+          payload.type === "sun"
+            ? "sun_report"
+            : payload.type === "crowd"
+              ? "crowd_report"
+              : payload.type === "beer"
+                ? "beer_price"
+                : "photo";
+        showRewardFeedback({
+          type: rewardType,
+          awardedPoints: r.awardedPoints,
+          beforePoints,
+          afterPoints: r.newPoints,
+          isBeerConfirm: payload.type === "beer" ? payload.isConfirm : undefined,
+        });
         close();
       } catch (e) {
-        const raw = e instanceof Error ? e.message : String(e);
-        if (raw.toLowerCase().includes("cooldown")) {
-          showReward({
-            emoji: "👌",
-            title: "Allerede oppdatert",
-            subtitle: "Du kan rapportere igjen om noen minutter.",
-            variant: "points",
-          });
-          close();
-          return;
-        }
-        toast.error(toUserErrorMessage(e));
+        handleSubmitError(e);
+        close();
       } finally {
         setSubmitting(false);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [addContribution, beforePoints, upload, user?.id],
+    [executePending, beforePoints, handleSubmitError],
+  );
+
+  const submitNewVenueWithPending = useCallback(
+    async (
+      data: VenueAddPayload,
+      payload: PendingPayload,
+    ): Promise<{ ok: true } | { ok: false; handled: boolean }> => {
+      setSubmitting(true);
+      const startPoints = beforePoints;
+      try {
+        const venueR = await addContribution.mutateAsync({ type: "venue_add", data });
+        if (!venueR.venueId) throw new Error("Kunne ikke opprette stedet.");
+        try {
+          const reportR = await executePending(venueR.venueId, payload);
+          showCombinedRewardFeedback({
+            venueName: data.name,
+            pending: payload,
+            totalPoints: venueR.awardedPoints + reportR.awardedPoints,
+            beforePoints: startPoints,
+            afterPoints: reportR.newPoints,
+          });
+        } catch {
+          // venue created but pending failed → still acknowledge venue
+          showRewardFeedback({
+            type: "venue_add",
+            awardedPoints: venueR.awardedPoints,
+            beforePoints: startPoints,
+            afterPoints: venueR.newPoints,
+          });
+        }
+        close();
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, handled: false };
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [addContribution, beforePoints, executePending],
   );
 
   // Bus subscription: BottomNav + plus opens this sheet
