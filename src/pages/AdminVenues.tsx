@@ -149,7 +149,7 @@ const AdminVenues = () => {
                   />
                 </button>
                 <Link
-                  to={`/venue/${v.slug}`}
+                  to={`/steder/${v.slug}`}
                   className="rounded-full px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
                 >
                   Vis
@@ -164,7 +164,18 @@ const AdminVenues = () => {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              {expanded && <AdminVenuePhotos venueId={v.id} />}
+              {expanded && (
+                <>
+                  <AdminVenueEditor
+                    venueId={v.id}
+                    slug={v.slug}
+                    initialDescription={v.description ?? ""}
+                    initialTags={v.tags ?? []}
+                    initialHours={v.hours ?? ""}
+                  />
+                  <AdminVenuePhotos venueId={v.id} />
+                </>
+              )}
             </div>
           );
         })}
