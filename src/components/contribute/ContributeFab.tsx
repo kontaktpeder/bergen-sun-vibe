@@ -31,7 +31,8 @@ const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Oslo: { lat: 59.9139, lng: 10.7522 },
 };
 
-type Mode = "menu" | "sun" | "beer" | "photo" | "venue" | "crowd";
+type Mode = "menu" | "pick-venue" | "sun" | "beer" | "photo" | "venue" | "crowd";
+type ContribMode = "sun" | "beer" | "photo" | "crowd";
 type SuccessState = { venueId: string; venueSlug?: string } | null;
 
 export function ContributeFab() {
