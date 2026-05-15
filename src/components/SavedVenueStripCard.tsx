@@ -33,12 +33,14 @@ interface Props {
   userPhotoUrl?: string | null;
   index?: number;
   hasNewUpdate?: boolean;
+  variant?: "default" | "compact";
 }
 
-export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0, hasNewUpdate = false }: Props) {
+export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0, hasNewUpdate = false, variant = "default" }: Props) {
   const updatedAt = latestUpdateAt(venue, badge);
   const previewBadges = getVenuePreviewBadges(badge);
   const status = statusLine(badge);
+  const compact = variant === "compact";
 
   return (
     <Link
