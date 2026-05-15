@@ -34,10 +34,8 @@ export default function PlacePage() {
   const { data: badgeMap = {} } = useVenueBadges(ids);
   const { data: photoMap = {} } = useVenuePhotos(ids);
 
-  const venueBadgeIds = useMemo(() => (venue?.dbId ? [venue.dbId] : []), [venue?.dbId]);
-  const { data: venueBadgeMap = {} } = useVenueBadges(venueBadgeIds);
-  const venueBadge = venue?.dbId ? venueBadgeMap[venue.dbId] : undefined;
-  const contentBlocks = venue ? buildVenueContentBlocks(venue, venueBadge) : null;
+  const desc = venue?.description?.trim() ?? "";
+  const hasIntro = desc.length >= 20;
 
   if (!isLoading && !venue) {
     return (
