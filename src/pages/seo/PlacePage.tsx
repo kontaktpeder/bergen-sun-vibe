@@ -81,7 +81,7 @@ export default function PlacePage() {
           description={buildDescription("place", {
             name: venue.name,
             city: venue.city ?? "",
-            description: contentBlocks?.introShort ?? venue.description,
+            description: desc,
           })}
           canonical={buildCanonical(`/steder/${venue.id}`)}
           robots={noindex ? "noindex,follow" : "index,follow"}
