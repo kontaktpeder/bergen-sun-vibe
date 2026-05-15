@@ -215,10 +215,7 @@ const Explore = () => {
               <div className="min-w-0 flex-1">
                 <div className="truncate font-display text-base font-semibold">{v.name}</div>
                 <div className="truncate text-xs text-muted-foreground">{v.area} · {v.category}</div>
-                {badgeMap[v.dbId]?.sun && (
-                  <div className="mt-1"><DataSunBadge badge={badgeMap[v.dbId]} /></div>
-                )}
-                <div className="mt-0.5"><CrowdTag level={badgeMap[v.dbId]?.crowd} /></div>
+                <div className="mt-1"><VenuePreviewBadges badges={getVenuePreviewBadges(badgeMap[v.dbId])} /></div>
               </div>
               {v.rating > 0 && (
                 <div className="shrink-0 text-right">
