@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { resolveVenueImage, type ResolvedVenueImage } from "@/lib/venue-image";
+import { googlePlacePhotoUrl, type ResolvedVenueImage } from "@/lib/venue-image";
 import { VenueFallback } from "./VenueFallback";
 import type { Venue } from "@/lib/domain";
 
@@ -17,7 +17,22 @@ type Props = {
   compactFallback?: boolean;
 };
 
-type Status = "loading" | "loaded" | "error";
+type Status = "loading" | "loaded";
+
+function buildSources(
+  venue: Pick<Venue, "image" | "googlePhotoName">,
+  userPhotoUrl: string | null | undefined,
+  size?: { w?: number; h?: number },
+): ResolvedVenueImage[] {
+  const out: ResolvedVenueImage[] = [];
+  if (userPhotoUrl && userPhotoUrl.trim().length > 0)
+    out.push({ kind: "user", src: userPhotoUrl });
+  if (venue.image && venue.image.trim().length > 0)
+    out.push({ kind: "custom", src: venue.image });
+  const g = googlePlacePhotoUrl(venue.googlePhotoName, size);
+  if (g) out.push({ kind: "google", src: g });
+  return out;
+}
 
 export function VenueImage({
   venue,
@@ -33,57 +48,59 @@ export function VenueImage({
 }: Props) {
   const sizeW = size?.w;
   const sizeH = size?.h;
-  const initial = resolveVenueImage(venue, userPhotoUrl, { w: sizeW, h: sizeH });
-  const [resolved, setResolved] = useState<ResolvedVenueImage>(initial);
-  const [status, setStatus] = useState<Status>(
-    initial.kind === "fallback" ? "loaded" : "loading",
+
+  const sources = useMemo(
+    () => buildSources(venue, userPhotoUrl, { w: sizeW, h: sizeH }),
+    [venue.image, venue.googlePhotoName, userPhotoUrl, sizeW, sizeH],
   );
 
+  const [index, setIndex] = useState(0);
+  const [status, setStatus] = useState<Status>(sources.length > 0 ? "loading" : "loaded");
+
   useEffect(() => {
-    const r = resolveVenueImage(venue, userPhotoUrl, { w: sizeW, h: sizeH });
-    setResolved(prev => (prev.kind === r.kind && prev.src === r.src ? prev : r));
-    setStatus(prev => {
-      if (r.kind === "fallback") return "loaded";
-      // Only reset to loading if the source actually changed
-      return prev === "loaded" && resolved.src === r.src ? prev : "loading";
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [venue.image, venue.googlePhotoName, userPhotoUrl, sizeW, sizeH]);
+    setIndex(0);
+    setStatus(sources.length > 0 ? "loading" : "loaded");
+  }, [sources]);
+
+  const current = sources[index];
+
+  if (!current) {
+    return <VenueFallback venue={venue} className={className} compact={compactFallback} />;
+  }
 
   const handleError = () => {
-    setResolved({ kind: "fallback", src: null });
-    setStatus("loaded");
+    if (index < sources.length - 1) {
+      setIndex(index + 1);
+      setStatus("loading");
+    } else {
+      // Exhausted — force fallback by advancing past the end
+      setIndex(sources.length);
+      setStatus("loaded");
+    }
   };
-
-  if (resolved.kind === "fallback") {
-    return (
-      <VenueFallback venue={venue} className={className} compact={compactFallback} />
-    );
-  }
 
   return (
     <div className={cn("relative h-full w-full overflow-hidden bg-secondary/40", className)}>
       {status === "loading" && (
         <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-secondary/60 to-secondary/30" />
       )}
-      {status !== "error" && (
-        <img
-          src={resolved.src}
-          alt={alt ?? venue.name}
-          loading={loading}
-          decoding="async"
-          // @ts-expect-error fetchpriority is valid HTML but missing from React types in older versions
-          fetchpriority={fetchPriority}
-          onLoad={() => setStatus("loaded")}
-          onError={handleError}
-          className={cn(
-            "h-full w-full object-cover transition-opacity duration-300",
-            status === "loaded" ? "opacity-100" : "opacity-0",
-            imgClassName,
-          )}
-        />
-      )}
-      {resolved.kind === "google" && status === "loaded" && showAttribution && (
+      <img
+        key={current.src}
+        src={current.src}
+        alt={alt ?? venue.name}
+        loading={loading}
+        decoding="async"
+        // @ts-expect-error fetchpriority is valid HTML but missing from React types in older versions
+        fetchpriority={fetchPriority}
+        onLoad={() => setStatus("loaded")}
+        onError={handleError}
+        className={cn(
+          "h-full w-full object-cover transition-opacity duration-300",
+          status === "loaded" ? "opacity-100" : "opacity-0",
+          imgClassName,
+        )}
+      />
+      {current.kind === "google" && status === "loaded" && showAttribution && (
         <span className="pointer-events-none absolute bottom-1 right-1 rounded bg-black/55 px-1.5 py-0.5 text-[9px] font-medium leading-none text-white">
           Google
         </span>
