@@ -24,7 +24,6 @@ const VenueDetail = () => {
   const params = useParams<{ id?: string; slug?: string }>();
   const slug = params.slug ?? params.id;
   const navigate = useNavigate();
-  const [, setSearchParams] = useSearchParams();
   const { isAuthed } = useAuthProfile();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [authOpen, setAuthOpen] = useState(false);
@@ -32,10 +31,6 @@ const VenueDetail = () => {
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
   const venueIds = venue?.dbId ? [venue.dbId] : [];
   useVenueBadges(venueIds);
-
-  const openContribute = (mode: "sun" | "beer" | "photo" | "crowd") => {
-    setSearchParams({ contribute: mode }, { replace: false });
-  };
 
   if (isLoading) {
     return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Laster…</div>;
