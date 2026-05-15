@@ -351,7 +351,13 @@ export function ContributeFab() {
             />
           ) : mode === "capture-photo" ? (
             <CapturePhotoStep
-              onPicked={(file) => stashAndConfirm({ type: "photo", file })}
+              onPicked={async (file) => {
+                if (isOnVenue && venueDbId) {
+                  await submitForVenue(venueDbId, { type: "photo", file });
+                } else {
+                  stashAndConfirm({ type: "photo", file });
+                }
+              }}
               onBack={() => setMode("menu")}
             />
           ) : mode === "confirm-venue" ? (
