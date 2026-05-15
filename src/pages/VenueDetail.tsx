@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, MapPin, Clock, Star } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useVenue } from "@/hooks/useVenue";
