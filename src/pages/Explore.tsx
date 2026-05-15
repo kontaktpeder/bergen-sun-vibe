@@ -84,6 +84,11 @@ const Explore = () => {
 
   return (
     <div className="relative min-h-screen">
+      <SeoHead
+        title={`Utforsk steder i ${city} | Utefolket`}
+        description={`Kart og live-stemning fra utesteder i ${city} akkurat nå.`}
+        canonical={buildCanonical(`/${citySlugFor(city)}`)}
+      />
       {/* Map — fyller mer av skjermen for app-feel */}
       <div className="relative h-[82vh] overflow-hidden bg-secondary">
         <div className="absolute inset-0">
