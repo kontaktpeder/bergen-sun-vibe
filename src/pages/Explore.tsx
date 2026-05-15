@@ -242,7 +242,7 @@ const Explore = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-display text-base font-semibold">{v.name}</div>
-                <div className="truncate text-xs text-muted-foreground">{v.area} · {v.category}</div>
+                <div className="truncate text-xs text-muted-foreground">{venueLocationLabel(v, userLoc)} · {v.category}</div>
                 <div className="mt-1"><VenuePreviewBadges badges={getVenuePreviewBadges(badgeMap[v.dbId])} /></div>
               </div>
               <div className="shrink-0">
