@@ -40,6 +40,8 @@ export default function CityPage() {
   const ids = useMemo(() => venues.map((v) => v.dbId), [venues]);
   const { data: badgeMap = {} } = useVenueBadges(ids);
   const { data: photoMap = {} } = useVenuePhotos(ids);
+  const { location: userLocation, locate } = useUserLocation();
+  useEffect(() => { locate(); }, [locate]);
 
   if (!cityName) {
     // Ukjent by-slug — la NotFound håndtere via redirect
