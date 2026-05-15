@@ -118,7 +118,7 @@ const userLocationIcon = L.divIcon({
   iconAnchor: [9, 9],
 });
 
-export function VenueMap({ venues, selectedId, onSelect, fallbackCenter, userLocation }: VenueMapProps) {
+export function VenueMap({ venues, selectedId, onSelect, fallbackCenter, userLocation, flyToSelectedOnMount }: VenueMapProps) {
   const validVenues = useMemo(
     () => venues.filter((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng)),
     [venues],
