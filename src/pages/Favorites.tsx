@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { Heart, ChevronDown } from "lucide-react";
 import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useVenues } from "@/hooks/useVenues";
@@ -8,17 +8,17 @@ import { useCity } from "@/context/CityContext";
 import { belongsToCity } from "@/lib/domain";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { useVenuePhotos } from "@/hooks/useVenuePhotos";
-import { useFavoriteContributionsFeed } from "@/hooks/useFavoriteContributionsFeed";
+import { useFollowedVenuesDigest } from "@/hooks/useFollowedVenuesDigest";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { distanceMeters } from "@/lib/geo";
 import { SavedVenueStripCard } from "@/components/SavedVenueStripCard";
-import { FavoriteUpdateFeedItem } from "@/components/FavoriteUpdateFeedItem";
+import { FollowedVenueDigestCard } from "@/components/FollowedVenueDigestCard";
 import { SeoHead } from "@/components/seo/SeoHead";
 import { buildCanonical } from "@/lib/seo";
 import { citySlugFor } from "@/lib/city-copy";
 
 const NEAR_RADIUS_M = 1000;
-const NEW_UPDATE_WINDOW_MS = 24 * 60 * 60 * 1000;
+const TOP_DIGESTS = 6;
 
 const Favorites = () => {
   const { favorites: favs, isLoading: favsLoading } = useFavorites();
@@ -26,6 +26,7 @@ const Favorites = () => {
   const { currentCity } = useCity();
   const { data: allVenues = [], isLoading: venuesLoading } = useVenues();
   const { location, locate } = useUserLocation();
+  const [showAllDigests, setShowAllDigests] = useState(false);
   const isLoading = venuesLoading || authLoading || (isAuthed && favsLoading);
 
   const savedVenues = useMemo(
@@ -44,7 +45,7 @@ const Favorites = () => {
 
   const { data: badgeMap = {} } = useVenueBadges(venueIds);
   const { data: photoMap = {} } = useVenuePhotos(venueIds);
-  const { data: feed = [], isLoading: feedLoading } = useFavoriteContributionsFeed(venueIds);
+  const { digests, isLoading: digestsLoading } = useFollowedVenuesDigest(venueIds, venueByDbId);
 
   const hasSaved = savedVenues.length > 0;
 
@@ -52,15 +53,11 @@ const Favorites = () => {
     if (isAuthed && hasSaved && !location) locate();
   }, [isAuthed, hasSaved, location, locate]);
 
-  // Distinct venue_ids in feed within the last 24h → "ny oppdatering"
   const venuesWithNewUpdate = useMemo(() => {
-    const cutoff = Date.now() - NEW_UPDATE_WINDOW_MS;
     const set = new Set<string>();
-    for (const c of feed) {
-      if (new Date(c.created_at).getTime() >= cutoff) set.add(c.venue_id);
-    }
+    for (const d of digests) if (d.hasNewSince) set.add(d.venue.dbId);
     return set;
-  }, [feed]);
+  }, [digests]);
 
   const nearCount = useMemo(() => {
     if (!location) return null;
@@ -69,11 +66,14 @@ const Favorites = () => {
     ).length;
   }, [savedVenues, location]);
 
+  const visibleDigests = showAllDigests ? digests : digests.slice(0, TOP_DIGESTS);
+  const hasMoreDigests = digests.length > TOP_DIGESTS;
+
   return (
     <div className="px-5 pt-[max(env(safe-area-inset-top),1.5rem)] pb-10">
       <SeoHead
         title={`Steder du følger i ${currentCity} | Utefolket`}
-        description={`Følg sol, stemning og ølpriser på stedene du følger i ${currentCity}.`}
+        description={`Status på stedene du følger i ${currentCity} — sol, stemning, ølpriser og bilder.`}
         canonical={buildCanonical(`/${citySlugFor(currentCity)}`)}
       />
       <header className="pt-2">
@@ -82,7 +82,7 @@ const Favorites = () => {
         </div>
         <h1 className="mt-1 font-display text-3xl font-semibold">Dine steder</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Stedene du følger og vil holde øye med.
+          Status på stedene du følger akkurat nå.
         </p>
 
         {isAuthed && hasSaved && (
@@ -155,42 +155,50 @@ const Favorites = () => {
       {hasSaved && (
         <>
           <section className="mt-8">
-            <h2 className="px-1 font-display text-lg font-semibold">Nytt fra dine steder</h2>
+            <h2 className="px-1 font-display text-lg font-semibold">Oppdaterte steder</h2>
             <p className="mt-0.5 px-1 text-xs text-muted-foreground">
-              Siste aktivitet på stedene du følger
+              Sol, stemning, øl og bilder — samlet per sted
             </p>
 
-            {feedLoading && (
-              <div className="mt-4 text-sm text-muted-foreground">Henter oppdateringer…</div>
+            {digestsLoading && (
+              <div className="mt-4 text-sm text-muted-foreground">Henter status…</div>
             )}
 
-            {!feedLoading && feed.length === 0 && (
+            {!digestsLoading && digests.length === 0 && (
               <div className="mt-4 rounded-2xl bg-card p-5 text-center shadow-soft">
                 <p className="text-sm text-muted-foreground">
-                  Ingen nye oppdateringer ennå. Kom tilbake om litt — eller bidra selv.
+                  Ingen ferske oppdateringer ennå. Kom tilbake om litt — eller bidra selv.
                 </p>
               </div>
             )}
 
             <div className="mt-3 grid gap-2">
-              {feed.map((c) => {
-                const venue = venueByDbId[c.venue_id];
-                if (!venue) return null;
-                return (
-                  <FavoriteUpdateFeedItem
-                    key={c.id}
-                    contribution={c}
-                    venue={venue}
-                    userPhotoUrl={photoMap[venue.dbId] ?? null}
-                  />
-                );
-              })}
+              {visibleDigests.map((d) => (
+                <FollowedVenueDigestCard
+                  key={d.venue.dbId}
+                  digest={d}
+                  userPhotoUrl={photoMap[d.venue.dbId] ?? null}
+                />
+              ))}
             </div>
+
+            {hasMoreDigests && !showAllDigests && (
+              <button
+                onClick={() => setShowAllDigests(true)}
+                className="tap-scale mt-3 inline-flex items-center gap-1 px-1 text-sm font-medium text-primary"
+              >
+                Se alle oppdateringer
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            )}
           </section>
 
-          <section className="mt-8">
+          <section className="mt-10">
             <h2 className="px-1 font-display text-lg font-semibold">Alle steder du følger</h2>
-            <div className="mt-3 grid grid-cols-2 gap-3">
+            <p className="mt-0.5 px-1 text-xs text-muted-foreground">
+              Hele samlingen din
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-2">
               {savedVenues.map((v, i) => (
                 <SavedVenueStripCard
                   key={v.id}
@@ -199,6 +207,7 @@ const Favorites = () => {
                   userPhotoUrl={photoMap[v.dbId] ?? null}
                   index={i}
                   hasNewUpdate={venuesWithNewUpdate.has(v.dbId)}
+                  variant="compact"
                 />
               ))}
             </div>
