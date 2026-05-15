@@ -189,10 +189,6 @@ const VenueDetail = () => {
           )}
         </div>
 
-        {/* Last updated */}
-        <div className="mt-4 text-xs text-muted-foreground">
-          Sist oppdatert {timeAgo(venue.lastActivityAt)}
-        </div>
 
         {/* Mini-feed */}
         {contributions.length > 0 && (
