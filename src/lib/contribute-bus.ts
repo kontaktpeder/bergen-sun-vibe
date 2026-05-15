@@ -2,7 +2,7 @@ type Mode = "menu" | "sun" | "beer" | "photo" | "venue" | "crowd" | "capture-pho
 type Listener = (mode: Mode) => void;
 const listeners = new Set<Listener>();
 
-export function openContributeFab(mode: Mode = "venue") {
+export function openContributeFab(mode: Mode = "menu") {
   listeners.forEach((l) => l(mode));
 }
 

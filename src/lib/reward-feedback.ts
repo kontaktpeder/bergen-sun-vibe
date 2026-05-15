@@ -1,5 +1,6 @@
 import { getLevel } from "@/lib/levels";
 import { showReward } from "@/components/RewardOverlay";
+import { pendingActionLine, type PendingPayload } from "@/lib/contribute-pending";
 
 type RewardArgs = {
   type: "sun_report" | "beer_price" | "photo" | "venue_add" | "crowd_report";
