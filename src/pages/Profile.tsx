@@ -12,7 +12,7 @@ import { SeoHead } from "@/components/seo/SeoHead";
 import { buildCanonical } from "@/lib/seo";
 
 const Profile = () => {
-  const favs = useFavorites();
+  const { favorites: favs } = useFavorites();
   const navigate = useNavigate();
   const { user, profile, isAuthed, loading } = useAuthProfile();
   const { data: isAdmin } = useIsAdmin(user?.id);
@@ -20,7 +20,7 @@ const Profile = () => {
   const cities: City[] = ["Bergen", "Oslo"];
 
   const stats = [
-    { label: "Dine steder", value: favs.length, icon: Heart },
+    { label: "Dine steder", value: isAuthed ? favs.length : 0, icon: Heart },
     { label: "Poeng", value: profile?.points ?? 0, icon: Sun },
   ];
 
