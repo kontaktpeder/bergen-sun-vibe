@@ -39,7 +39,7 @@ const AdminVenues = () => {
     queryFn: async (): Promise<VenueRow[]> => {
       const { data, error } = await supabase
         .from("venues")
-        .select("id, name, slug, category, city, area, created_at")
+        .select("id, name, slug, category, city, area, description, tags, hours, created_at")
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
