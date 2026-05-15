@@ -63,7 +63,7 @@ function FitBounds({ venues }: { venues: Venue[] }) {
   return null;
 }
 
-function PanToSelected({ venues, selectedId }: { venues: Venue[]; selectedId: string | null }) {
+function PanToSelected({ venues, selectedId, flyOnMount }: { venues: Venue[]; selectedId: string | null; flyOnMount?: boolean }) {
   const map = useMap();
   const isFirst = useRef(true);
   useEffect(() => {
@@ -71,14 +71,14 @@ function PanToSelected({ venues, selectedId }: { venues: Venue[]; selectedId: st
     if (!v) return;
     if (isFirst.current) {
       isFirst.current = false;
-      return;
+      if (!flyOnMount) return;
     }
     const t = setTimeout(() => {
       map.invalidateSize();
       map.flyTo([v.lat, v.lng], 17, { animate: true, duration: 0.9 });
     }, 350);
     return () => clearTimeout(t);
-  }, [map, selectedId, venues]);
+  }, [map, selectedId, venues, flyOnMount]);
   return null;
 }
 
@@ -88,6 +88,7 @@ interface VenueMapProps {
   onSelect: (id: string) => void;
   fallbackCenter: [number, number];
   userLocation?: { lat: number; lng: number } | null;
+  flyToSelectedOnMount?: boolean;
 }
 
 function FlyToUser({ location }: { location: { lat: number; lng: number } | null | undefined }) {
