@@ -879,8 +879,10 @@ function PhotoForm({ venueId, onDone }: { venueId?: string; onDone: (f: File) =>
 
 function VenueForm({
   onDone,
+  initialCoords,
 }: {
   onDone: (d: VenueAddPayload) => void;
+  initialCoords?: { lat: number; lng: number };
 }) {
   const { currentCity } = useCity();
   const { data: allVenues = [] } = useVenues();
@@ -888,11 +890,13 @@ function VenueForm({
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
-  const [lat, setLat] = useState<string>("");
-  const [lng, setLng] = useState<string>("");
+  const [lat, setLat] = useState<string>(initialCoords ? initialCoords.lat.toFixed(6) : "");
+  const [lng, setLng] = useState<string>(initialCoords ? initialCoords.lng.toFixed(6) : "");
   const [showManual, setShowManual] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
-  const [geoState, setGeoState] = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [geoState, setGeoState] = useState<"idle" | "loading" | "ok" | "error">(
+    initialCoords ? "ok" : "idle",
+  );
   const [geoErr, setGeoErr] = useState<string | null>(null);
 
   type PlaceCandidate = {
