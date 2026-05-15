@@ -165,10 +165,10 @@ const Explore = () => {
                         {selected.reviews > 0 && <span className="text-muted-foreground">({selected.reviews})</span>}
                       </div>
                     )}
-                    {badgeMap[selected.dbId]?.sun && (
-                      <div className="mt-1.5"><DataSunBadge badge={badgeMap[selected.dbId]} /></div>
-                    )}
-                    <div className="mt-1"><CrowdTag level={badgeMap[selected.dbId]?.crowd} /></div>
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <VenuePreviewBadges badges={getVenuePreviewBadges(badgeMap[selected.dbId])} />
+                      <VenueCardFavoriteButton venueId={selected.id} className="ml-auto" />
+                    </div>
                   </div>
                 </div>
               </div>
