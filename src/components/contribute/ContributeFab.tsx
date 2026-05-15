@@ -41,7 +41,7 @@ const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
 
 type Mode =
   | "menu"
-  | "pick-venue"
+  | "search-venue"
   | "confirm-venue"
   | "capture-photo"
   | "sun"
@@ -50,12 +50,6 @@ type Mode =
   | "venue"
   | "crowd";
 type ContribMode = "sun" | "beer" | "photo" | "crowd";
-
-type PendingPayload =
-  | { type: "sun"; status: SunStatus }
-  | { type: "crowd"; level: CrowdLevel }
-  | { type: "beer"; price: number; isConfirm: boolean }
-  | { type: "photo"; file: File };
 
 type SuccessState = { venueId: string; venueSlug?: string } | null;
 
