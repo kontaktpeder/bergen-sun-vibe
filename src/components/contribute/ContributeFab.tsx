@@ -322,10 +322,6 @@ export function ContributeFab() {
             <Menu
               isOnVenue={isOnVenue}
               onPick={(m) => {
-                if (m === "venue") {
-                  setMode("venue");
-                  return;
-                }
                 if (isOnVenue) {
                   setMode(m);
                   return;
@@ -351,15 +347,19 @@ export function ContributeFab() {
                 if (!pendingPayload || submitting) return;
                 void submitForVenue(venue.dbId, pendingPayload);
               }}
-              onChangeVenue={() => setMode("pick-venue")}
+              onChangeVenue={() => setMode("search-venue")}
               onExplore={() => {
                 close();
                 navigate("/explore");
               }}
             />
-          ) : mode === "pick-venue" ? (
-            <PickVenueStep
-              contrib={pendingContrib}
+          ) : mode === "search-venue" ? (
+            <SearchVenueStep
+              venues={cityVenues}
+              favorites={favs}
+              userLoc={userLoc}
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
               onPick={(venue) => {
                 if (pendingPayload) {
                   void submitForVenue(venue.dbId, pendingPayload);
@@ -368,10 +368,7 @@ export function ContributeFab() {
                   navigate(`/steder/${venue.id}?contribute=${pendingContrib}`);
                 }
               }}
-              onExplore={() => {
-                close();
-                navigate("/explore");
-              }}
+              onAddVenue={() => setMode("venue")}
               onBack={() => setMode(pendingPayload ? "confirm-venue" : "menu")}
             />
           ) : mode === "sun" ? (
@@ -418,8 +415,13 @@ export function ContributeFab() {
             />
           ) : (
             <VenueForm
+              initialCoords={userLoc ? { lat: userLoc.lat, lng: userLoc.lng } : undefined}
               onDone={async (data) => {
-                const submit = async (payload: VenueAddPayload) => {
+                const submitWithPending = async (payload: VenueAddPayload) => {
+                  if (pendingPayload) {
+                    await submitNewVenueWithPending(payload, pendingPayload);
+                    return;
+                  }
                   const r = await addContribution.mutateAsync({ type: "venue_add", data: payload });
                   showRewardFeedback({
                     type: "venue_add",
@@ -434,20 +436,41 @@ export function ContributeFab() {
                   }
                 };
 
+                const handleDupSlug = async (dupSlug: string) => {
+                  if (!pendingPayload) return false;
+                  const existing = cityVenues.find((v) => v.id === dupSlug);
+                  if (!existing) return false;
+                  try {
+                    const r = await executePending(existing.dbId, pendingPayload);
+                    showCombinedRewardFeedback({
+                      venueName: existing.name,
+                      pending: pendingPayload,
+                      totalPoints: r.awardedPoints,
+                      beforePoints,
+                      afterPoints: r.newPoints,
+                    });
+                    close();
+                    return true;
+                  } catch {
+                    return false;
+                  }
+                };
+
                 try {
-                  await submit(data);
+                  await submitWithPending(data);
                 } catch (e) {
                   const raw = e instanceof Error ? e.message : String(e);
 
                   const dupGoogle = raw.match(/duplicate_google_place:([\w-]+)/);
                   if (dupGoogle) {
-                    const slug = dupGoogle[1];
+                    const dupSlug = dupGoogle[1];
+                    if (await handleDupSlug(dupSlug)) return;
                     toast.error("Stedet finnes allerede", {
                       action: {
                         label: "Åpne",
                         onClick: () => {
                           close();
-                          navigate(`/steder/${slug}`);
+                          navigate(`/steder/${dupSlug}`);
                         },
                       },
                     });
@@ -456,14 +479,15 @@ export function ContributeFab() {
 
                   const dupClose = raw.match(/duplicate_venue_close:([\w-]+):(.+)$/);
                   if (dupClose) {
-                    const slug = dupClose[1];
+                    const dupSlug = dupClose[1];
                     const name = dupClose[2];
+                    if (await handleDupSlug(dupSlug)) return;
                     toast.error(`"${name}" finnes allerede her i nærheten`, {
                       action: {
                         label: "Åpne",
                         onClick: () => {
                           close();
-                          navigate(`/steder/${slug}`);
+                          navigate(`/steder/${dupSlug}`);
                         },
                       },
                     });
@@ -479,7 +503,7 @@ export function ContributeFab() {
                         label: "Ja, legg til",
                         onClick: async () => {
                           try {
-                            await submit({ ...data, confirm_distinct: true });
+                            await submitWithPending({ ...data, confirm_distinct: true });
                           } catch (err) {
                             toast.error(toUserErrorMessage(err));
                           }
