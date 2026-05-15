@@ -131,15 +131,12 @@ const VenueDetail = () => {
 
         <VenueStickyActions onMap={openMap} onShare={handleShare} onSave={handleFav} saved={fav} />
 
-        <VenueSection id="akkurat-na" title="Akkurat nå">
-          <VenueStatusBadges
+        <VenueSection id="akkurat-na" title="Akkurat nå" subtitle="Oppdatert av folk ute nå">
+          <VenueLiveStatus
             contributions={contributions}
-            onSun={() => openContribute("sun")}
-            onCrowd={() => openContribute("crowd")}
-            onBeer={() => openContribute("beer")}
-            onPhoto={() => openContribute("photo")}
+            onContribute={(m) => openContributeFab(m)}
           />
-          <VenuePhotoGallery contributions={contributions} onAdd={() => openContribute("photo")} />
+          <VenuePhotoGallery contributions={contributions} />
         </VenueSection>
 
         {venue.dealText && (
