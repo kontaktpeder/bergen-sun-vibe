@@ -101,7 +101,7 @@ export function VenueLiveStatus({ contributions, onContribute }: Props) {
           emoji="📸"
           emptyLabel="Ingen bilder ennå"
           actionLabel="Legg til bilde →"
-          onAction={() => onContribute?.("photo")}
+          onAction={() => onContribute?.("capture-photo")}
         />
       )}
     </div>
