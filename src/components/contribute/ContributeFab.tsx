@@ -94,7 +94,7 @@ export function ContributeFab() {
   // Venue guess data
   const { currentCity } = useCity();
   const { data: allVenues = [] } = useVenues();
-  const favs = useFavorites();
+  const { favorites: favs } = useFavorites();
   const cityVenues = useMemo(
     () => allVenues.filter((v) => belongsToCity(v, currentCity as "Bergen" | "Oslo")),
     [allVenues, currentCity],
