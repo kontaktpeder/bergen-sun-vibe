@@ -1,12 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Trophy } from "lucide-react";
 import { useLeaderboard } from "@/hooks/useLeaderboard";
+import { useCity } from "@/context/CityContext";
 
 const medal = (rank: number) => (rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`);
 
 const Leaderboard = () => {
   const { data: entries = [], isLoading, error } = useLeaderboard(10);
   const navigate = useNavigate();
+  const { currentCity } = useCity();
 
   return (
     <div className="px-5 pt-[max(env(safe-area-inset-top),1.5rem)] pb-12">
@@ -16,7 +18,7 @@ const Leaderboard = () => {
         </button>
         <div>
           <h1 className="font-display text-2xl font-semibold">Topplisten</h1>
-          <p className="text-sm text-muted-foreground">Bergens mest aktive sol-bidragsytere</p>
+          <p className="text-sm text-muted-foreground">{currentCity}s mest aktive sol-bidragsytere</p>
         </div>
       </div>
 
