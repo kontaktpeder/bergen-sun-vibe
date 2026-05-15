@@ -35,7 +35,9 @@ const Explore = () => {
   const [filter, setFilter] = useState("all");
   const { currentCity: city } = useCity();
   const { data: venues = [], isLoading, error } = useVenues();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const venueParam = searchParams.get("venue");
+  const [selectedId, setSelectedId] = useState<string | null>(venueParam);
   const [query, setQuery] = useState("");
   const { location: userLoc, loading: locLoading, error: locError, locate } = useUserLocation();
 
@@ -47,10 +49,14 @@ const Explore = () => {
   const { data: badgeMap = {} } = useVenueBadges(cityVenues.map(v => v.dbId));
 
   useEffect(() => {
+    if (venueParam && cityVenues.find(v => v.id === venueParam)) {
+      setSelectedId(venueParam);
+      return;
+    }
     if (cityVenues.length && !cityVenues.find(v => v.id === selectedId)) {
       setSelectedId(cityVenues[0].id);
     }
-  }, [cityVenues, selectedId]);
+  }, [cityVenues, selectedId, venueParam]);
 
   const filtered = useMemo(() => {
     let v = cityVenues;
