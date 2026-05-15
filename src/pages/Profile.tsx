@@ -17,7 +17,7 @@ const Profile = () => {
   const cities: City[] = ["Bergen", "Oslo"];
 
   const stats = [
-    { label: "Lagret", value: favs.length, icon: Heart },
+    { label: "Dine steder", value: favs.length, icon: Heart },
     { label: "Poeng", value: profile?.points ?? 0, icon: Sun },
   ];
 

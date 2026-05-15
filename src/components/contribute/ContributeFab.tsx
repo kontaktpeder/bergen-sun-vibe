@@ -19,8 +19,9 @@ import { toUserErrorMessage } from "@/lib/error-messages";
 import { FLAGS } from "@/lib/flags";
 import { subscribeContributeFab } from "@/lib/contribute-bus";
 import { useCity } from "@/context/CityContext";
-import { inferLegacyCity } from "@/lib/domain";
+import { inferLegacyCity, belongsToCity } from "@/lib/domain";
 import { useVenues } from "@/hooks/useVenues";
+import { useFavorites } from "@/lib/favorites";
 import { findPossibleDuplicate } from "@/lib/dedupe-venues";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -31,12 +32,14 @@ const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Oslo: { lat: 59.9139, lng: 10.7522 },
 };
 
-type Mode = "menu" | "sun" | "beer" | "photo" | "venue" | "crowd";
+type Mode = "menu" | "pick-venue" | "sun" | "beer" | "photo" | "venue" | "crowd";
+type ContribMode = "sun" | "beer" | "photo" | "crowd";
 type SuccessState = { venueId: string; venueSlug?: string } | null;
 
 export function ContributeFab() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("menu");
+  const [pendingContrib, setPendingContrib] = useState<ContribMode | null>(null);
   const [success, setSuccess] = useState<SuccessState>(null);
   const { isAuthed, user, profile, loading } = useAuthProfile();
   const params = useParams();
@@ -63,6 +66,7 @@ export function ContributeFab() {
 
   const reset = () => {
     setMode("menu");
+    setPendingContrib(null);
     setSuccess(null);
   };
 
@@ -128,7 +132,31 @@ export function ContributeFab() {
               }}
             />
           ) : mode === "menu" ? (
-            <Menu onPick={(m) => setMode(m)} isOnVenue={isOnVenue} />
+            <Menu
+              isOnVenue={isOnVenue}
+              onPick={(m) => {
+                if (m === "venue" || isOnVenue) {
+                  setMode(m);
+                  return;
+                }
+                // Global contribute → need to pick a venue first
+                setPendingContrib(m as ContribMode);
+                setMode("pick-venue");
+              }}
+            />
+          ) : mode === "pick-venue" ? (
+            <PickVenueStep
+              contrib={pendingContrib}
+              onPick={(slug) => {
+                close();
+                navigate(`/steder/${slug}?contribute=${pendingContrib}`);
+              }}
+              onExplore={() => {
+                close();
+                navigate("/explore");
+              }}
+              onBack={() => setMode("menu")}
+            />
           ) : mode === "sun" ? (
             <SunForm
               venueId={venueDbId}
@@ -372,39 +400,107 @@ function VenueAddSuccess({
 }
 
 function Menu({ onPick, isOnVenue }: { onPick: (m: Mode) => void; isOnVenue: boolean }) {
-  // Global menu = primary action is "add new venue".
-  // On a venue page the local module handles sun/beer/photo, so this menu
-  // is only used as a fallback (deep-link cleared) — keep simple.
-  if (!isOnVenue) {
-    return (
-      <div className="pb-4">
-        <div className="text-center">
-          <h2 className="font-display text-lg font-semibold">Legg til nytt sted</h2>
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Mangler et sted? Legg det til så andre kan finne det.
-        </p>
-        <div className="mt-5 grid">
-          <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
-        </div>
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          For å rapportere sol, ølpris eller bilde — åpne et sted først.
-        </p>
-      </div>
-    );
-  }
   return (
     <div className="pb-4">
       <div className="text-center">
-        <h2 className="font-display text-lg font-semibold">Hva vil du dele?</h2>
+        <h2 className="font-display text-lg font-semibold">Del nå</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Hva vil du dele?</p>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <ActionCard emoji="☀️" label="Sol & stemning" onClick={() => onPick("sun")} />
-        <ActionCard emoji="👥" label="Hvor fullt?" onClick={() => onPick("crowd")} />
-        <ActionCard emoji="🍺" label="Ølpris" onClick={() => onPick("beer")} />
-        <ActionCard emoji="📸" label="Bilde" onClick={() => onPick("photo")} />
-        <ActionCard emoji="📍" label="Nytt sted" onClick={() => onPick("venue")} />
+        <ActionCard emoji="📸" label="Ta bilde" onClick={() => onPick("photo")} />
+        <ActionCard emoji="☀️" label="Rapporter sol" onClick={() => onPick("sun")} />
+        <ActionCard emoji="🙂" label="Rapporter folk" onClick={() => onPick("crowd")} />
+        <ActionCard emoji="🍺" label="Legg inn ølpris" onClick={() => onPick("beer")} />
+        <ActionCard emoji="📍" label="Legg til sted" onClick={() => onPick("venue")} />
       </div>
+      {!isOnVenue && (
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          Velg deretter hvilket sted oppdateringen gjelder.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PickVenueStep({
+  contrib,
+  onPick,
+  onExplore,
+  onBack,
+}: {
+  contrib: ContribMode | null;
+  onPick: (slug: string) => void;
+  onExplore: () => void;
+  onBack: () => void;
+}) {
+  const favs = useFavorites();
+  const { currentCity } = useCity();
+  const { data: allVenues = [] } = useVenues();
+  const saved = allVenues.filter(
+    (v) => favs.includes(v.id) && belongsToCity(v, currentCity as "Bergen" | "Oslo"),
+  );
+
+  const title: Record<ContribMode, string> = {
+    sun: "Hvor vil du rapportere sol?",
+    crowd: "Hvor vil du rapportere folk?",
+    beer: "Hvor vil du legge inn ølpris?",
+    photo: "Hvor vil du legge til bilde?",
+  };
+
+  return (
+    <div className="pb-4">
+      <div className="text-center">
+        <h2 className="font-display text-lg font-semibold">
+          {contrib ? title[contrib] : "Velg sted"}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Velg fra dine lagrede steder, eller finn et sted i kartet.
+        </p>
+      </div>
+
+      {saved.length === 0 ? (
+        <div className="mt-5 rounded-2xl bg-secondary/60 p-5 text-center">
+          <p className="text-sm text-muted-foreground">
+            Du har ingen lagrede steder ennå. Finn et sted i kartet og lagre det først.
+          </p>
+          <Button className="mt-4 w-full" onClick={onExplore}>
+            Åpne kart
+          </Button>
+        </div>
+      ) : (
+        <>
+          <ul className="mt-4 max-h-[55vh] space-y-2 overflow-y-auto">
+            {saved.map((v) => (
+              <li key={v.id}>
+                <button
+                  onClick={() => onPick(v.id)}
+                  className="tap-scale flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left shadow-soft"
+                >
+                  <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
+                    <MapPin className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-medium">{v.name}</div>
+                    <div className="truncate text-xs text-muted-foreground">
+                      {v.area || v.city}
+                    </div>
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <Button variant="secondary" className="mt-4 w-full" onClick={onExplore}>
+            Finn et annet sted i kartet
+          </Button>
+        </>
+      )}
+
+      <button
+        onClick={onBack}
+        className="mt-3 w-full text-center text-xs text-muted-foreground underline-offset-2 hover:underline"
+      >
+        Tilbake
+      </button>
     </div>
   );
 }

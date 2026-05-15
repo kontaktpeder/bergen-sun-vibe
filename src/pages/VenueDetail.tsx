@@ -71,7 +71,7 @@ const VenueDetail = () => {
 
   const handleFav = () => {
     toggleFavorite(venue.id);
-    toast(fav ? "Fjernet fra lagret" : "Lagret ❤️");
+    toast(fav ? "Fjernet fra dine steder" : "Lagt til dine steder ❤️");
   };
 
   const openMap = () => {
