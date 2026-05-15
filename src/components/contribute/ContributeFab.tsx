@@ -39,6 +39,14 @@ const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Oslo: { lat: 59.9139, lng: 10.7522 },
 };
 
+function confirmTitleFor(p: PendingPayload | null): string | undefined {
+  if (!p) return undefined;
+  if (p.type === "sun") return "Hvor var solrapporten?";
+  if (p.type === "crowd") return "Hvor var stemningen?";
+  if (p.type === "beer") return "Hvor gjelder prisen?";
+  return "Er du her?";
+}
+
 type Mode =
   | "menu"
   | "search-venue"
