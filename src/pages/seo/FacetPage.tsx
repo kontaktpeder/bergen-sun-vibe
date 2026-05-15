@@ -17,6 +17,7 @@ import {
 } from "@/lib/seo";
 import { belongsToCity } from "@/lib/domain";
 import { useCity } from "@/context/CityContext";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 export default function FacetPage() {
   const { citySlug, facetSlug } = useParams<{ citySlug: string; facetSlug: string }>();
