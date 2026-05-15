@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, LocateFixed, Search, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useVenues } from "@/hooks/useVenues";
