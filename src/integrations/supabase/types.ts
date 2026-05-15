@@ -294,6 +294,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_contribution: {
+        Args: { _contribution_id: string }
+        Returns: Json
+      }
       admin_delete_venue: { Args: { _venue_id: string }; Returns: Json }
       has_role: {
         Args: {
