@@ -51,12 +51,24 @@ const Explore = () => {
   useEffect(() => {
     if (venueParam && cityVenues.find(v => v.id === venueParam)) {
       setSelectedId(venueParam);
-      return;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [venueParam, cityVenues.length]);
+
+  useEffect(() => {
     if (cityVenues.length && !cityVenues.find(v => v.id === selectedId)) {
       setSelectedId(cityVenues[0].id);
     }
-  }, [cityVenues, selectedId, venueParam]);
+  }, [cityVenues, selectedId]);
+
+  const handleSelect = (id: string) => {
+    setSelectedId(id);
+    if (venueParam) {
+      const next = new URLSearchParams(searchParams);
+      next.delete("venue");
+      setSearchParams(next, { replace: true });
+    }
+  };
 
   const filtered = useMemo(() => {
     let v = cityVenues;
