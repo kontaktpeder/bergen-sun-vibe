@@ -108,6 +108,7 @@ export default function PlacePage() {
                 index={i}
                 badge={badgeMap[v.dbId] ?? null}
                 userPhotoUrl={photoMap[v.dbId] ?? null}
+                userLocation={userLocation}
               />
             ))}
           </div>
