@@ -226,7 +226,7 @@ const Explore = () => {
             <button
               key={v.id}
               onClick={() => {
-                setSelectedId(v.id);
+                handleSelect(v.id);
                 if (typeof window !== "undefined") {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }
