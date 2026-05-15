@@ -141,17 +141,10 @@ const VenueDetail = () => {
         <h1 className="mt-1 font-display text-3xl font-semibold leading-tight">{venue.name}</h1>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          {venue.area && (
+          {(venue.address || venue.area) && (
             <span className="inline-flex items-center gap-1 text-muted-foreground">
               <MapPin className="h-3.5 w-3.5" />
-              {venue.area}{cityLabel ? `, ${cityLabel}` : ""}
-            </span>
-          )}
-          {venue.rating > 0 && (
-            <span className="inline-flex items-center gap-1.5">
-              <Star className="h-4 w-4 fill-sun text-sun" />
-              <span className="font-semibold">{venue.rating}</span>
-              <span className="text-muted-foreground">({venue.reviews})</span>
+              {venue.address || `${venue.area}${cityLabel ? `, ${cityLabel}` : ""}`}
             </span>
           )}
         </div>
