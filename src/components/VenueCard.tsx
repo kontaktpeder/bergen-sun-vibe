@@ -122,7 +122,7 @@ export function VenueCard({ venue, variant = "default", index = 0, badge, userPh
           <h4 className="truncate font-display text-base font-semibold">{venue.name}</h4>
           <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-sun text-sun" />{venue.rating}</span>
-            <span>·</span><span className="capitalize truncate">{venue.category}</span>
+            <span>·</span><span className="capitalize truncate">{venue.category}</span><span>·</span><span className="truncate">{locationLabel}</span>
           </div>
         </div>
       </Link>
