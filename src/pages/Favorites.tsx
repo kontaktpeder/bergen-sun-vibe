@@ -10,6 +10,9 @@ import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 import { useFavoriteContributionsFeed } from "@/hooks/useFavoriteContributionsFeed";
 import { SavedVenueStripCard } from "@/components/SavedVenueStripCard";
 import { FavoriteUpdateFeedItem } from "@/components/FavoriteUpdateFeedItem";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { buildCanonical } from "@/lib/seo";
+import { citySlugFor } from "@/lib/city-copy";
 
 const Favorites = () => {
   const favs = useFavorites();
