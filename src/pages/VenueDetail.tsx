@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, MapPin, Clock, Star, Navigation } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Clock, Star } from "lucide-react";
 import { toast } from "sonner";
+import { useMemo, useState } from "react";
 import { useVenue } from "@/hooks/useVenue";
 import { useVenueContributions } from "@/hooks/useVenueContributions";
 import { SunBadge } from "@/components/SunBadge";
@@ -13,10 +14,16 @@ import { VenueImage } from "@/components/VenueImage";
 import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { SaveVenueAuthPrompt } from "@/components/SaveVenueAuthPrompt";
-import { useState } from "react";
 import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
 import { inferLegacyCity } from "@/lib/domain";
+import { buildVenueContentBlocks } from "@/lib/venueContent";
+import { VenueVibePills } from "@/components/venue/VenueVibePills";
+import { VenueStickyActions } from "@/components/venue/VenueStickyActions";
+import { VenueIntroBlock } from "@/components/venue/VenueIntroBlock";
+import { VenueWorthKnowing } from "@/components/venue/VenueWorthKnowing";
+import { VenueLocalTips } from "@/components/venue/VenueLocalTips";
+import { VenueSection } from "@/components/venue/VenueSection";
 
 const VenueDetail = () => {
   const params = useParams<{ id?: string; slug?: string }>();
@@ -31,6 +38,11 @@ const VenueDetail = () => {
   const venueIds = venue?.dbId ? [venue.dbId] : [];
   const { data: badgeMap = {} } = useVenueBadges(venueIds);
   const badge = venue?.dbId ? badgeMap[venue.dbId] : undefined;
+
+  const content = useMemo(
+    () => (venue ? buildVenueContentBlocks(venue, badge) : null),
+    [venue, badge],
+  );
 
   const openContribute = (mode: "sun" | "beer" | "photo" | "crowd") => {
     setSearchParams({ contribute: mode }, { replace: false });
@@ -51,7 +63,7 @@ const VenueDetail = () => {
     );
   }
 
-  if (!venue) {
+  if (!venue || !content) {
     return (
       <div className="grid min-h-screen place-items-center p-6 text-center">
         <div>
@@ -63,7 +75,6 @@ const VenueDetail = () => {
   }
 
   const fav = isFavorite(venue.id);
-
   const cityLabel = venue.city ?? (venue.lat && venue.lng ? inferLegacyCity(venue.lat, venue.lng) : null);
 
   const handleShare = async () => {
@@ -100,7 +111,9 @@ const VenueDetail = () => {
   };
 
   return (
-    <div className="pb-10">
+    <article className="pb-10">
+      <SaveVenueAuthPrompt open={authOpen} onOpenChange={setAuthOpen} />
+
       {/* Hero */}
       <div className="relative h-[55vh] overflow-hidden">
         {(() => {
@@ -137,22 +150,35 @@ const VenueDetail = () => {
         <h1 className="mt-1 font-display text-3xl font-semibold leading-tight">{venue.name}</h1>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          <span className="inline-flex items-center gap-1.5">
-            <Star className="h-4 w-4 fill-sun text-sun" />
-            <span className="font-semibold">{venue.rating}</span>
-            <span className="text-muted-foreground">({venue.reviews})</span>
-          </span>
-          <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{venue.area}</span>
+          {venue.area && (
+            <span className="inline-flex items-center gap-1 text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5" />
+              {venue.area}{cityLabel ? `, ${cityLabel}` : ""}
+            </span>
+          )}
+          {venue.rating > 0 && (
+            <span className="inline-flex items-center gap-1.5">
+              <Star className="h-4 w-4 fill-sun text-sun" />
+              <span className="font-semibold">{venue.rating}</span>
+              <span className="text-muted-foreground">({venue.reviews})</span>
+            </span>
+          )}
         </div>
 
-        {/* Live status + contribute (combined) */}
-        <VenueStatusBadges
-          contributions={contributions}
-          onSun={() => openContribute("sun")}
-          onCrowd={() => openContribute("crowd")}
-          onBeer={() => openContribute("beer")}
-          onPhoto={() => openContribute("photo")}
-        />
+        <VenueVibePills labels={content.vibeLabels} />
+
+        <VenueStickyActions onMap={openMap} onShare={handleShare} onSave={handleFav} saved={fav} />
+
+        <VenueSection id="akkurat-na" title="Akkurat nå">
+          <VenueStatusBadges
+            contributions={contributions}
+            onSun={() => openContribute("sun")}
+            onCrowd={() => openContribute("crowd")}
+            onBeer={() => openContribute("beer")}
+            onPhoto={() => openContribute("photo")}
+          />
+          <VenuePhotoGallery contributions={contributions} onAdd={() => openContribute("photo")} />
+        </VenueSection>
 
         {venue.dealText && (
           <div className="mt-4 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-primary to-sunset-pink p-4 text-white shadow-card">
@@ -164,21 +190,18 @@ const VenueDetail = () => {
           </div>
         )}
 
-        {/* Photo gallery */}
-        <VenuePhotoGallery contributions={contributions} onAdd={() => openContribute("photo")} />
+        <VenueIntroBlock
+          introShort={content.introShort}
+          introFull={content.introFull}
+          showReadMore={content.showReadMore}
+        />
 
-        {/* Tags */}
-        <div className="mt-5 flex flex-wrap gap-2">
-          {venue.tags.map((t) => (
-            <span key={t} className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-foreground">#{t}</span>
-          ))}
-        </div>
+        <VenueWorthKnowing facts={content.facts} />
 
-        {/* Description */}
-        <p className="mt-5 text-[15px] leading-relaxed text-foreground/85">{venue.description}</p>
+        <VenueLocalTips tips={content.tips} />
 
         {/* Hours */}
-        <div className="mt-5 flex items-center gap-3 rounded-2xl bg-card p-4 shadow-soft">
+        <div className="mt-6 flex items-center gap-3 rounded-2xl bg-card p-4 shadow-soft">
           <div className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
             <Clock className="h-4 w-4" />
           </div>
@@ -202,69 +225,60 @@ const VenueDetail = () => {
 
         {/* Mini-feed */}
         {contributions.length > 0 && (
-          <div className="mt-4 rounded-2xl bg-card p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold uppercase tracking-widest text-primary">Aktivitet</div>
-              <span className="text-[10px] text-muted-foreground">Rapporter feil med 🚩 på bidraget</span>
+          <VenueSection id="aktivitet" title="Aktivitet">
+            <div className="rounded-2xl bg-card p-4 shadow-soft">
+              <div className="flex items-center justify-end">
+                <span className="text-[10px] text-muted-foreground">Rapporter feil med 🚩 på bidraget</span>
+              </div>
+              <ul className="mt-3 space-y-3">
+                {contributions.map((c) => {
+                  const d = c.data as Record<string, unknown>;
+                  let label = "Bidrag";
+                  let emoji = "✨";
+                  if (c.type === "sun_report") {
+                    const s = String(d?.status ?? "");
+                    const meta: Record<string, { e: string; l: string }> = {
+                      sun: { e: "☀️", l: "Rapporterte sol" },
+                      partial: { e: "⛅", l: "Rapporterte delvis sol" },
+                      going_down: { e: "🌇", l: "Sol på vei ned" },
+                      shade: { e: "🌥️", l: "Rapporterte skygge" },
+                    };
+                    emoji = meta[s]?.e ?? "☀️";
+                    label = meta[s]?.l ?? "Solrapport";
+                  } else if (c.type === "crowd_report") {
+                    const lvl = String(d?.level ?? "");
+                    const meta: Record<string, { e: string; l: string }> = {
+                      quiet: { e: "😌", l: "Rapporterte rolig stemning" },
+                      some: { e: "🙂", l: "Rapporterte litt liv" },
+                      full: { e: "🔥", l: "Rapporterte fullt / livlig" },
+                      queue: { e: "🔥", l: "Rapporterte fullt / livlig" },
+                    };
+                    emoji = meta[lvl]?.e ?? "👥";
+                    label = meta[lvl]?.l ?? "Stemning";
+                  } else if (c.type === "beer_price") {
+                    emoji = "🍺";
+                    label = `Oppdaterte ølpris til kr ${d?.price}`;
+                  } else if (c.type === "photo") {
+                    emoji = "📸";
+                    label = "La til bilde";
+                  }
+                  return (
+                    <li key={c.id} className="flex items-center gap-3 text-sm">
+                      <span className="text-lg">{emoji}</span>
+                      <div className="flex-1">
+                        <div className="font-medium">{label}</div>
+                        <div className="text-xs text-muted-foreground">{timeAgo(c.created_at)}</div>
+                      </div>
+                      <ReportButton contributionId={c.id} />
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-            <ul className="mt-3 space-y-3">
-              {contributions.map((c) => {
-                const d = c.data as Record<string, unknown>;
-                let label = "Bidrag";
-                let emoji = "✨";
-                if (c.type === "sun_report") {
-                  const s = String(d?.status ?? "");
-                  const meta: Record<string, { e: string; l: string }> = {
-                    sun: { e: "☀️", l: "Rapporterte sol" },
-                    partial: { e: "⛅", l: "Rapporterte delvis sol" },
-                    going_down: { e: "🌇", l: "Sol på vei ned" },
-                    shade: { e: "🌥️", l: "Rapporterte skygge" },
-                  };
-                  emoji = meta[s]?.e ?? "☀️";
-                  label = meta[s]?.l ?? "Solrapport";
-                } else if (c.type === "crowd_report") {
-                  const lvl = String(d?.level ?? "");
-                  const meta: Record<string, { e: string; l: string }> = {
-                    quiet: { e: "😌", l: "Rapporterte rolig stemning" },
-                    some: { e: "🙂", l: "Rapporterte litt liv" },
-                    full: { e: "🔥", l: "Rapporterte fullt / livlig" },
-                    queue: { e: "🔥", l: "Rapporterte fullt / livlig" },
-                  };
-                  emoji = meta[lvl]?.e ?? "👥";
-                  label = meta[lvl]?.l ?? "Stemning";
-                } else if (c.type === "beer_price") {
-                  emoji = "🍺";
-                  label = `Oppdaterte ølpris til kr ${d?.price}`;
-                } else if (c.type === "photo") {
-                  emoji = "📸";
-                  label = "La til bilde";
-                }
-                return (
-                  <li key={c.id} className="flex items-center gap-3 text-sm">
-                    <span className="text-lg">{emoji}</span>
-                    <div className="flex-1">
-                      <div className="font-medium">{label}</div>
-                      <div className="text-xs text-muted-foreground">{timeAgo(c.created_at)}</div>
-                    </div>
-                    <ReportButton contributionId={c.id} />
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+          </VenueSection>
         )}
-
-        {/* Actions */}
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          <button onClick={openMap} className="tap-scale flex items-center justify-center gap-2 rounded-full bg-night py-3.5 font-medium text-white shadow-card">
-            <Navigation className="h-4 w-4" /> Åpne i kart
-          </button>
-          <button onClick={handleShare} className="tap-scale flex items-center justify-center gap-2 rounded-full bg-card py-3.5 font-medium shadow-soft">
-            <Share2 className="h-4 w-4" /> Del
-          </button>
-        </div>
       </div>
-    </div>
+    </article>
   );
 };
 
