@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { Beer } from "lucide-react";
 import type { Venue } from "@/lib/domain";
 import type { VenueBadgeState } from "@/hooks/useVenueBadges";
 import { VenueImage } from "@/components/VenueImage";
-import { DataSunBadge } from "@/components/DataSunBadge";
-import { CrowdTag } from "@/components/VenueCard";
+import { VenuePreviewBadges } from "@/components/VenuePreviewBadges";
+import { VenueCardFavoriteButton } from "@/components/VenueCardFavoriteButton";
+import { getVenuePreviewBadges } from "@/lib/venuePreviewBadges";
 import { timeAgo } from "@/lib/time";
 
 const CARD_SIZE = { w: 600, h: 600 };
@@ -24,6 +24,7 @@ interface Props {
 
 export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0 }: Props) {
   const updatedAt = latestUpdateAt(venue, badge);
+  const previewBadges = getVenuePreviewBadges(badge);
 
   return (
     <Link
@@ -41,18 +42,9 @@ export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0 }: P
         />
         <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-night/10 to-transparent" />
 
-        <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-1">
-          {badge?.sun && <DataSunBadge badge={badge} size="sm" />}
-          {badge?.beerPrice != null && (
-            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-foreground shadow-soft">
-              <Beer className="h-3 w-3" />
-              {badge.beerPrice} kr
-            </span>
-          )}
-        </div>
-
-        <div className="absolute bottom-2 right-2">
-          <CrowdTag level={badge?.crowd} />
+        <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-1.5">
+          <VenuePreviewBadges badges={previewBadges} />
+          <VenueCardFavoriteButton venueId={venue.id} />
         </div>
 
         <div className="absolute inset-x-0 bottom-0 p-3 text-white">

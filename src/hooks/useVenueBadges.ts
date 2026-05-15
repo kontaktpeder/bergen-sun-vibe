@@ -65,11 +65,14 @@ export function useVenueBadges(venueIds: string[]) {
         if (r.type === "sun_report" && s.sun === null) {
           const ageMs = Date.now() - new Date(r.created_at).getTime();
           if (ageMs > FRESH_MS) {
-            s.sun = "unknown";
+            // Utløpt sol-rapport → ingen badge på preview-kort.
+            // Stedssiden kan vise "Trenger ditt bidrag" basert på fravær.
+            s.sun = null;
+            s.sunAt = null;
           } else {
-            s.sun = mapSun(r.data?.status) ?? "unknown";
+            s.sun = mapSun(r.data?.status);
+            s.sunAt = s.sun ? r.created_at : null;
           }
-          s.sunAt = r.created_at;
         } else if (r.type === "beer_price" && s.beerPrice === null) {
           const raw = r.data?.price;
           const n = typeof raw === "number" ? raw : Number(raw);

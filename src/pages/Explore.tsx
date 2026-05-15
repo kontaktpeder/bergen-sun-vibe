@@ -6,15 +6,15 @@ import { useVenues } from "@/hooks/useVenues";
 import { belongsToCity } from "@/lib/domain";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { FilterChips } from "@/components/FilterChips";
-import { SunBadge } from "@/components/SunBadge";
-import { DataSunBadge } from "@/components/DataSunBadge";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { VenueMap } from "@/components/VenueMap";
 import { VenueImage } from "@/components/VenueImage";
+import { VenuePreviewBadges } from "@/components/VenuePreviewBadges";
+import { VenueCardFavoriteButton } from "@/components/VenueCardFavoriteButton";
+import { getVenuePreviewBadges } from "@/lib/venuePreviewBadges";
 import { useCity } from "@/context/CityContext";
 import { CityBanner } from "@/components/CityBanner";
 import { cn } from "@/lib/utils";
-import { CrowdTag } from "@/components/VenueCard";
 
 const filters = [
   { id: "all", label: "Alt", emoji: "✨" },
@@ -165,10 +165,10 @@ const Explore = () => {
                         {selected.reviews > 0 && <span className="text-muted-foreground">({selected.reviews})</span>}
                       </div>
                     )}
-                    {badgeMap[selected.dbId]?.sun && (
-                      <div className="mt-1.5"><DataSunBadge badge={badgeMap[selected.dbId]} /></div>
-                    )}
-                    <div className="mt-1"><CrowdTag level={badgeMap[selected.dbId]?.crowd} /></div>
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <VenuePreviewBadges badges={getVenuePreviewBadges(badgeMap[selected.dbId])} />
+                      <VenueCardFavoriteButton venueId={selected.id} className="ml-auto" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -215,10 +215,7 @@ const Explore = () => {
               <div className="min-w-0 flex-1">
                 <div className="truncate font-display text-base font-semibold">{v.name}</div>
                 <div className="truncate text-xs text-muted-foreground">{v.area} · {v.category}</div>
-                {badgeMap[v.dbId]?.sun && (
-                  <div className="mt-1"><DataSunBadge badge={badgeMap[v.dbId]} /></div>
-                )}
-                <div className="mt-0.5"><CrowdTag level={badgeMap[v.dbId]?.crowd} /></div>
+                <div className="mt-1"><VenuePreviewBadges badges={getVenuePreviewBadges(badgeMap[v.dbId])} /></div>
               </div>
               {v.rating > 0 && (
                 <div className="shrink-0 text-right">
