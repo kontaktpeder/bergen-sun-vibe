@@ -48,7 +48,7 @@ export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0, has
       className="group block w-full tap-scale animate-stagger"
       style={{ animationDelay: `${index * 50}ms` }}
     >
-      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-card">
+      <div className={`relative ${compact ? "aspect-square" : "aspect-[4/5]"} overflow-hidden rounded-2xl shadow-card`}>
         <VenueImage
           venue={venue}
           userPhotoUrl={userPhotoUrl}
@@ -58,28 +58,34 @@ export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0, has
         />
         <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-night/10 to-transparent" />
 
-        <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-1.5">
-          <VenuePreviewBadges badges={previewBadges} />
-          <VenueCardFavoriteButton venueId={venue.id} />
-        </div>
-
-        {hasNewUpdate && (
-          <div className="absolute bottom-[68px] left-2">
-            <span className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground shadow-soft">
-              Ny oppdatering
-            </span>
+        {!compact && (
+          <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-1.5">
+            <VenuePreviewBadges badges={previewBadges} />
+            <VenueCardFavoriteButton venueId={venue.id} />
           </div>
         )}
 
-        <div className="absolute inset-x-0 bottom-0 p-3 text-white">
-          <h4 className="truncate font-display text-base font-semibold">{venue.name}</h4>
-          {status ? (
+        {hasNewUpdate && (
+          <div className={compact ? "absolute top-2 right-2" : "absolute bottom-[68px] left-2"}>
+            {compact ? (
+              <span className="block h-2 w-2 rounded-full bg-primary shadow-glow" />
+            ) : (
+              <span className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground shadow-soft">
+                Ny oppdatering
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className={`absolute inset-x-0 bottom-0 ${compact ? "p-2" : "p-3"} text-white`}>
+          <h4 className={`truncate font-display font-semibold ${compact ? "text-sm" : "text-base"}`}>{venue.name}</h4>
+          {!compact && (status ? (
             <p className="mt-0.5 truncate text-[11px] opacity-90">{status}</p>
           ) : updatedAt ? (
             <p className="mt-0.5 text-[10px] uppercase tracking-wider opacity-85">
               Oppdatert {timeAgo(updatedAt)}
             </p>
-          ) : null}
+          ) : null)}
         </div>
       </div>
     </Link>
