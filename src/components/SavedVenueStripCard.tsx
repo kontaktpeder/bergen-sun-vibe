@@ -29,7 +29,7 @@ export function SavedVenueStripCard({ venue, badge, userPhotoUrl, index = 0 }: P
   return (
     <Link
       to={`/steder/${venue.id}`}
-      className="group block w-[200px] shrink-0 tap-scale animate-stagger"
+      className="group block w-full tap-scale animate-stagger"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-card">
