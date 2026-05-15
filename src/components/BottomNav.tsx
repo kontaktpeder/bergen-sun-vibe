@@ -43,7 +43,7 @@ export function BottomNav() {
               <span className="-mt-5 grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-primary to-sunset-pink text-white shadow-float">
                 <Plus className="h-7 w-7" strokeWidth={2.5} />
               </span>
-              <span className="text-[10px] font-semibold text-foreground">Del nå</span>
+              <span className="text-[10px] font-semibold text-foreground">{isPlace ? "Oppdater" : "Del nå"}</span>
             </button>
           )}
           {rightItems.map(({ to, icon: Icon, label }) => (
