@@ -224,7 +224,7 @@ const Home = () => {
               <h2 className="mt-1 font-display text-2xl font-semibold">Kveldens utvalgte</h2>
             </div>
           </div>
-          <VenueCard venue={featured} variant="feature" badge={badgeMap[featured.dbId] ?? null} userPhotoUrl={photoMap[featured.dbId] ?? null} eager />
+          <VenueCard venue={featured} variant="feature" badge={badgeMap[featured.dbId] ?? null} userPhotoUrl={photoMap[featured.dbId] ?? null} userLocation={userLocation} eager />
         </section>
       )}
 
