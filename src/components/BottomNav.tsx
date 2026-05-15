@@ -35,7 +35,7 @@ export function BottomNav() {
           ))}
           {FLAGS.contributionsEnabled && !onAuth && (
             <button
-              onClick={() => openContributeFab("menu")}
+              onClick={() => openContributeFab("capture-photo")}
               aria-label="Del nå"
               className="tap-scale flex flex-col items-center gap-0.5 px-2"
             >
