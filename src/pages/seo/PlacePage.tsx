@@ -14,6 +14,7 @@ import {
   shouldNoIndex,
   slugifyNorwegian,
 } from "@/lib/seo";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 import VenueDetail from "@/pages/VenueDetail";
 
