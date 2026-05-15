@@ -7,6 +7,7 @@ import { VenueImage } from "@/components/VenueImage";
 interface Props {
   result: VenueGuessResult | null;
   loading?: boolean;
+  title?: string;
   onConfirm: (venue: Venue) => void;
   onChangeVenue: () => void;
   onExplore: () => void;
@@ -15,6 +16,7 @@ interface Props {
 export function ConfirmVenueStep({
   result,
   loading,
+  title,
   onConfirm,
   onChangeVenue,
   onExplore,
@@ -54,7 +56,7 @@ export function ConfirmVenueStep({
     <div className="pb-4">
       <div className="text-center">
         <h2 className="font-display text-lg font-semibold">
-          {showSingle ? "Er du her?" : "Hvilket sted er du på?"}
+          {title ?? (showSingle ? "Er du her?" : "Hvilket sted er du på?")}
         </h2>
         {showSingle && (
           <p className="mt-1 text-sm text-muted-foreground">

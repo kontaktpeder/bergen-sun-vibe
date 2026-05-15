@@ -39,6 +39,14 @@ const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
   Oslo: { lat: 59.9139, lng: 10.7522 },
 };
 
+function confirmTitleFor(p: PendingPayload | null): string | undefined {
+  if (!p) return undefined;
+  if (p.type === "sun") return "Hvor var solrapporten?";
+  if (p.type === "crowd") return "Hvor var stemningen?";
+  if (p.type === "beer") return "Hvor gjelder prisen?";
+  return "Er du her?";
+}
+
 type Mode =
   | "menu"
   | "search-venue"
@@ -106,7 +114,14 @@ export function ContributeFab() {
     );
   }, [userLoc, cityVenues, favs, badgeMap]);
 
-  // Trigger geolocation when entering confirm step
+  // Warm up GPS as soon as menu opens (not on a venue page) — so confirm step is instant
+  useEffect(() => {
+    if (open && !isOnVenue && !userLoc && !geoLoading) {
+      locate();
+    }
+  }, [open, isOnVenue, userLoc, geoLoading, locate]);
+
+  // Fallback: trigger geolocation when entering confirm step
   useEffect(() => {
     if (mode === "confirm-venue" && !userLoc && !geoLoading) {
       locate();
@@ -343,6 +358,7 @@ export function ContributeFab() {
             <ConfirmVenueStep
               result={guessResult}
               loading={geoLoading || (!userLoc && !guessResult)}
+              title={confirmTitleFor(pendingPayload)}
               onConfirm={(venue) => {
                 if (!pendingPayload || submitting) return;
                 void submitForVenue(venue.dbId, pendingPayload);
