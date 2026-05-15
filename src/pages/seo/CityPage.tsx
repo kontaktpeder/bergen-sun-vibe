@@ -17,6 +17,7 @@ import {
 } from "@/lib/seo";
 import { belongsToCity } from "@/lib/domain";
 import { useCity } from "@/context/CityContext";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 export default function CityPage() {
   const { citySlug } = useParams<{ citySlug: string }>();
