@@ -29,12 +29,12 @@ const Auth = () => {
         });
         if (error) throw error;
         toast.success("Konto opprettet — du er logget inn ☀️");
-        navigate("/profile");
+        navigate("/");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Velkommen tilbake");
-        navigate("/profile");
+        navigate("/");
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Noe gikk galt";
