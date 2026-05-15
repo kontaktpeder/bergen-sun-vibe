@@ -90,22 +90,7 @@ const VenueDetail = () => {
   };
 
   const openMap = () => {
-    const label = venue.name ? `${venue.name}${cityLabel ? `, ${cityLabel}` : ""}` : `${venue.lat},${venue.lng}`;
-    const q = encodeURIComponent(label);
-    const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-    const isIOS = /iPad|iPhone|iPod/.test(ua);
-    const isAndroid = /Android/.test(ua);
-    let url: string;
-    if (isIOS) {
-      url = `maps://?q=${q}&ll=${venue.lat},${venue.lng}`;
-    } else if (isAndroid) {
-      url = `geo:${venue.lat},${venue.lng}?q=${venue.lat},${venue.lng}(${q})`;
-    } else if (venue.googleMapsUrl) {
-      url = venue.googleMapsUrl;
-    } else {
-      url = `https://www.google.com/maps/search/?api=1&query=${q}&center=${venue.lat},${venue.lng}`;
-    }
-    window.open(url, "_blank");
+    navigate(`/explore?venue=${encodeURIComponent(venue.id)}`);
   };
 
   return (
