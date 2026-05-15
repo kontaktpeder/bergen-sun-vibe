@@ -27,6 +27,7 @@ const AdminVenues = () => {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const { data: venues = [], isLoading, error } = useQuery({
     queryKey: ["admin-venues"],
