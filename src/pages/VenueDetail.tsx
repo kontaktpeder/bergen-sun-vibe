@@ -30,6 +30,7 @@ const VenueDetail = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const { data: venue, isLoading, error } = useVenue(slug);
   const { data: contributions = [] } = useVenueContributions(venue?.dbId);
+  const { data: latestPhotoUrl } = useLatestVenuePhoto(venue?.dbId);
   const venueIds = venue?.dbId ? [venue.dbId] : [];
   useVenueBadges(venueIds);
 
