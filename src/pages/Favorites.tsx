@@ -10,6 +10,9 @@ import { useVenuePhotos } from "@/hooks/useVenuePhotos";
 import { useFavoriteContributionsFeed } from "@/hooks/useFavoriteContributionsFeed";
 import { SavedVenueStripCard } from "@/components/SavedVenueStripCard";
 import { FavoriteUpdateFeedItem } from "@/components/FavoriteUpdateFeedItem";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { buildCanonical } from "@/lib/seo";
+import { citySlugFor } from "@/lib/city-copy";
 
 const Favorites = () => {
   const favs = useFavorites();
@@ -38,6 +41,11 @@ const Favorites = () => {
 
   return (
     <div className="px-5 pt-[max(env(safe-area-inset-top),1.5rem)] pb-10">
+      <SeoHead
+        title={`Dine steder i ${currentCity} | Utefolket`}
+        description={`Følg sol, stemning og ølpriser på dine favorittsteder i ${currentCity}.`}
+        canonical={buildCanonical(`/${citySlugFor(currentCity)}`)}
+      />
       <header className="pt-2">
         <div className="text-xs font-semibold uppercase tracking-widest text-primary">
           Dine steder

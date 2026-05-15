@@ -7,6 +7,9 @@ import { useIsAdmin } from "@/hooks/useReports";
 import { supabase } from "@/integrations/supabase/client";
 import { getLevel, getNextLevelThreshold, getLevelProgress } from "@/lib/levels";
 import { useCity, type City } from "@/context/CityContext";
+import { cityFooter, citySlugFor } from "@/lib/city-copy";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { buildCanonical } from "@/lib/seo";
 
 const Profile = () => {
   const favs = useFavorites();
@@ -42,6 +45,12 @@ const Profile = () => {
   if (!isAuthed) {
     return (
       <div className="px-5 pt-[max(env(safe-area-inset-top),1.5rem)] pb-12">
+        <SeoHead
+          title={`Min profil — Utefolket ${currentCity}`}
+          description={`Bli en del av Utefolket i ${currentCity}. Bidra med sol, stemning og ølpriser.`}
+          canonical={buildCanonical(`/${citySlugFor(currentCity)}`)}
+          robots="noindex,follow"
+        />
         <div className="mt-10 overflow-hidden rounded-3xl bg-gradient-to-br from-night via-sunset-purple to-primary p-7 text-white shadow-card">
           <div className="grid h-12 w-12 place-items-center rounded-full bg-sun shadow-glow">
             <Sun className="h-6 w-6 text-night" strokeWidth={2.5} />
@@ -58,13 +67,19 @@ const Profile = () => {
           </button>
         </div>
 
-        <p className="mt-10 text-center text-xs text-muted-foreground">v1.0 · Laget med ☀️ i Bergen</p>
+        <p className="mt-10 text-center text-xs text-muted-foreground">v1.0 · {cityFooter(currentCity)}</p>
       </div>
     );
   }
 
   return (
     <div className="pb-6">
+      <SeoHead
+        title={`Min profil — Utefolket ${currentCity}`}
+        description={`Følg sol, stemning og ølpriser i ${currentCity}.`}
+        canonical={buildCanonical(`/${citySlugFor(currentCity)}`)}
+        robots="noindex,follow"
+      />
       <div className="relative h-44 overflow-hidden bg-gradient-to-br from-primary via-sunset-pink to-sunset-purple">
         <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-sun blur-3xl opacity-60" />
       </div>
@@ -203,7 +218,7 @@ const Profile = () => {
           <LogOut className="h-4 w-4" /> Logg ut
         </button>
 
-        <p className="mt-8 text-center text-xs text-muted-foreground">v1.0 · Laget med ☀️ i Bergen</p>
+        <p className="mt-8 text-center text-xs text-muted-foreground">v1.0 · {cityFooter(currentCity)}</p>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import { VenueImage } from "@/components/VenueImage";
 import { isFavorite, toggleFavorite, useFavorites } from "@/lib/favorites";
 import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
+import { inferLegacyCity } from "@/lib/domain";
 
 const VenueDetail = () => {
   const params = useParams<{ id?: string; slug?: string }>();
@@ -58,8 +59,11 @@ const VenueDetail = () => {
 
   const fav = isFavorite(venue.id);
 
+  const cityLabel = venue.city ?? (venue.lat && venue.lng ? inferLegacyCity(venue.lat, venue.lng) : null);
+
   const handleShare = async () => {
-    const data = { title: `${venue.name} – Uteliv Bergen`, text: venue.description, url: window.location.href };
+    const brand = cityLabel ? `Utefolket ${cityLabel}` : "Utefolket";
+    const data = { title: `${venue.name} – ${brand}`, text: venue.description, url: window.location.href };
     try {
       if (navigator.share) await navigator.share(data);
       else {
@@ -80,7 +84,7 @@ const VenueDetail = () => {
       return;
     }
     const q = encodeURIComponent(
-      venue.name ? `${venue.name}, ${venue.city ?? "Bergen"}` : `${venue.lat},${venue.lng}`,
+      venue.name ? `${venue.name}${cityLabel ? `, ${cityLabel}` : ""}` : `${venue.lat},${venue.lng}`,
     );
     const url = `https://www.google.com/maps/search/?api=1&query=${q}&center=${venue.lat},${venue.lng}`;
     window.open(url, "_blank");

@@ -15,6 +15,9 @@ import { getVenuePreviewBadges } from "@/lib/venuePreviewBadges";
 import { useCity } from "@/context/CityContext";
 import { CityBanner } from "@/components/CityBanner";
 import { cn } from "@/lib/utils";
+import { SeoHead } from "@/components/seo/SeoHead";
+import { buildCanonical } from "@/lib/seo";
+import { citySlugFor } from "@/lib/city-copy";
 
 const filters = [
   { id: "all", label: "Alt", emoji: "✨" },
@@ -81,6 +84,11 @@ const Explore = () => {
 
   return (
     <div className="relative min-h-screen">
+      <SeoHead
+        title={`Utforsk steder i ${city} | Utefolket`}
+        description={`Kart og live-stemning fra utesteder i ${city} akkurat nå.`}
+        canonical={buildCanonical(`/${citySlugFor(city)}`)}
+      />
       {/* Map — fyller mer av skjermen for app-feel */}
       <div className="relative h-[82vh] overflow-hidden bg-secondary">
         <div className="absolute inset-0">
