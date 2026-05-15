@@ -332,6 +332,15 @@ export type Database = {
         Returns: Json
       }
       admin_delete_venue: { Args: { _venue_id: string }; Returns: Json }
+      admin_update_venue: {
+        Args: {
+          _description: string
+          _hours: string
+          _tags: string[]
+          _venue_id: string
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

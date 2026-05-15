@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { useIsAdmin } from "@/hooks/useReports";
 import { AdminVenuePhotos } from "@/components/admin/AdminVenuePhotos";
+import { AdminVenueEditor } from "@/components/admin/AdminVenueEditor";
 import { cn } from "@/lib/utils";
 
 type VenueRow = {
@@ -17,6 +18,9 @@ type VenueRow = {
   category: string;
   city: string | null;
   area: string | null;
+  description: string | null;
+  tags: string[] | null;
+  hours: string | null;
   created_at: string;
 };
 
@@ -35,7 +39,7 @@ const AdminVenues = () => {
     queryFn: async (): Promise<VenueRow[]> => {
       const { data, error } = await supabase
         .from("venues")
-        .select("id, name, slug, category, city, area, created_at")
+        .select("id, name, slug, category, city, area, description, tags, hours, created_at")
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
@@ -145,7 +149,7 @@ const AdminVenues = () => {
                   />
                 </button>
                 <Link
-                  to={`/venue/${v.slug}`}
+                  to={`/steder/${v.slug}`}
                   className="rounded-full px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
                 >
                   Vis
@@ -160,7 +164,18 @@ const AdminVenues = () => {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              {expanded && <AdminVenuePhotos venueId={v.id} />}
+              {expanded && (
+                <>
+                  <AdminVenueEditor
+                    venueId={v.id}
+                    slug={v.slug}
+                    initialDescription={v.description ?? ""}
+                    initialTags={v.tags ?? []}
+                    initialHours={v.hours ?? ""}
+                  />
+                  <AdminVenuePhotos venueId={v.id} />
+                </>
+              )}
             </div>
           );
         })}
