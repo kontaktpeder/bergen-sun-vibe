@@ -143,7 +143,7 @@ export function VenueMap({ venues, selectedId, onSelect, fallbackCenter, userLoc
         maxZoom={20}
       />
       <FitBounds venues={validVenues} />
-      <PanToSelected venues={validVenues} selectedId={selectedId} />
+      <PanToSelected venues={validVenues} selectedId={selectedId} flyOnMount={flyToSelectedOnMount} />
       <FlyToUser location={userLocation} />
       {userLocation && (
         <Marker position={[userLocation.lat, userLocation.lng]} icon={userLocationIcon} />
