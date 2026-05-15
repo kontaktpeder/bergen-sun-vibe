@@ -256,6 +256,7 @@ const Home = () => {
                   index={i}
                   badge={badgeMap[v.dbId] ?? null}
                   userPhotoUrl={photoMap[v.dbId] ?? null}
+                  userLocation={userLocation}
                   eager={i < 3}
                 />
               ))}
