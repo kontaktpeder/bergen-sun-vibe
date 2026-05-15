@@ -123,31 +123,47 @@ const AdminVenues = () => {
       )}
 
       <div className="mt-5 space-y-2">
-        {filtered.map((v) => (
-          <div key={v.id} className="flex items-center gap-3 rounded-2xl bg-card p-3 shadow-soft">
-            <div className="min-w-0 flex-1">
-              <div className="truncate font-medium">{v.name}</div>
-              <div className="truncate text-xs text-muted-foreground">
-                {v.category}{v.area ? ` · ${v.area}` : ""}{v.city ? ` · ${v.city}` : ""}
+        {filtered.map((v) => {
+          const expanded = expandedId === v.id;
+          return (
+            <div key={v.id} className="rounded-2xl bg-card shadow-soft">
+              <div className="flex items-center gap-3 p-3">
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-medium">{v.name}</div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {v.category}{v.area ? ` · ${v.area}` : ""}{v.city ? ` · ${v.city}` : ""}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setExpandedId(expanded ? null : v.id)}
+                  className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+                  aria-label="Vis bilder"
+                >
+                  <ImageIcon className="h-4 w-4" />
+                  <ChevronDown
+                    className={cn("h-3 w-3 transition-transform", expanded && "rotate-180")}
+                  />
+                </button>
+                <Link
+                  to={`/venue/${v.slug}`}
+                  className="rounded-full px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Vis
+                </Link>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={pendingId === v.id}
+                  onClick={() => handleDelete(v)}
+                  aria-label={`Slett ${v.name}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
+              {expanded && <AdminVenuePhotos venueId={v.id} />}
             </div>
-            <Link
-              to={`/venue/${v.slug}`}
-              className="rounded-full px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
-            >
-              Vis
-            </Link>
-            <Button
-              variant="destructive"
-              size="sm"
-              disabled={pendingId === v.id}
-              onClick={() => handleDelete(v)}
-              aria-label={`Slett ${v.name}`}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
