@@ -108,7 +108,7 @@ const VenueDetail = () => {
             return (
               <span className="inline-flex items-center gap-1.5 rounded-full glass px-3 py-2 text-xs font-medium shadow-soft">
                 <Clock className="h-3.5 w-3.5" />
-                {latest ? `Sist oppdatert ${timeAgo(latest)}` : "Trenger ditt bidrag"}
+                {latest ? `Sist oppdatert ${timeAgo(latest)}` : "Ingen oppdatering ennå"}
               </span>
             );
           })()}
