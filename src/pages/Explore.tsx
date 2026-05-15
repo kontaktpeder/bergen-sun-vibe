@@ -104,6 +104,7 @@ const Explore = () => {
             onSelect={setSelectedId}
             fallbackCenter={CITY_CENTERS[city]}
             userLocation={userLoc}
+            flyToSelectedOnMount={!!venueParam}
           />
         </div>
 
