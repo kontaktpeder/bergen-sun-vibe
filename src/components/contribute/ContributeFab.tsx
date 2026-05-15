@@ -132,7 +132,31 @@ export function ContributeFab() {
               }}
             />
           ) : mode === "menu" ? (
-            <Menu onPick={(m) => setMode(m)} isOnVenue={isOnVenue} />
+            <Menu
+              isOnVenue={isOnVenue}
+              onPick={(m) => {
+                if (m === "venue" || isOnVenue) {
+                  setMode(m);
+                  return;
+                }
+                // Global contribute → need to pick a venue first
+                setPendingContrib(m as ContribMode);
+                setMode("pick-venue");
+              }}
+            />
+          ) : mode === "pick-venue" ? (
+            <PickVenueStep
+              contrib={pendingContrib}
+              onPick={(slug) => {
+                close();
+                navigate(`/steder/${slug}?contribute=${pendingContrib}`);
+              }}
+              onExplore={() => {
+                close();
+                navigate("/explore");
+              }}
+              onBack={() => setMode("menu")}
+            />
           ) : mode === "sun" ? (
             <SunForm
               venueId={venueDbId}
