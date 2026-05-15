@@ -218,7 +218,7 @@ const Profile = () => {
           <LogOut className="h-4 w-4" /> Logg ut
         </button>
 
-        <p className="mt-8 text-center text-xs text-muted-foreground">v1.0 · Laget med ☀️ i Bergen</p>
+        <p className="mt-8 text-center text-xs text-muted-foreground">v1.0 · {cityFooter(currentCity)}</p>
       </div>
     </div>
   );
