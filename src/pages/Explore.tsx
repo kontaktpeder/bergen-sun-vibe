@@ -164,7 +164,7 @@ const Explore = () => {
         {/* Floating "Du er her" knapp */}
         <button
           type="button"
-          onClick={locate}
+          onClick={() => { if (locPermission === "denied") setHelpOpen(true); else locate(); }}
           disabled={locLoading}
           className={cn(
             "tap-scale absolute right-3 z-[550] inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-2 text-xs font-medium shadow-float backdrop-blur transition-all disabled:opacity-60",
