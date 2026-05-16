@@ -3,6 +3,7 @@ import { useCity, type City } from "@/context/CityContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { LocateFixed, MapPin } from "lucide-react";
 import { toast } from "sonner";
+import { LocationPermissionHelp } from "@/components/LocationPermissionHelp";
 import { cn } from "@/lib/utils";
 
 const CITIES: { id: City; label: string; emoji: string }[] = [
