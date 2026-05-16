@@ -89,8 +89,10 @@ const Explore = () => {
   const selected = cityVenues.find(v => v.id === selectedId) ?? null;
 
   useEffect(() => {
-    if (locError) toast.error(locError);
-  }, [locError]);
+    if (!locError) return;
+    if (locPermission === "denied") setHelpOpen(true);
+    else toast.error(locError);
+  }, [locError, locPermission]);
 
   useEffect(() => {
     if (!userLoc || !cityVenues.length) return;
