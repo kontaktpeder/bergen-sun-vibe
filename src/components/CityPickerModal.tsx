@@ -14,6 +14,7 @@ const CITIES: { id: City; label: string; emoji: string }[] = [
 export function CityPickerModal() {
   const { hasChosenCity, setCurrentCity, chooseCityByLocation, pickerOpen, closePicker } = useCity();
   const [busy, setBusy] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const open = !hasChosenCity || pickerOpen;
   const dismissable = hasChosenCity;
 
@@ -29,7 +30,7 @@ export function CityPickerModal() {
         denied = status?.state === "denied";
       } catch { /* ignore */ }
       if (denied) {
-        toast.error("Du har sagt nei til posisjon tidligere. Skru på posisjon for nettsiden i innstillingene og prøv igjen.", { duration: 6000 });
+        setHelpOpen(true);
       } else {
         toast.error("Fant ikke posisjonen din. Prøv igjen eller velg by manuelt.");
       }
