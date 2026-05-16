@@ -82,6 +82,7 @@ export function CityPickerModal() {
           <MapPin className="h-3 w-3" /> Du kan bytte by når som helst
         </p>
       </DialogContent>
+      <LocationPermissionHelp open={helpOpen} onOpenChange={setHelpOpen} onRetry={handleLocate} />
     </Dialog>
   );
 }
