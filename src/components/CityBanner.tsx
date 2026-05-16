@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronDown, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useCity, type City } from "@/context/CityContext";
+import { LocationPermissionHelp } from "@/components/LocationPermissionHelp";
 import { cn } from "@/lib/utils";
 
 const CITIES: City[] = ["Oslo", "Bergen"];
@@ -14,6 +15,7 @@ type Props = {
 export function CityBanner({ className, variant = "light" }: Props) {
   const { currentCity, setCurrentCity, chooseCityByLocation, openPicker } = useCity();
   const [open, setOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const chooseCity = (city: City) => {
     setCurrentCity(city);
@@ -34,7 +36,7 @@ export function CityBanner({ className, variant = "light" }: Props) {
       denied = status?.state === "denied";
     } catch { /* ignore */ }
     if (denied) {
-      toast.error("Du har sagt nei til posisjon tidligere. Skru på posisjon for nettsiden i innstillingene og prøv igjen.", { duration: 6000 });
+      setHelpOpen(true);
     } else {
       toast.error("Fant ikke posisjonen din. Prøv igjen.");
     }
@@ -100,6 +102,7 @@ export function CityBanner({ className, variant = "light" }: Props) {
         </button>
         </div>
       )}
+      <LocationPermissionHelp open={helpOpen} onOpenChange={setHelpOpen} onRetry={chooseLocation} />
     </div>
   );
 }

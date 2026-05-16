@@ -3,6 +3,7 @@ import { useCity, type City } from "@/context/CityContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { LocateFixed, MapPin } from "lucide-react";
 import { toast } from "sonner";
+import { LocationPermissionHelp } from "@/components/LocationPermissionHelp";
 import { cn } from "@/lib/utils";
 
 const CITIES: { id: City; label: string; emoji: string }[] = [
@@ -13,6 +14,7 @@ const CITIES: { id: City; label: string; emoji: string }[] = [
 export function CityPickerModal() {
   const { hasChosenCity, setCurrentCity, chooseCityByLocation, pickerOpen, closePicker } = useCity();
   const [busy, setBusy] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const open = !hasChosenCity || pickerOpen;
   const dismissable = hasChosenCity;
 
@@ -28,7 +30,7 @@ export function CityPickerModal() {
         denied = status?.state === "denied";
       } catch { /* ignore */ }
       if (denied) {
-        toast.error("Du har sagt nei til posisjon tidligere. Skru på posisjon for nettsiden i innstillingene og prøv igjen.", { duration: 6000 });
+        setHelpOpen(true);
       } else {
         toast.error("Fant ikke posisjonen din. Prøv igjen eller velg by manuelt.");
       }
@@ -80,6 +82,7 @@ export function CityPickerModal() {
           <MapPin className="h-3 w-3" /> Du kan bytte by når som helst
         </p>
       </DialogContent>
+      <LocationPermissionHelp open={helpOpen} onOpenChange={setHelpOpen} onRetry={handleLocate} />
     </Dialog>
   );
 }

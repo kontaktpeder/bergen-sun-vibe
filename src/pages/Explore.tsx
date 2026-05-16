@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useVenues } from "@/hooks/useVenues";
 import { belongsToCity } from "@/lib/domain";
 import { useUserLocation } from "@/hooks/useUserLocation";
+import { LocationPermissionHelp } from "@/components/LocationPermissionHelp";
 import { FilterChips } from "@/components/FilterChips";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { VenueMap } from "@/components/VenueMap";
@@ -40,7 +41,8 @@ const Explore = () => {
   const venueParam = searchParams.get("venue");
   const [selectedId, setSelectedId] = useState<string | null>(venueParam);
   const [query, setQuery] = useState("");
-  const { location: userLoc, loading: locLoading, error: locError, locate } = useUserLocation();
+  const { location: userLoc, loading: locLoading, error: locError, permission: locPermission, locate } = useUserLocation();
+  const [helpOpen, setHelpOpen] = useState(false);
   useEffect(() => { locate(); }, [locate]);
 
   const cityVenues = useMemo(
@@ -87,8 +89,10 @@ const Explore = () => {
   const selected = cityVenues.find(v => v.id === selectedId) ?? null;
 
   useEffect(() => {
-    if (locError) toast.error(locError);
-  }, [locError]);
+    if (!locError) return;
+    if (locPermission === "denied") setHelpOpen(true);
+    else toast.error(locError);
+  }, [locError, locPermission]);
 
   useEffect(() => {
     if (!userLoc || !cityVenues.length) return;
@@ -160,7 +164,7 @@ const Explore = () => {
         {/* Floating "Du er her" knapp */}
         <button
           type="button"
-          onClick={locate}
+          onClick={() => { if (locPermission === "denied") setHelpOpen(true); else locate(); }}
           disabled={locLoading}
           className={cn(
             "tap-scale absolute right-3 z-[550] inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-2 text-xs font-medium shadow-float backdrop-blur transition-all disabled:opacity-60",
@@ -253,6 +257,7 @@ const Explore = () => {
           ))}
         </div>
       </section>
+      <LocationPermissionHelp open={helpOpen} onOpenChange={setHelpOpen} onRetry={locate} />
     </div>
   );
 };
