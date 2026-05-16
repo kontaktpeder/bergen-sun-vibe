@@ -21,7 +21,17 @@ export function CityPickerModal() {
     const city = await chooseCityByLocation();
     setBusy(false);
     if (!city) {
-      toast.error("Kunne ikke finne posisjon. Velg by manuelt.");
+      let denied = false;
+      try {
+        // @ts-ignore
+        const status = await navigator.permissions?.query?.({ name: "geolocation" as PermissionName });
+        denied = status?.state === "denied";
+      } catch { /* ignore */ }
+      if (denied) {
+        toast.error("Posisjon er blokkert. Trykk på låsikonet i adressefeltet og tillat posisjon, og prøv igjen.", { duration: 6000 });
+      } else {
+        toast.error("Kunne ikke finne posisjon. Prøv igjen eller velg by manuelt.");
+      }
     } else {
       toast.success(`Viser steder i ${city}`);
     }
