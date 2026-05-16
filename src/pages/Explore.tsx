@@ -257,6 +257,7 @@ const Explore = () => {
           ))}
         </div>
       </section>
+      <LocationPermissionHelp open={helpOpen} onOpenChange={setHelpOpen} onRetry={locate} />
     </div>
   );
 };
