@@ -15,6 +15,7 @@ type Props = {
 export function CityBanner({ className, variant = "light" }: Props) {
   const { currentCity, setCurrentCity, chooseCityByLocation, openPicker } = useCity();
   const [open, setOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const chooseCity = (city: City) => {
     setCurrentCity(city);
