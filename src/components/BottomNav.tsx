@@ -16,8 +16,7 @@ export function BottomNav() {
   const location = useLocation();
   const onAuth = location.pathname.startsWith("/auth");
   const isPlace = /^\/(steder|venue)\//.test(location.pathname);
-  const scrollHidden = useHideOnScroll(48, false);
-  const hidden = isPlace ? false : scrollHidden;
+  const hidden = false;
 
   return (
     <nav
