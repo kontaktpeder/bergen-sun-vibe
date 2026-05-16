@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useVenues } from "@/hooks/useVenues";
 import { belongsToCity } from "@/lib/domain";
 import { useUserLocation } from "@/hooks/useUserLocation";
+import { LocationPermissionHelp } from "@/components/LocationPermissionHelp";
 import { FilterChips } from "@/components/FilterChips";
 import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { VenueMap } from "@/components/VenueMap";
