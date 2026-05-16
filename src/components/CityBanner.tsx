@@ -36,7 +36,7 @@ export function CityBanner({ className, variant = "light" }: Props) {
       denied = status?.state === "denied";
     } catch { /* ignore */ }
     if (denied) {
-      toast.error("Du har sagt nei til posisjon tidligere. Skru på posisjon for nettsiden i innstillingene og prøv igjen.", { duration: 6000 });
+      setHelpOpen(true);
     } else {
       toast.error("Fant ikke posisjonen din. Prøv igjen.");
     }
