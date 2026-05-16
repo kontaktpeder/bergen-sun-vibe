@@ -102,6 +102,7 @@ export function CityBanner({ className, variant = "light" }: Props) {
         </button>
         </div>
       )}
+      <LocationPermissionHelp open={helpOpen} onOpenChange={setHelpOpen} onRetry={chooseLocation} />
     </div>
   );
 }
