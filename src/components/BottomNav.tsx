@@ -3,8 +3,6 @@ import { Heart, Map, User, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { openContributeFab } from "@/lib/contribute-bus";
 import { FLAGS } from "@/lib/flags";
-import { useHideOnScroll } from "@/hooks/useScrollDirection";
-
 const leftItems = [
   { to: "/", icon: Heart, label: "Dine steder" },
   { to: "/explore", icon: Map, label: "Utforsk" },
@@ -18,8 +16,7 @@ export function BottomNav() {
   const location = useLocation();
   const onAuth = location.pathname.startsWith("/auth");
   const isPlace = /^\/(steder|venue)\//.test(location.pathname);
-  const scrollHidden = useHideOnScroll(48, false);
-  const hidden = isPlace ? false : scrollHidden;
+  const hidden = false;
 
   return (
     <nav
