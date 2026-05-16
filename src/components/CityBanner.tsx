@@ -20,9 +20,24 @@ export function CityBanner({ className, variant = "light" }: Props) {
     setOpen(false);
   };
 
-  const chooseLocation = () => {
+  const chooseLocation = async () => {
     setOpen(false);
-    void chooseCityByLocation();
+    const city = await chooseCityByLocation();
+    if (city) {
+      toast.success(`Viser steder i ${city}`);
+      return;
+    }
+    let denied = false;
+    try {
+      // @ts-ignore
+      const status = await navigator.permissions?.query?.({ name: "geolocation" as PermissionName });
+      denied = status?.state === "denied";
+    } catch { /* ignore */ }
+    if (denied) {
+      toast.error("Posisjon er blokkert. Trykk på låsikonet i adressefeltet og tillat posisjon, og prøv igjen.", { duration: 6000 });
+    } else {
+      toast.error("Kunne ikke finne posisjon. Prøv igjen.");
+    }
   };
 
   const openModal = () => {
