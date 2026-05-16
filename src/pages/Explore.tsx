@@ -41,7 +41,8 @@ const Explore = () => {
   const venueParam = searchParams.get("venue");
   const [selectedId, setSelectedId] = useState<string | null>(venueParam);
   const [query, setQuery] = useState("");
-  const { location: userLoc, loading: locLoading, error: locError, locate } = useUserLocation();
+  const { location: userLoc, loading: locLoading, error: locError, permission: locPermission, locate } = useUserLocation();
+  const [helpOpen, setHelpOpen] = useState(false);
   useEffect(() => { locate(); }, [locate]);
 
   const cityVenues = useMemo(
