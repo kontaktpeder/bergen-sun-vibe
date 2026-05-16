@@ -3,19 +3,7 @@ import { useCallback, useState } from "react";
 type UserLocation = { lat: number; lng: number };
 
 export const LOCATION_DENIED_MESSAGE =
-  "Posisjon er blokkert i nettleseren. Trykk på låsikonet i adressefeltet og tillat posisjon, og prøv igjen.";
-
-async function getPermissionState(): Promise<PermissionState | null> {
-  try {
-    // @ts-ignore - permissions API not in all TS libs
-    if (typeof navigator === "undefined" || !navigator.permissions?.query) return null;
-    // @ts-ignore
-    const status = await navigator.permissions.query({ name: "geolocation" as PermissionName });
-    return status.state as PermissionState;
-  } catch {
-    return null;
-  }
-}
+  "Du har sagt nei til posisjon tidligere. Skru på posisjon for nettsiden i nettleserinnstillingene og prøv igjen.";
 
 export function useUserLocation() {
   const [location, setLocation] = useState<UserLocation | null>(null);
@@ -23,23 +11,18 @@ export function useUserLocation() {
   const [error, setError] = useState<string | null>(null);
   const [permission, setPermission] = useState<PermissionState | null>(null);
 
-  const locate = useCallback(async () => {
+  const locate = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
-      setError("Geolocation er ikke støttet på denne enheten.");
+      setError("Posisjon støttes ikke på denne enheten.");
       return;
     }
 
     setLoading(true);
     setError(null);
 
-    const state = await getPermissionState();
-    setPermission(state);
-    if (state === "denied") {
-      setError(LOCATION_DENIED_MESSAGE);
-      setLoading(false);
-      return;
-    }
-
+    // Always call getCurrentPosition — triggers the browser prompt when state
+    // is "prompt". If permission is already denied, the browser will reject
+    // silently (it cannot be re-prompted from JS) and we show a clear message.
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
@@ -51,7 +34,7 @@ export function useUserLocation() {
           setPermission("denied");
           setError(LOCATION_DENIED_MESSAGE);
         } else {
-          setError(err.message || "Kunne ikke hente posisjon.");
+          setError("Fant ikke posisjonen din. Prøv igjen.");
         }
         setLoading(false);
       },
