@@ -34,9 +34,9 @@ export function CityBanner({ className, variant = "light" }: Props) {
       denied = status?.state === "denied";
     } catch { /* ignore */ }
     if (denied) {
-      toast.error("Posisjon er blokkert. Trykk på låsikonet i adressefeltet og tillat posisjon, og prøv igjen.", { duration: 6000 });
+      toast.error("Du har sagt nei til posisjon tidligere. Skru på posisjon for nettsiden i innstillingene og prøv igjen.", { duration: 6000 });
     } else {
-      toast.error("Kunne ikke finne posisjon. Prøv igjen.");
+      toast.error("Fant ikke posisjonen din. Prøv igjen.");
     }
   };
 
