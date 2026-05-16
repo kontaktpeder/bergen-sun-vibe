@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, MapPin } from "lucide-react";
+import { toast } from "sonner";
 import { useCity, type City } from "@/context/CityContext";
 import { cn } from "@/lib/utils";
 
