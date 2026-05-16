@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronDown, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useCity, type City } from "@/context/CityContext";
+import { LocationPermissionHelp } from "@/components/LocationPermissionHelp";
 import { cn } from "@/lib/utils";
 
 const CITIES: City[] = ["Oslo", "Bergen"];
