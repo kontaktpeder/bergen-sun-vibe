@@ -22,8 +22,9 @@ import {
   touchActiveVenue,
 } from "@/lib/activeVenueSession";
 import { flyPoints, PointsFlyupHost } from "@/components/share/PointsFlyup";
+import { ShareReceiptStep, type ReceiptData } from "@/components/share/ShareReceiptStep";
+import { getLevel } from "@/lib/levels";
 import { showReward } from "@/components/RewardOverlay";
-import { getLevel, getNextLevelThreshold } from "@/lib/levels";
 import { toast } from "sonner";
 import { toUserErrorMessage } from "@/lib/error-messages";
 import { cn } from "@/lib/utils";
