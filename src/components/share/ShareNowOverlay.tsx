@@ -93,6 +93,11 @@ export function ShareNowOverlay() {
   const [step, setStep] = useState<Step>("camera");
   const [draft, setDraft] = useState<Draft>({});
   const [ctx, setCtx] = useState<ShareNowContext>({});
+  const [addVenueDraft, setAddVenueDraft] = useState<AddVenueDraft>({
+    name: "",
+    category: "bar",
+    address: "",
+  });
 
   const { isAuthed, user, profile } = useAuthProfile();
   const navigate = useNavigate();
