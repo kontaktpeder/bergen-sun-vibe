@@ -35,12 +35,12 @@ import { POINTS } from "@/lib/contribution-types";
 
 type Step =
   | "camera"
-  | "preview"
   | "venue-confirm"
   | "sun"
   | "crowd"
   | "beer"
   | "venue-pick"
+  | "add-venue"
   | "publish"
   | "submitting";
 
