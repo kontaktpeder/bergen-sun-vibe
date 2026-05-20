@@ -512,12 +512,10 @@ export function ShareNowOverlay() {
 
 
           {step === "publish" && (
-            <PublishStep
-              draft={draft}
-              estPoints={estPoints}
-              onPublish={publish}
-              onChangeVenue={() => setStep("venue-pick")}
-            />
+            <div className="flex flex-1 flex-col items-center justify-center gap-3">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="text-sm text-white/70">Forbereder…</p>
+            </div>
           )}
 
           {step === "submitting" && (
@@ -525,6 +523,24 @@ export function ShareNowOverlay() {
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
               <p className="text-sm text-white/70">Publiserer…</p>
             </div>
+          )}
+
+          {step === "receipt" && receipt && (
+            <ShareReceiptStep
+              venue={draft.venue}
+              draft={{
+                photoUrl: draft.photoUrl,
+                sun: draft.sun,
+                crowd: draft.crowd,
+                beer: draft.beer,
+              }}
+              receipt={receipt}
+              onDone={close}
+              onAddReport={() => {
+                setReceipt(null);
+                setStep("sun");
+              }}
+            />
           )}
         </div>
       </div>
