@@ -87,20 +87,24 @@ export function ShareReceiptStep({ venue, draft, receipt, onDone, onAddReport }:
   const nextThreshold = getNextLevelThreshold(receipt.newPoints);
 
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto">
-      <div className="pt-16 px-6 text-center">
-        <h2 className="font-display text-3xl font-semibold">Publisert ✨</h2>
+    <div className="flex flex-1 flex-col min-h-0">
+      <div className="shrink-0 px-6 pt-10 text-center">
+        <h2 className="font-display text-2xl font-semibold">Publisert ✨</h2>
         {venue && (
-          <p className="mt-1 text-sm text-white/60">Takk for at du delte fra {venue.name}</p>
+          <p className="mt-1 text-xs text-white/60">Takk for at du delte fra {venue.name}</p>
         )}
       </div>
 
-      <div className="px-6 pt-6">
-        <div className="overflow-hidden rounded-3xl bg-white/5 shadow-2xl ring-1 ring-white/10">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-4">
+        <div className="mx-auto max-w-sm overflow-hidden rounded-3xl bg-white/5 shadow-2xl ring-1 ring-white/10">
           {draft.photoUrl && (
-            <img src={draft.photoUrl} alt="" className="aspect-[4/5] w-full object-cover" />
+            <img
+              src={draft.photoUrl}
+              alt=""
+              className="max-h-[32vh] w-full object-cover"
+            />
           )}
-          <div className="space-y-2 p-5">
+          <div className="space-y-1.5 p-4">
             {venue && (
               <div className="flex items-center gap-2 text-sm font-medium text-white/90">
                 <MapPin className="h-4 w-4 text-primary" />
@@ -114,26 +118,27 @@ export function ShareReceiptStep({ venue, draft, receipt, onDone, onAddReport }:
           </div>
         </div>
 
-        <div className="mt-5 text-center">
-          <div className="font-display text-4xl font-bold text-white">
+        <div className="mt-3 flex items-baseline justify-center gap-2 text-center">
+          <div className="font-display text-2xl font-bold text-white">
             +{receipt.awardedPoints}p
           </div>
           {levelUp ? (
-            <div className="mt-1 text-sm font-medium text-primary">
-              Nivå opp! Du er nå {newLevel}
+            <div className="text-xs font-medium text-primary">
+              Nivå opp! {newLevel}
             </div>
           ) : nextThreshold ? (
-            <div className="mt-1 text-xs text-white/50">
-              {nextThreshold - receipt.newPoints} poeng til neste nivå
+            <div className="text-xs text-white/50">
+              {nextThreshold - receipt.newPoints}p til neste nivå
             </div>
           ) : null}
-          {receipt.errors.length > 0 && (
-            <div className="mt-2 text-xs text-white/50">
-              Noen ting feilet: {receipt.errors.join(", ")}
-            </div>
-          )}
         </div>
+        {receipt.errors.length > 0 && (
+          <div className="mt-1 text-center text-xs text-white/50">
+            Noen ting feilet: {receipt.errors.join(", ")}
+          </div>
+        )}
       </div>
+
 
       <div className="mt-auto space-y-2 px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-6">
         {venue && (
