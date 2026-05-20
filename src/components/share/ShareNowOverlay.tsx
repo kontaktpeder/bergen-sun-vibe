@@ -44,7 +44,8 @@ type Step =
   | "add-venue"
   | "pick-location"
   | "publish"
-  | "submitting";
+  | "submitting"
+  | "receipt";
 
 type AddVenueDraft = {
   name: string;
