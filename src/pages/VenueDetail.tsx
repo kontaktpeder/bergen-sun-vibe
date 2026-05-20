@@ -15,6 +15,8 @@ import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { SaveVenueAuthPrompt } from "@/components/SaveVenueAuthPrompt";
 import { timeAgo } from "@/lib/time";
+import { shareVenue } from "@/components/ShareVenueButton";
+import { latestLiveFromContributions } from "@/lib/shareText";
 
 import { inferLegacyCity } from "@/lib/domain";
 import { VenueStickyActions } from "@/components/venue/VenueStickyActions";
