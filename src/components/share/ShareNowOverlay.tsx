@@ -394,13 +394,56 @@ export function ShareNowOverlay() {
                 setDraft((d) => ({ ...d, venue }));
                 setStep("publish");
               }}
-              onAddNew={() => {
-                // Defer to legacy ContributeFab for venue_add (kept mounted as fallback)
-                close();
-                setTimeout(() => openContributeFab("venue"), 300);
+              onAddNew={() => setStep("add-venue")}
+            />
+          )}
+
+          {step === "add-venue" && (
+            <AddVenueStep
+              userLoc={userLoc}
+              city={currentCity as "Bergen" | "Oslo"}
+              onBack={() => setStep("venue-pick")}
+              onCreated={async (payload) => {
+                setStep("submitting");
+                const beforePoints = profile?.points ?? 0;
+                try {
+                  const r = await addContribution.mutateAsync({
+                    type: "venue_add",
+                    data: payload,
+                  });
+                  const latestNewPoints = r.newPoints;
+                  if (r.venueId) {
+                    const venue = { venueId: r.venueId, slug: r.venueSlug, name: payload.name };
+                    setActiveVenue(venue);
+                    setDraft((d) => ({ ...d, venue }));
+                    flyPoints(r.awardedPoints);
+                    setStep("publish");
+                  } else {
+                    // Fallback: no venueId returned — end flow cleanly, do NOT stub.
+                    console.warn("[ShareNow] venue_add returned no venueId", { payload, r });
+                    const oldLevel = getLevel(beforePoints);
+                    const newLevel = getLevel(latestNewPoints);
+                    showReward({
+                      emoji: "🎉",
+                      title: "Stedet er sendt inn",
+                      subtitle:
+                        oldLevel !== newLevel
+                          ? `Nivå opp! Du er nå ${newLevel}`
+                          : "Vi gjør det klart om et øyeblikk",
+                      points: r.awardedPoints,
+                      variant: oldLevel !== newLevel ? "levelup" : "points",
+                    });
+                    close();
+                  }
+                } catch (e) {
+                  toast.error(toUserErrorMessage(e));
+                  setStep("add-venue");
+                }
               }}
             />
           )}
+
+
 
           {step === "publish" && (
             <PublishStep
