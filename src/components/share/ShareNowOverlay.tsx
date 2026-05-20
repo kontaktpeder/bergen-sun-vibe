@@ -346,22 +346,12 @@ export function ShareNowOverlay() {
               onPicked={(file) => {
                 setDraft((d) => ({ ...d, photo: file, photoUrl: URL.createObjectURL(file) }));
                 flyPoints(POINTS.photo);
-                setStep("preview");
+                setStep("sun");
               }}
               onSkip={() => skipTo("sun")}
             />
           )}
 
-          {step === "preview" && draft.photoUrl && (
-            <PreviewStep
-              url={draft.photoUrl}
-              onRetake={() => {
-                setDraft((d) => ({ ...d, photo: undefined, photoUrl: undefined }));
-                setStep("camera");
-              }}
-              onNext={() => setStep("sun")}
-            />
-          )}
 
           {step === "sun" && (
             <ChipStep
