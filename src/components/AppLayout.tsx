@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { BottomNav } from "./BottomNav";
 import { ContributeFab } from "./contribute/ContributeFab";
+import { ShareNowOverlay } from "./share/ShareNowOverlay";
 import { RewardOverlayHost } from "./RewardOverlay";
 import { CityPickerModal } from "./CityPickerModal";
 import { ScrollManager } from "./ScrollManager";
@@ -14,7 +15,10 @@ export function AppLayout() {
       <div key={location.pathname} className="animate-fade-in">
         <Outlet />
       </div>
+      {/* Legacy ContributeFab kept mounted ONLY as a fallback for venue_add. */}
+      {/* TODO(share-flow): remove once ShareNowOverlay handles venue creation. */}
       {FLAGS.contributionsEnabled && <ContributeFab />}
+      {FLAGS.contributionsEnabled && <ShareNowOverlay />}
       <BottomNav />
       <RewardOverlayHost />
       <CityPickerModal />
