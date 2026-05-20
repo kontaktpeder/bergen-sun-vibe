@@ -174,6 +174,7 @@ export function ShareNowOverlay() {
       setDraft({});
       setStep("camera");
       setCtx({});
+      setReceipt(null);
       setAddVenueDraft({ name: "", category: "bar", address: "" });
     }, 250);
   }, []);
