@@ -638,27 +638,22 @@ function CameraStep({
 }
 
 function AddVenueStep({
-  userLoc,
+  value,
+  onChange,
   city,
   onBack,
-  onCreated,
+  onPickLocation,
+  onSubmit,
 }: {
-  userLoc: { lat: number; lng: number } | null;
+  value: AddVenueDraft;
+  onChange: (updater: (d: AddVenueDraft) => AddVenueDraft) => void;
   city: "Bergen" | "Oslo";
   onBack: () => void;
-  onCreated: (payload: {
-    name: string;
-    lat: number;
-    lng: number;
-    category: "bar" | "cafe" | "restaurant";
-    city: "Bergen" | "Oslo";
-    address?: string;
-  }) => void;
+  onPickLocation: () => void;
+  onSubmit: () => void;
 }) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
-  const [address, setAddress] = useState("");
-  const canSubmit = name.trim().length >= 2 && !!userLoc;
+  const hasLocation = value.lat != null && value.lng != null;
+  const canSubmit = value.name.trim().length >= 2 && hasLocation;
 
   const CATS: { value: "bar" | "cafe" | "restaurant"; emoji: string; label: string }[] = [
     { value: "bar", emoji: "🍻", label: "Bar" },
@@ -667,7 +662,7 @@ function AddVenueStep({
   ];
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col overflow-y-auto">
       <StepHeader title="Legg til nytt sted" subtitle={`I ${city}`} />
       <div className="flex-1 space-y-5 px-6 pt-6">
         <div>
@@ -676,24 +671,22 @@ function AddVenueStep({
           </label>
           <Input
             autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={value.name}
+            onChange={(e) => onChange((d) => ({ ...d, name: e.target.value }))}
             placeholder="Stedets navn"
             className="border-white/20 bg-white/10 text-white placeholder:text-white/40"
           />
         </div>
         <div>
-          <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">
-            Type
-          </label>
+          <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">Type</label>
           <div className="grid grid-cols-3 gap-2">
             {CATS.map((c) => (
               <button
                 key={c.value}
-                onClick={() => setCategory(c.value)}
+                onClick={() => onChange((d) => ({ ...d, category: c.value }))}
                 className={cn(
                   "tap-scale rounded-2xl py-4 text-center transition-colors",
-                  category === c.value
+                  value.category === c.value
                     ? "bg-gradient-to-br from-primary to-sunset-pink"
                     : "bg-white/10 active:bg-white/20",
                 )}
@@ -704,37 +697,64 @@ function AddVenueStep({
             ))}
           </div>
         </div>
+
+        <div>
+          <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">
+            Plassering
+          </label>
+          <button
+            type="button"
+            onClick={onPickLocation}
+            className="tap-scale flex w-full items-center gap-3 rounded-2xl bg-white/10 p-4 text-left active:bg-white/20"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/10">
+              <MapPin className="h-4 w-4 text-primary" />
+            </span>
+            <div className="min-w-0 flex-1">
+              {hasLocation ? (
+                <>
+                  <div className="text-sm font-medium text-white">
+                    {value.locationSource === "manual"
+                      ? "Valgt på kart"
+                      : "Bruker din posisjon"}
+                  </div>
+                  <div className="truncate text-xs text-white/50">
+                    {value.lat!.toFixed(5)}, {value.lng!.toFixed(5)}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-sm font-medium text-white">Velg plassering på kart</div>
+                  <div className="text-xs text-white/50">Vi trenger å vite hvor stedet ligger</div>
+                </>
+              )}
+            </div>
+            <span className="text-xs font-medium text-primary">
+              {hasLocation ? "Endre" : "Velg"}
+            </span>
+          </button>
+        </div>
+
         <div>
           <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">
             Adresse (valgfritt)
           </label>
           <Input
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            value={value.address}
+            onChange={(e) => onChange((d) => ({ ...d, address: e.target.value }))}
             placeholder="Gateadresse"
             className="border-white/20 bg-white/10 text-white placeholder:text-white/40"
           />
         </div>
-        {!userLoc && (
-          <p className="text-xs text-white/60">
-            Vi trenger din posisjon for å plassere stedet på kartet. Aktiver stedstilgang og prøv igjen.
-          </p>
+
+        {!hasLocation && (
+          <p className="text-xs text-white/60">Velg plassering først.</p>
         )}
       </div>
       <div className="space-y-2 px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-4">
         <button
           disabled={!canSubmit}
-          onClick={() =>
-            userLoc &&
-            onCreated({
-              name: name.trim(),
-              lat: userLoc.lat,
-              lng: userLoc.lng,
-              category,
-              city,
-              address: address.trim() || undefined,
-            })
-          }
+          onClick={onSubmit}
           className="tap-scale w-full rounded-2xl bg-gradient-to-br from-primary to-sunset-pink py-5 text-base font-semibold text-white shadow-float disabled:opacity-50"
         >
           Legg til og fortsett
@@ -749,6 +769,43 @@ function AddVenueStep({
     </div>
   );
 }
+
+function PickLocationStep({
+  initial,
+  city,
+  onCancel,
+  onConfirm,
+}: {
+  initial: { lat: number; lng: number } | null;
+  city: string;
+  onCancel: () => void;
+  onConfirm: (lat: number, lng: number) => void;
+}) {
+  // Fallback center: Bergen / Oslo if no initial location
+  const fallback =
+    city === "Oslo" ? { lat: 59.9139, lng: 10.7522 } : { lat: 60.3913, lng: 5.3221 };
+  const start = initial ?? fallback;
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <StepHeader title="Velg plassering" subtitle="Dra kartet eller trykk for å sette pin" />
+      <div className="flex-1 px-4 pt-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
+        <div className="rounded-3xl bg-white p-3 text-foreground shadow-2xl">
+          <LocationPickerMap
+            initialLat={start.lat}
+            initialLng={start.lng}
+            city={city}
+            selectedLocation={initial ?? undefined}
+            mode="pick"
+            onSelectLocation={(lat, lng) => onConfirm(lat, lng)}
+            onCancel={onCancel}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 
 function ChipStep<T extends string>({
