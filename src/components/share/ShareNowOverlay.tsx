@@ -584,41 +584,119 @@ function CameraStep({
   );
 }
 
-function PreviewStep({
-  url,
-  onRetake,
-  onNext,
+function AddVenueStep({
+  userLoc,
+  city,
+  onBack,
+  onCreated,
 }: {
-  url: string;
-  onRetake: () => void;
-  onNext: () => void;
+  userLoc: { lat: number; lng: number } | null;
+  city: "Bergen" | "Oslo";
+  onBack: () => void;
+  onCreated: (payload: {
+    name: string;
+    lat: number;
+    lng: number;
+    category: "bar" | "cafe" | "restaurant";
+    city: "Bergen" | "Oslo";
+    address?: string;
+  }) => void;
 }) {
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState<"bar" | "cafe" | "restaurant">("bar");
+  const [address, setAddress] = useState("");
+  const canSubmit = name.trim().length >= 2 && !!userLoc;
+
+  const CATS: { value: "bar" | "cafe" | "restaurant"; emoji: string; label: string }[] = [
+    { value: "bar", emoji: "🍻", label: "Bar" },
+    { value: "cafe", emoji: "☕", label: "Kafé" },
+    { value: "restaurant", emoji: "🍽️", label: "Restaurant" },
+  ];
+
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex flex-1 items-center justify-center p-6 pt-20">
-        <img
-          src={url}
-          alt="Forhåndsvisning"
-          className="max-h-full w-full rounded-3xl object-cover shadow-2xl"
-        />
+      <StepHeader title="Legg til nytt sted" subtitle={`I ${city}`} />
+      <div className="flex-1 space-y-5 px-6 pt-6">
+        <div>
+          <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">
+            Hva heter stedet?
+          </label>
+          <Input
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Stedets navn"
+            className="border-white/20 bg-white/10 text-white placeholder:text-white/40"
+          />
+        </div>
+        <div>
+          <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">
+            Type
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {CATS.map((c) => (
+              <button
+                key={c.value}
+                onClick={() => setCategory(c.value)}
+                className={cn(
+                  "tap-scale rounded-2xl py-4 text-center transition-colors",
+                  category === c.value
+                    ? "bg-gradient-to-br from-primary to-sunset-pink"
+                    : "bg-white/10 active:bg-white/20",
+                )}
+              >
+                <div className="text-2xl">{c.emoji}</div>
+                <div className="mt-1 text-xs font-medium">{c.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">
+            Adresse (valgfritt)
+          </label>
+          <Input
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Gateadresse"
+            className="border-white/20 bg-white/10 text-white placeholder:text-white/40"
+          />
+        </div>
+        {!userLoc && (
+          <p className="text-xs text-white/60">
+            Vi trenger din posisjon for å plassere stedet på kartet. Aktiver stedstilgang og prøv igjen.
+          </p>
+        )}
       </div>
-      <div className="grid grid-cols-2 gap-3 px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-4">
+      <div className="space-y-2 px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-4">
         <button
-          onClick={onRetake}
-          className="tap-scale rounded-2xl bg-white/10 py-4 text-sm font-medium text-white active:bg-white/20"
+          disabled={!canSubmit}
+          onClick={() =>
+            userLoc &&
+            onCreated({
+              name: name.trim(),
+              lat: userLoc.lat,
+              lng: userLoc.lng,
+              category,
+              city,
+              address: address.trim() || undefined,
+            })
+          }
+          className="tap-scale w-full rounded-2xl bg-gradient-to-br from-primary to-sunset-pink py-5 text-base font-semibold text-white shadow-float disabled:opacity-50"
         >
-          Ta nytt
+          Legg til og fortsett
         </button>
         <button
-          onClick={onNext}
-          className="tap-scale rounded-2xl bg-gradient-to-br from-primary to-sunset-pink py-4 text-sm font-semibold text-white shadow-float"
+          onClick={onBack}
+          className="tap-scale w-full rounded-2xl bg-white/10 py-4 text-sm font-medium text-white active:bg-white/20"
         >
-          Bruk bilde
+          Tilbake
         </button>
       </div>
     </div>
   );
 }
+
 
 function ChipStep<T extends string>({
   title,
