@@ -334,7 +334,7 @@ export function ShareNowOverlay() {
           >
             <X className="h-5 w-5" />
           </button>
-          {draft.venue && step !== "venue-confirm" && step !== "venue-pick" && (
+          {draft.venue && step !== "venue-confirm" && step !== "venue-pick" && step !== "receipt" && step !== "submitting" && step !== "publish" && (
             <button
               onClick={() => skipTo("venue-pick")}
               className="tap-scale flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium active:bg-white/20"
@@ -344,7 +344,7 @@ export function ShareNowOverlay() {
               <span className="text-white/60">· bytt</span>
             </button>
           )}
-          {estPoints > 0 && step !== "submitting" && (
+          {estPoints > 0 && step !== "submitting" && step !== "publish" && step !== "receipt" && (
             <span className="rounded-full bg-gradient-to-br from-primary to-sunset-pink px-3 py-1.5 text-xs font-bold shadow-lg">
               +{estPoints}p
             </span>
