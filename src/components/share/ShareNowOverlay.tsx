@@ -208,17 +208,29 @@ export function ShareNowOverlay() {
   }, [draft]);
 
   const publish = useCallback(async () => {
-    if (!draft.venue || !user?.id) {
-      toast.error("Velg et sted først.");
+    if (!user?.id) {
+      toast.error("Du må være innlogget.");
+      return;
+    }
+    if (!draft.venue) {
       setStep("venue-pick");
       return;
     }
+    const beforePoints = profile?.points ?? 0;
+
     if (estPoints === 0) {
-      toast.error("Velg minst én ting å dele.");
+      setReceipt({
+        empty: true,
+        awardedPoints: 0,
+        beforePoints,
+        newPoints: beforePoints,
+        errors: [],
+      });
+      setStep("receipt");
       return;
     }
+
     setStep("submitting");
-    const beforePoints = profile?.points ?? 0;
     let total = 0;
     let latestNewPoints = beforePoints;
     const errors: string[] = [];
@@ -281,36 +293,32 @@ export function ShareNowOverlay() {
       setActiveVenue(draft.venue);
       touchActiveVenue();
 
-      if (total > 0) {
-        flyPoints(total);
-        const oldLevel = getLevel(beforePoints);
-        const newLevel = getLevel(latestNewPoints);
-        const nextThreshold = getNextLevelThreshold(latestNewPoints);
-        const subtitle = oldLevel !== newLevel
-          ? `Nivå opp! Du er nå ${newLevel}`
-          : nextThreshold
-            ? `${nextThreshold - latestNewPoints} poeng til neste nivå`
-            : undefined;
-        showReward({
-          emoji: "✨",
-          title: `Delt fra ${draft.venue.name}`,
-          subtitle,
-          points: total,
-          variant: oldLevel !== newLevel ? "levelup" : "points",
-        });
-      } else if (errors.length === 0) {
-        toast.success("Takk for bidraget!");
-      }
+      if (total > 0) flyPoints(total);
 
-      if (errors.length > 0) {
-        toast.error(`Noen ting feilet: ${errors.join(", ")}`);
-      }
-      close();
+      setReceipt({
+        empty: false,
+        awardedPoints: total,
+        beforePoints,
+        newPoints: latestNewPoints,
+        errors,
+      });
+      setStep("receipt");
     } catch (e) {
       toast.error(toUserErrorMessage(e));
-      setStep("publish");
+      setStep(draft.sun || draft.crowd || draft.beer ? "beer" : "sun");
     }
-  }, [draft, user?.id, profile?.points, addContribution, upload, close, estPoints]);
+  }, [draft, user?.id, profile?.points, addContribution, upload, estPoints]);
+
+  const publishingRef = useRef(false);
+  useEffect(() => {
+    if (step !== "publish") {
+      publishingRef.current = false;
+      return;
+    }
+    if (publishingRef.current) return;
+    publishingRef.current = true;
+    void publish();
+  }, [step, publish]);
 
   if (!open) return <PointsFlyupHost />;
 
