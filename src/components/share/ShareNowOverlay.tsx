@@ -96,6 +96,7 @@ export function ShareNowOverlay() {
   const [step, setStep] = useState<Step>("camera");
   const [draft, setDraft] = useState<Draft>({});
   const [ctx, setCtx] = useState<ShareNowContext>({});
+  const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [addVenueDraft, setAddVenueDraft] = useState<AddVenueDraft>({
     name: "",
     category: "bar",
