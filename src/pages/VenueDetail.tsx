@@ -138,11 +138,14 @@ const VenueDetail = () => {
         <VenueSection id="akkurat-na" title="Akkurat nå" subtitle="Oppdatert av folk ute nå">
           <VenueLiveStatus
             contributions={contributions}
-            onContribute={() =>
+            onContribute={(m) => {
+              const startAt =
+                m === "sun" ? "sun" : m === "crowd" ? "crowd" : m === "beer" ? "beer" : "camera";
               openShareNow({
                 fromVenue: { venueId: venue.dbId, slug: venue.id, name: venue.name },
-              })
-            }
+                startAt,
+              });
+            }}
           />
           <VenuePhotoGallery contributions={contributions} />
         </VenueSection>
