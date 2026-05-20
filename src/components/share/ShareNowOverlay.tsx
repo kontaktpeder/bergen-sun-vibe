@@ -41,8 +41,18 @@ type Step =
   | "beer"
   | "venue-pick"
   | "add-venue"
+  | "pick-location"
   | "publish"
   | "submitting";
+
+type AddVenueDraft = {
+  name: string;
+  category: "bar" | "cafe" | "restaurant";
+  address: string;
+  lat?: number;
+  lng?: number;
+  locationSource?: "gps" | "manual";
+};
 
 interface Draft {
   photo?: File;
