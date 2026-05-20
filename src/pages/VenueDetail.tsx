@@ -9,7 +9,7 @@ import { useVenueBadges } from "@/hooks/useVenueBadges";
 import { ReportButton } from "@/components/ReportButton";
 import { VenueLiveStatus } from "@/components/venue/VenueLiveStatus";
 import { VenuePhotoGallery } from "@/components/VenuePhotoGallery";
-import { openContributeFab } from "@/lib/contribute-bus";
+import { openShareNow } from "@/lib/share-bus";
 import { VenueImage } from "@/components/VenueImage";
 import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
@@ -138,7 +138,14 @@ const VenueDetail = () => {
         <VenueSection id="akkurat-na" title="Akkurat nå" subtitle="Oppdatert av folk ute nå">
           <VenueLiveStatus
             contributions={contributions}
-            onContribute={(m) => openContributeFab(m)}
+            onContribute={(m) => {
+              const startAt =
+                m === "sun" ? "sun" : m === "crowd" ? "crowd" : m === "beer" ? "beer" : "camera";
+              openShareNow({
+                fromVenue: { venueId: venue.dbId, slug: venue.id, name: venue.name },
+                startAt,
+              });
+            }}
           />
           <VenuePhotoGallery contributions={contributions} />
         </VenueSection>
