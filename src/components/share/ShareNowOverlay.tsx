@@ -410,18 +410,38 @@ export function ShareNowOverlay() {
                 setDraft((d) => ({ ...d, venue }));
                 setStep("publish");
               }}
-              onAddNew={() => setStep("add-venue")}
+              onAddNew={() => {
+                setAddVenueDraft((d) => {
+                  if (d.lat != null && d.lng != null) return d;
+                  if (userLoc) {
+                    return { ...d, lat: userLoc.lat, lng: userLoc.lng, locationSource: "gps" };
+                  }
+                  return d;
+                });
+                setStep("add-venue");
+              }}
             />
           )}
 
           {step === "add-venue" && (
             <AddVenueStep
-              userLoc={userLoc}
+              value={addVenueDraft}
+              onChange={setAddVenueDraft}
               city={currentCity as "Bergen" | "Oslo"}
               onBack={() => setStep("venue-pick")}
-              onCreated={async (payload) => {
+              onPickLocation={() => setStep("pick-location")}
+              onSubmit={async () => {
+                if (addVenueDraft.lat == null || addVenueDraft.lng == null) return;
                 setStep("submitting");
                 const beforePoints = profile?.points ?? 0;
+                const payload = {
+                  name: addVenueDraft.name.trim(),
+                  lat: addVenueDraft.lat,
+                  lng: addVenueDraft.lng,
+                  category: addVenueDraft.category,
+                  city: currentCity as "Bergen" | "Oslo",
+                  address: addVenueDraft.address.trim() || undefined,
+                };
                 try {
                   const r = await addContribution.mutateAsync({
                     type: "venue_add",
@@ -458,6 +478,23 @@ export function ShareNowOverlay() {
               }}
             />
           )}
+
+          {step === "pick-location" && (
+            <PickLocationStep
+              initial={
+                addVenueDraft.lat != null && addVenueDraft.lng != null
+                  ? { lat: addVenueDraft.lat, lng: addVenueDraft.lng }
+                  : userLoc
+              }
+              city={currentCity as string}
+              onCancel={() => setStep("add-venue")}
+              onConfirm={(lat, lng) => {
+                setAddVenueDraft((d) => ({ ...d, lat, lng, locationSource: "manual" }));
+                setStep("add-venue");
+              }}
+            />
+          )}
+
 
 
 
