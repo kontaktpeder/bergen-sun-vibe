@@ -1,8 +1,9 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Heart, Map, User, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { openContributeFab } from "@/lib/contribute-bus";
+import { openShareNow } from "@/lib/share-bus";
 import { FLAGS } from "@/lib/flags";
+
 const leftItems = [
   { to: "/", icon: Heart, label: "Dine steder" },
   { to: "/explore", icon: Map, label: "Utforsk" },
@@ -15,16 +16,11 @@ const rightItems = [
 export function BottomNav() {
   const location = useLocation();
   const onAuth = location.pathname.startsWith("/auth");
-  const isPlace = /^\/(steder|venue)\//.test(location.pathname);
-  const hidden = false;
 
   return (
     <nav
-      className={cn(
-        "pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-[max(env(safe-area-inset-bottom),0.5rem)] transition-all duration-300 ease-out",
-        hidden ? "translate-y-[120%] opacity-0" : "translate-y-0 opacity-100",
-      )}
-      aria-hidden={hidden}
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-[max(env(safe-area-inset-bottom),0.5rem)]"
+      aria-hidden={false}
     >
       <div className="mx-auto max-w-md px-4">
         <div className="pointer-events-auto flex items-end justify-around rounded-3xl border border-white/40 bg-white/55 backdrop-blur-2xl shadow-[0_10px_30px_rgba(20,10,30,0.15)] px-2 py-2">
@@ -33,14 +29,15 @@ export function BottomNav() {
           ))}
           {FLAGS.contributionsEnabled && !onAuth && (
             <button
-              onClick={() => openContributeFab("menu")}
+              onClick={() => openShareNow()}
               aria-label="Del nå"
-              className="tap-scale flex flex-col items-center gap-0.5 px-2"
+              className="tap-scale relative flex flex-col items-center gap-0.5 px-2"
             >
-              <span className="-mt-5 grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-primary to-sunset-pink text-white shadow-float">
-                <Plus className="h-7 w-7" strokeWidth={2.5} />
+              <span className="relative -mt-7 grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-primary to-sunset-pink text-white shadow-float ring-4 ring-white/60">
+                <span className="absolute inset-0 -m-1 rounded-full bg-gradient-to-br from-primary to-sunset-pink opacity-50 animate-pulse-ring" />
+                <Plus className="relative h-8 w-8" strokeWidth={2.6} />
               </span>
-              <span className="text-[10px] font-semibold text-foreground">{isPlace ? "Oppdater" : "Del nå"}</span>
+              <span className="text-[10px] font-bold text-foreground">Del nå</span>
             </button>
           )}
           {rightItems.map(({ to, icon: Icon, label }) => (
