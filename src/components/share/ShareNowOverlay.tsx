@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import type { SunStatus, CrowdLevel } from "@/lib/contribution-types";
 import { POINTS } from "@/lib/contribution-types";
 
