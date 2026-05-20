@@ -140,7 +140,7 @@ export function ShareReceiptStep({ venue, draft, receipt, onDone, onAddReport }:
       </div>
 
 
-      <div className="mt-auto space-y-2 px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-6">
+      <div className="shrink-0 space-y-2 px-6 pb-[max(env(safe-area-inset-bottom),1rem)] pt-3">
         {venue && (
           <ShareVenueButton
             variant="primary"
