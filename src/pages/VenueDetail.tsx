@@ -15,6 +15,8 @@ import { useFavorites } from "@/lib/favorites";
 import { useAuthProfile } from "@/hooks/useAuthProfile";
 import { SaveVenueAuthPrompt } from "@/components/SaveVenueAuthPrompt";
 import { timeAgo } from "@/lib/time";
+import { shareVenue } from "@/components/ShareVenueButton";
+import { latestLiveFromContributions } from "@/lib/shareText";
 
 import { inferLegacyCity } from "@/lib/domain";
 import { VenueStickyActions } from "@/components/venue/VenueStickyActions";
@@ -64,15 +66,13 @@ const VenueDetail = () => {
   const cityLabel = venue.city ?? (venue.lat && venue.lng ? inferLegacyCity(venue.lat, venue.lng) : null);
 
   const handleShare = async () => {
-    const brand = cityLabel ? `Utefolket ${cityLabel}` : "Utefolket";
-    const data = { title: `${venue.name} – ${brand}`, text: venue.description, url: window.location.href };
-    try {
-      if (navigator.share) await navigator.share(data);
-      else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success("Lenke kopiert");
-      }
-    } catch { /* cancelled */ }
+    const live = latestLiveFromContributions(
+      contributions as Array<{ type: string; data: Record<string, unknown>; created_at: string }>,
+    );
+    await shareVenue(
+      { name: venue.name, slug: venue.id, id: venue.dbId, city: cityLabel },
+      live,
+    );
   };
 
   const handleFav = () => {

@@ -22,8 +22,9 @@ import {
   touchActiveVenue,
 } from "@/lib/activeVenueSession";
 import { flyPoints, PointsFlyupHost } from "@/components/share/PointsFlyup";
+import { ShareReceiptStep, type ReceiptData } from "@/components/share/ShareReceiptStep";
+import { getLevel } from "@/lib/levels";
 import { showReward } from "@/components/RewardOverlay";
-import { getLevel, getNextLevelThreshold } from "@/lib/levels";
 import { toast } from "sonner";
 import { toUserErrorMessage } from "@/lib/error-messages";
 import { cn } from "@/lib/utils";
@@ -44,7 +45,8 @@ type Step =
   | "add-venue"
   | "pick-location"
   | "publish"
-  | "submitting";
+  | "submitting"
+  | "receipt";
 
 type AddVenueDraft = {
   name: string;
@@ -94,6 +96,7 @@ export function ShareNowOverlay() {
   const [step, setStep] = useState<Step>("camera");
   const [draft, setDraft] = useState<Draft>({});
   const [ctx, setCtx] = useState<ShareNowContext>({});
+  const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [addVenueDraft, setAddVenueDraft] = useState<AddVenueDraft>({
     name: "",
     category: "bar",
@@ -171,6 +174,7 @@ export function ShareNowOverlay() {
       setDraft({});
       setStep("camera");
       setCtx({});
+      setReceipt(null);
       setAddVenueDraft({ name: "", category: "bar", address: "" });
     }, 250);
   }, []);
@@ -204,17 +208,29 @@ export function ShareNowOverlay() {
   }, [draft]);
 
   const publish = useCallback(async () => {
-    if (!draft.venue || !user?.id) {
-      toast.error("Velg et sted først.");
+    if (!user?.id) {
+      toast.error("Du må være innlogget.");
+      return;
+    }
+    if (!draft.venue) {
       setStep("venue-pick");
       return;
     }
+    const beforePoints = profile?.points ?? 0;
+
     if (estPoints === 0) {
-      toast.error("Velg minst én ting å dele.");
+      setReceipt({
+        empty: true,
+        awardedPoints: 0,
+        beforePoints,
+        newPoints: beforePoints,
+        errors: [],
+      });
+      setStep("receipt");
       return;
     }
+
     setStep("submitting");
-    const beforePoints = profile?.points ?? 0;
     let total = 0;
     let latestNewPoints = beforePoints;
     const errors: string[] = [];
@@ -277,36 +293,32 @@ export function ShareNowOverlay() {
       setActiveVenue(draft.venue);
       touchActiveVenue();
 
-      if (total > 0) {
-        flyPoints(total);
-        const oldLevel = getLevel(beforePoints);
-        const newLevel = getLevel(latestNewPoints);
-        const nextThreshold = getNextLevelThreshold(latestNewPoints);
-        const subtitle = oldLevel !== newLevel
-          ? `Nivå opp! Du er nå ${newLevel}`
-          : nextThreshold
-            ? `${nextThreshold - latestNewPoints} poeng til neste nivå`
-            : undefined;
-        showReward({
-          emoji: "✨",
-          title: `Delt fra ${draft.venue.name}`,
-          subtitle,
-          points: total,
-          variant: oldLevel !== newLevel ? "levelup" : "points",
-        });
-      } else if (errors.length === 0) {
-        toast.success("Takk for bidraget!");
-      }
+      if (total > 0) flyPoints(total);
 
-      if (errors.length > 0) {
-        toast.error(`Noen ting feilet: ${errors.join(", ")}`);
-      }
-      close();
+      setReceipt({
+        empty: false,
+        awardedPoints: total,
+        beforePoints,
+        newPoints: latestNewPoints,
+        errors,
+      });
+      setStep("receipt");
     } catch (e) {
       toast.error(toUserErrorMessage(e));
-      setStep("publish");
+      setStep(draft.sun || draft.crowd || draft.beer ? "beer" : "sun");
     }
-  }, [draft, user?.id, profile?.points, addContribution, upload, close, estPoints]);
+  }, [draft, user?.id, profile?.points, addContribution, upload, estPoints]);
+
+  const publishingRef = useRef(false);
+  useEffect(() => {
+    if (step !== "publish") {
+      publishingRef.current = false;
+      return;
+    }
+    if (publishingRef.current) return;
+    publishingRef.current = true;
+    void publish();
+  }, [step, publish]);
 
   if (!open) return <PointsFlyupHost />;
 
@@ -322,7 +334,7 @@ export function ShareNowOverlay() {
           >
             <X className="h-5 w-5" />
           </button>
-          {draft.venue && step !== "venue-confirm" && step !== "venue-pick" && (
+          {draft.venue && step !== "venue-confirm" && step !== "venue-pick" && step !== "receipt" && step !== "submitting" && step !== "publish" && (
             <button
               onClick={() => skipTo("venue-pick")}
               className="tap-scale flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium active:bg-white/20"
@@ -332,7 +344,7 @@ export function ShareNowOverlay() {
               <span className="text-white/60">· bytt</span>
             </button>
           )}
-          {estPoints > 0 && step !== "submitting" && (
+          {estPoints > 0 && step !== "submitting" && step !== "publish" && step !== "receipt" && (
             <span className="rounded-full bg-gradient-to-br from-primary to-sunset-pink px-3 py-1.5 text-xs font-bold shadow-lg">
               +{estPoints}p
             </span>
@@ -500,12 +512,10 @@ export function ShareNowOverlay() {
 
 
           {step === "publish" && (
-            <PublishStep
-              draft={draft}
-              estPoints={estPoints}
-              onPublish={publish}
-              onChangeVenue={() => setStep("venue-pick")}
-            />
+            <div className="flex flex-1 flex-col items-center justify-center gap-3">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="text-sm text-white/70">Forbereder…</p>
+            </div>
           )}
 
           {step === "submitting" && (
@@ -513,6 +523,24 @@ export function ShareNowOverlay() {
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
               <p className="text-sm text-white/70">Publiserer…</p>
             </div>
+          )}
+
+          {step === "receipt" && receipt && (
+            <ShareReceiptStep
+              venue={draft.venue}
+              draft={{
+                photoUrl: draft.photoUrl,
+                sun: draft.sun,
+                crowd: draft.crowd,
+                beer: draft.beer,
+              }}
+              receipt={receipt}
+              onDone={close}
+              onAddReport={() => {
+                setReceipt(null);
+                setStep("sun");
+              }}
+            />
           )}
         </div>
       </div>

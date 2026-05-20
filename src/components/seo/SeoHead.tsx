@@ -7,6 +7,8 @@ interface Props {
   robots?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   image?: string;
+  imageAlt?: string;
+  ogType?: "website" | "article" | "place";
 }
 
 const JSONLD_ID = "seo-jsonld";
@@ -23,7 +25,16 @@ function setMeta(name: string, content: string, property = false) {
   el.setAttribute("content", content);
 }
 
-export function SeoHead({ title, description, canonical, robots = "index,follow", jsonLd, image }: Props) {
+export function SeoHead({
+  title,
+  description,
+  canonical,
+  robots = "index,follow",
+  jsonLd,
+  image,
+  imageAlt,
+  ogType = "website",
+}: Props) {
   useEffect(() => {
     document.title = title;
     setMeta("description", description);
@@ -31,11 +42,19 @@ export function SeoHead({ title, description, canonical, robots = "index,follow"
     setMeta("og:title", title, true);
     setMeta("og:description", description, true);
     setMeta("og:url", canonical, true);
+    setMeta("og:type", ogType, true);
+    setMeta("og:site_name", "Utefolket", true);
+    setMeta("og:locale", "nb_NO", true);
     setMeta("twitter:title", title);
     setMeta("twitter:description", description);
+    setMeta("twitter:card", image ? "summary_large_image" : "summary");
     if (image) {
       setMeta("og:image", image, true);
       setMeta("twitter:image", image);
+      if (imageAlt) {
+        setMeta("og:image:alt", imageAlt, true);
+        setMeta("twitter:image:alt", imageAlt);
+      }
     }
 
     let link = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
@@ -46,7 +65,6 @@ export function SeoHead({ title, description, canonical, robots = "index,follow"
     }
     link.href = canonical;
 
-    // JSON-LD
     const existing = document.getElementById(JSONLD_ID);
     if (existing) existing.remove();
     if (jsonLd) {
@@ -61,7 +79,7 @@ export function SeoHead({ title, description, canonical, robots = "index,follow"
       const s = document.getElementById(JSONLD_ID);
       if (s) s.remove();
     };
-  }, [title, description, canonical, robots, image, jsonLd]);
+  }, [title, description, canonical, robots, image, imageAlt, ogType, jsonLd]);
 
   return null;
 }
