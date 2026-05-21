@@ -14,6 +14,7 @@ import { belongsToCity, type Venue } from "@/lib/domain";
 import { resolveVenueGuess, formatDistance } from "@/lib/resolveVenueGuess";
 import { distanceMeters } from "@/lib/dedupe-venues";
 import { subscribeShareNow, type ShareNowContext } from "@/lib/share-bus";
+import { supabase } from "@/integrations/supabase/client";
 
 import {
   getActiveVenue,
