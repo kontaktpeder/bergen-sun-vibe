@@ -55,7 +55,7 @@ type AddVenueDraft = {
   address: string;
   lat?: number;
   lng?: number;
-  locationSource?: "gps" | "manual";
+  locationSource?: "gps" | "manual" | "google";
 };
 
 interface Draft {
