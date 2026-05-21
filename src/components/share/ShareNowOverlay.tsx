@@ -442,6 +442,7 @@ export function ShareNowOverlay() {
               value={addVenueDraft}
               onChange={setAddVenueDraft}
               city={currentCity as "Bergen" | "Oslo"}
+              userLoc={userLoc}
               onBack={() => setStep("venue-pick")}
               onPickLocation={() => setStep("pick-location")}
               onSubmit={async () => {
