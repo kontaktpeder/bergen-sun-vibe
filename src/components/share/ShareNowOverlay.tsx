@@ -672,6 +672,7 @@ function AddVenueStep({
   value,
   onChange,
   city,
+  userLoc,
   onBack,
   onPickLocation,
   onSubmit,
@@ -679,6 +680,7 @@ function AddVenueStep({
   value: AddVenueDraft;
   onChange: (updater: (d: AddVenueDraft) => AddVenueDraft) => void;
   city: "Bergen" | "Oslo";
+  userLoc: { lat: number; lng: number } | null;
   onBack: () => void;
   onPickLocation: () => void;
   onSubmit: () => void;
@@ -692,6 +694,62 @@ function AddVenueStep({
     { value: "restaurant", emoji: "🍽️", label: "Restaurant" },
   ];
 
+  type PlaceSuggestion = {
+    name: string;
+    formatted_address: string | null;
+    google_place_id: string;
+    lat: number | null;
+    lng: number | null;
+  };
+  const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const lastPickedRef = useRef<string>("");
+
+  useEffect(() => {
+    const q = value.name.trim();
+    if (q.length < 2 || q === lastPickedRef.current) {
+      setSuggestions([]);
+      return;
+    }
+    if (!showSuggestions) return;
+    const handle = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("search-google-place", {
+          body: {
+            name: q,
+            city,
+            lat: userLoc?.lat,
+            lng: userLoc?.lng,
+          },
+        });
+        if (error) throw error;
+        const matches = (data?.matches ?? []) as PlaceSuggestion[];
+        setSuggestions(matches.slice(0, 5));
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [value.name, city, userLoc?.lat, userLoc?.lng, showSuggestions]);
+
+  const pickSuggestion = (s: PlaceSuggestion) => {
+    lastPickedRef.current = s.name;
+    setSuggestions([]);
+    setShowSuggestions(false);
+    onChange((d) => ({
+      ...d,
+      name: s.name,
+      address: s.formatted_address ?? d.address,
+      lat: s.lat ?? d.lat,
+      lng: s.lng ?? d.lng,
+      locationSource: s.lat != null && s.lng != null ? "google" : d.locationSource,
+    }));
+  };
+
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
       <StepHeader title="Legg til nytt sted" subtitle={`I ${city}`} />
@@ -700,13 +758,46 @@ function AddVenueStep({
           <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">
             Hva heter stedet?
           </label>
-          <Input
-            autoFocus
-            value={value.name}
-            onChange={(e) => onChange((d) => ({ ...d, name: e.target.value }))}
-            placeholder="Stedets navn"
-            className="border-white/20 bg-white/10 text-white placeholder:text-white/40"
-          />
+          <div className="relative">
+            <Input
+              autoFocus
+              value={value.name}
+              onChange={(e) => {
+                const v = e.target.value;
+                lastPickedRef.current = "";
+                setShowSuggestions(true);
+                onChange((d) => ({ ...d, name: v }));
+              }}
+              placeholder="Søk etter sted (Google)…"
+              className="border-white/20 bg-white/10 text-white placeholder:text-white/40"
+            />
+            {(searching || suggestions.length > 0) && showSuggestions && (
+              <div className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/95 shadow-float backdrop-blur">
+                {searching && suggestions.length === 0 && (
+                  <div className="flex items-center gap-2 px-4 py-3 text-xs text-white/60">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Søker i Google…
+                  </div>
+                )}
+                {suggestions.map((s) => (
+                  <button
+                    key={s.google_place_id}
+                    type="button"
+                    onClick={() => pickSuggestion(s)}
+                    className="tap-scale flex w-full items-start gap-3 px-4 py-3 text-left active:bg-white/10"
+                  >
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium text-white">{s.name}</div>
+                      {s.formatted_address && (
+                        <div className="truncate text-xs text-white/50">{s.formatted_address}</div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div>
           <label className="mb-2 block text-xs uppercase tracking-wider text-white/50">Type</label>
